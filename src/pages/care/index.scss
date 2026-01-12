@@ -144,14 +144,14 @@
   }
 
   .service-icon {
-    width: 48px;
-    height: 48px;
+    width: 67px;
+    height: 67px;
     border-radius: $border-radius-circle;
     background: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
+    font-size: 34px;
     margin-right: $spacing-md;
   }
 
@@ -176,7 +176,7 @@
   position: relative;
   border-radius: $border-radius-lg;
   overflow: hidden;
-  height: 160px;
+  height: 224px;
 
   .illustration-image {
     width: 100%;

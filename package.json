@@ -32,6 +32,8 @@
     "zustand": "^4.4.7"
   },
   "devDependencies": {
+    "@babel/core": "^7.28.5",
+    "@babel/preset-react": "^7.28.5",
     "@tarojs/cli": "^4.0.9",
     "@tarojs/taro-loader": "^4.0.9",
     "@tarojs/webpack5-runner": "^4.0.9",

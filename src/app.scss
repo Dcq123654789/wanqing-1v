@@ -1,7 +1,12 @@
 @import './assets/styles/variables.scss';
 @import './assets/styles/mixins.scss';
 
-* {
+// 全局样式重置
+page {
+  box-sizing: border-box;
+}
+
+view, text, image, input, button, textarea, scroll-view {
   box-sizing: border-box;
 }
 

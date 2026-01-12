@@ -87,21 +87,22 @@ function Login() {
   return (
     <View className="login-page">
       <View className="login-background">
-        <Image
-          src={require('../../../assets/images/backgrounds/login-bg.jpg')}
+      <Image
+          src={require('../../assets/images/backgrounds/login-bg.png')}
           className="bg-image"
           mode="aspectFill"
         />
         <View className="bg-overlay" />
       </View>
 
+      <Image
+        src={require('../../assets/images/icons/icon-logo.png')}
+        className="logo"
+      />
+
       <View className="login-container">
         <View className="login-header">
-          <Image
-            src={require('../../../assets/images/icons/icon-logo.png')}
-            className="logo"
-          />
-          <Text className="app-name">晚晴</Text>
+         
           <Text className="app-slogan">温暖相伴，幸福晚年</Text>
         </View>
 
@@ -109,7 +110,7 @@ function Login() {
           <View className="form-item">
             <View className="input-wrapper">
               <Image
-                src={require('../../../assets/images/icons/icon-login-user.png')}
+                src={require('../../assets/images/icons/icon-login-user.png')}
                 className="input-icon"
               />
               <Input
@@ -125,7 +126,7 @@ function Login() {
           <View className="form-item">
             <View className="input-wrapper">
               <Image
-                src={require('../../../assets/images/icons/icon-password.png')}
+                src={require('../../assets/images/icons/icon-password.png')}
                 className="input-icon"
               />
               <Input
@@ -137,7 +138,7 @@ function Login() {
                 placeholderClass="input-placeholder"
               />
               <Image
-                src={require(`../../../assets/images/icons/icon-eye${state.showPassword ? '-off' : ''}.png`)}
+                src={require(`../../assets/images/icons/icon-eye${state.showPassword ? '-off' : ''}.png`)}
                 className="eye-icon"
                 onClick={togglePasswordVisibility}
               />
@@ -149,7 +150,7 @@ function Login() {
             onClick={handleLogin}
             disabled={state.loading}
           >
-            {state.loading ? '登录中...' : '登录'}
+            {state.loading ? '登录中...' : '登录'}  
           </Button>
         </View>
 

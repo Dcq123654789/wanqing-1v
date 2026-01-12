@@ -35,6 +35,9 @@ const config = {
     enable: false
   },
   mini: {
+    webpackChain(chain) {
+      chain.resolve.alias.set('@', path.resolve(__dirname, '..', 'src'))
+    },
     postcss: {
       pxtransform: {
         enable: true,
