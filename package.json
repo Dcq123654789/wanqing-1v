@@ -1,0 +1,49 @@
+{
+  "name": "wanqing",
+  "version": "1.0.0",
+  "description": "晚晴微信小程序",
+  "templateInfo": {
+    "name": "default",
+    "typescript": true,
+    "css": "sass"
+  },
+  "scripts": {
+    "build:weapp": "taro build --type weapp",
+    "build:custom": "taro build --type custom",
+    "dev:weapp": "npm run build:weapp -- --watch",
+    "dev:custom": "npm run build:custom -- --watch"
+  },
+  "browserslist": [
+    "last 3 versions",
+    "Android >= 4.1",
+    "ios >= 8"
+  ],
+  "author": "",
+  "dependencies": {
+    "@tarojs/components": "^4.0.9",
+    "@tarojs/helper": "^4.0.9",
+    "@tarojs/plugin-framework-react": "^4.0.9",
+    "@tarojs/plugin-platform-weapp": "^4.0.9",
+    "@tarojs/react": "^4.0.9",
+    "@tarojs/runtime": "^4.0.9",
+    "@tarojs/taro": "^4.0.9",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "zustand": "^4.4.7"
+  },
+  "devDependencies": {
+    "@tarojs/cli": "^4.0.9",
+    "@tarojs/taro-loader": "^4.0.9",
+    "@tarojs/webpack5-runner": "^4.0.9",
+    "@types/react": "^18.2.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "babel-preset-taro": "^4.1.9",
+    "eslint": "^8.42.0",
+    "eslint-config-taro": "^4.0.9",
+    "eslint-plugin-react": "^7.32.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "sass": "^1.69.0",
+    "typescript": "^5.2.0"
+  }
+}

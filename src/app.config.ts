@@ -1,0 +1,47 @@
+export default {
+  pages: [
+    'pages/login/index',
+    'pages/home/index',
+    'pages/joy/index',
+    'pages/care/index',
+    'pages/profile/index'
+  ],
+  window: {
+    backgroundTextStyle: 'light',
+    navigationBarBackgroundColor: '#fff',
+    navigationBarTitleText: '晚晴',
+    navigationBarTextStyle: 'black'
+  },
+  tabBar: {
+    color: '#999',
+    selectedColor: '#ff9800',
+    backgroundColor: '#fff',
+    borderStyle: 'black',
+    list: [
+      {
+        pagePath: 'pages/home/index',
+        text: '首页',
+        iconPath: 'assets/images/icons/icon-home.png',
+        selectedIconPath: 'assets/images/icons/icon-home-active.png'
+      },
+      {
+        pagePath: 'pages/joy/index',
+        text: '乐享',
+        iconPath: 'assets/images/icons/icon-joy.png',
+        selectedIconPath: 'assets/images/icons/icon-joy-active.png'
+      },
+      {
+        pagePath: 'pages/care/index',
+        text: '颐养',
+        iconPath: 'assets/images/icons/icon-care.png',
+        selectedIconPath: 'assets/images/icons/icon-care-active.png'
+      },
+      {
+        pagePath: 'pages/profile/index',
+        text: '个人',
+        iconPath: 'assets/images/icons/icon-profile.png',
+        selectedIconPath: 'assets/images/icons/icon-profile-active.png'
+      }
+    ]
+  }
+}

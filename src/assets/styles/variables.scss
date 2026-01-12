@@ -1,0 +1,65 @@
+// 颜色系统
+$primary-color: #1890ff;
+$primary-light: #40a9ff;
+$primary-dark: #096dd9;
+
+$success-color: #52c41a;
+$warning-color: #faad14;
+$error-color: #f5222d;
+$info-color: #1890ff;
+
+$text-color: #333;
+$text-color-secondary: #666;
+$text-color-placeholder: #999;
+$text-color-disabled: #ccc;
+
+$border-color: #e8e8e8;
+$border-color-light: #f0f0f0;
+$background-color: #f5f5f5;
+$background-color-light: #fafafa;
+
+// 主题色 - 晚晴主题
+$wanqing-primary: #ff9800;
+$wanqing-secondary: #ff7043;
+$wanqing-accent: #ffca28;
+
+// 间距系统
+$spacing-xs: 8px;
+$spacing-sm: 12px;
+$spacing-md: 16px;
+$spacing-lg: 24px;
+$spacing-xl: 32px;
+$spacing-xxl: 48px;
+
+// 字体
+$font-size-xs: 10px;
+$font-size-sm: 12px;
+$font-size-md: 14px;
+$font-size-lg: 16px;
+$font-size-xl: 18px;
+$font-size-xxl: 20px;
+$font-size-title: 24px;
+
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-bold: 600;
+
+// 圆角
+$border-radius-sm: 4px;
+$border-radius-md: 8px;
+$border-radius-lg: 12px;
+$border-radius-xl: 16px;
+$border-radius-circle: 50%;
+
+// 阴影
+$shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
+$shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
+$shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.16);
+
+// 布局
+$header-height: 44px;
+$tabbar-height: 50px;
+
+// 过渡
+$transition-duration: 0.3s;
+$transition-timing: ease-in-out;

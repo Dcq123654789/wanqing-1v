@@ -1,0 +1,207 @@
+@import '@/assets/styles/variables.scss';
+@import '@/assets/styles/mixins.scss';
+
+.care-page {
+  min-height: 100vh;
+  background-color: $background-color;
+}
+
+.care-scroll {
+  height: 100vh;
+}
+
+.care-header {
+  position: relative;
+  height: 180px;
+  overflow: hidden;
+
+  .header-bg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .header-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 152, 0, 0.85) 0%, rgba(255, 112, 67, 0.9) 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    .page-title {
+      font-size: $font-size-title;
+      font-weight: $font-weight-bold;
+      color: #fff;
+      margin-bottom: $spacing-xs;
+    }
+
+    .page-subtitle {
+      font-size: $font-size-md;
+      color: rgba(255, 255, 255, 0.9);
+    }
+  }
+}
+
+.content-container {
+  padding: $spacing-md;
+  padding-bottom: $spacing-xxl;
+}
+
+.health-card {
+  background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%);
+  border-radius: $border-radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-md;
+
+  .health-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-lg;
+
+    .health-title {
+      font-size: $font-size-lg;
+      font-weight: $font-weight-bold;
+      color: #fff;
+    }
+
+    .health-date {
+      font-size: $font-size-sm;
+      color: rgba(255, 255, 255, 0.8);
+    }
+  }
+
+  .health-stats {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: $border-radius-md;
+    padding: $spacing-lg 0;
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      .stat-value {
+        font-size: 20px;
+        font-weight: $font-weight-bold;
+        color: #fff;
+        margin-bottom: $spacing-xs;
+      }
+
+      .stat-label {
+        font-size: $font-size-sm;
+        color: rgba(255, 255, 255, 0.9);
+      }
+    }
+
+    .stat-divider {
+      width: 1px;
+      height: 40px;
+      background: rgba(255, 255, 255, 0.3);
+    }
+  }
+}
+
+.service-section {
+  background: #fff;
+  border-radius: $border-radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-sm;
+
+  .section-title {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+    color: $text-color;
+    margin-bottom: $spacing-md;
+  }
+}
+
+.service-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.service-item {
+  display: flex;
+  align-items: center;
+  padding: $spacing-md;
+  background: $background-color;
+  border-radius: $border-radius-md;
+  transition: all $transition-duration $transition-timing;
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  .service-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: $border-radius-circle;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-right: $spacing-md;
+  }
+
+  .service-content {
+    flex: 1;
+
+    .service-title {
+      font-size: $font-size-md;
+      font-weight: $font-weight-medium;
+      color: $text-color;
+      margin-bottom: $spacing-xs;
+    }
+
+    .service-desc {
+      font-size: $font-size-sm;
+      color: $text-color-secondary;
+    }
+  }
+}
+
+.illustration-card {
+  position: relative;
+  border-radius: $border-radius-lg;
+  overflow: hidden;
+  height: 160px;
+
+  .illustration-image {
+    width: 100%;
+    height: 100%;
+  }
+
+  .illustration-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+    padding: $spacing-lg;
+    padding-top: 40px;
+
+    .illustration-title {
+      font-size: $font-size-lg;
+      font-weight: $font-weight-medium;
+      color: #fff;
+      margin-bottom: $spacing-xs;
+    }
+
+    .illustration-desc {
+      font-size: $font-size-sm;
+      color: rgba(255, 255, 255, 0.9);
+    }
+  }
+}

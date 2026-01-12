@@ -1,0 +1,131 @@
+@import '@/assets/styles/variables.scss';
+@import '@/assets/styles/mixins.scss';
+
+.joy-page {
+  min-height: 100vh;
+  background-color: $background-color;
+}
+
+.joy-scroll {
+  height: 100vh;
+}
+
+.joy-header {
+  position: relative;
+  height: 180px;
+  overflow: hidden;
+
+  .header-bg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .header-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 152, 0, 0.85) 0%, rgba(255, 112, 67, 0.9) 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    .page-title {
+      font-size: $font-size-title;
+      font-weight: $font-weight-bold;
+      color: #fff;
+      margin-bottom: $spacing-xs;
+    }
+
+    .page-subtitle {
+      font-size: $font-size-md;
+      color: rgba(255, 255, 255, 0.9);
+    }
+  }
+}
+
+.content-container {
+  padding: $spacing-md;
+  padding-bottom: $spacing-xxl;
+}
+
+.category-section {
+  display: flex;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-lg;
+  overflow-x: auto;
+  padding-bottom: $spacing-xs;
+
+  .category-item {
+    flex-shrink: 0;
+    padding: $spacing-sm $spacing-lg;
+    background: #fff;
+    border-radius: $border-radius-xl;
+    transition: all $transition-duration $transition-timing;
+
+    &.active {
+      background: $wanqing-primary;
+
+      .category-text {
+        color: #fff;
+      }
+    }
+
+    &:not(.active):active {
+      opacity: 0.7;
+    }
+
+    .category-text {
+      font-size: $font-size-md;
+      color: $text-color;
+    }
+  }
+}
+
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.activity-card {
+  background: #fff;
+  border-radius: $border-radius-lg;
+  overflow: hidden;
+  box-shadow: $shadow-sm;
+
+  .activity-image {
+    width: 100%;
+    height: 160px;
+  }
+
+  .activity-info {
+    padding: $spacing-md;
+
+    .activity-title {
+      font-size: $font-size-lg;
+      font-weight: $font-weight-medium;
+      color: $text-color;
+      margin-bottom: $spacing-xs;
+    }
+
+    .activity-desc {
+      font-size: $font-size-sm;
+      color: $text-color-secondary;
+      margin-bottom: $spacing-md;
+    }
+
+    .activity-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: $spacing-md;
+
+      .meta-item {
+        font-size: $font-size-sm;
+        color: $text-color-placeholder;
+      }
+    }
+  }
+}
