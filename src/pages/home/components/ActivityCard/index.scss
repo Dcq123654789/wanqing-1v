@@ -1,0 +1,94 @@
+@import '@/assets/styles/variables.scss';
+
+.activity-card {
+  flex-shrink: 0;
+  width: 520rpx;
+  background: #fff;
+  border-radius: 20rpx;
+  overflow: hidden;
+  box-shadow: 0 6rpx 20rpx rgba(0, 0, 0, 0.1);
+  margin-right: 24rpx;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2rpx solid rgba(255, 152, 0, 0.1);
+  position: relative;
+
+  // 装饰角标
+  &::before {
+    content: '';
+    position: absolute;
+    top: 16rpx;
+    left: 16rpx;
+    width: 40rpx;
+    height: 40rpx;
+    background: $gradient-warm;
+    border-radius: 50%;
+    z-index: 2;
+    box-shadow: 0 2rpx 8rpx rgba(255, 152, 0, 0.3);
+  }
+
+  &--press {
+    transform: scale(0.98);
+    box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.12);
+  }
+
+  &__image {
+    width: 100%;
+    height: 280rpx;
+    display: block;
+  }
+
+  &__content {
+    padding: 24rpx;
+    background: linear-gradient(180deg, #fff 0%, rgba(255, 245, 240, 0.5) 100%);
+  }
+
+  &__title {
+    display: block;
+    font-size: 32rpx;
+    color: #333;
+    margin-bottom: 12rpx;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    // 标题装饰图标
+    &::before {
+      content: '🎉 ';
+      font-size: 28rpx;
+    }
+  }
+
+  &__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 8rpx;
+  }
+
+  &__time {
+    display: block;
+    font-size: 26rpx;
+    color: #666;
+  }
+
+  &__location {
+    display: block;
+    font-size: 26rpx;
+    color: #666;
+  }
+
+  &__tag {
+    position: absolute;
+    top: 24rpx;
+    right: 24rpx;
+    display: inline-block;
+    padding: 8rpx 20rpx;
+    background: $gradient-warm;
+    color: #fff;
+    font-size: 24rpx;
+    border-radius: 20rpx;
+    font-weight: 500;
+    box-shadow: 0 2rpx 8rpx rgba(255, 152, 0, 0.3);
+    z-index: 3;
+  }
+}

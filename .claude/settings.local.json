@@ -5,7 +5,10 @@
       "Bash(curl:*)",
       "Bash(npx @tarojs/cli init:*)",
       "Bash(npm install:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(npm run dev:weapp:*)",
+      "WebSearch",
+      "Bash(npm run build:weapp:*)"
     ]
   }
 }

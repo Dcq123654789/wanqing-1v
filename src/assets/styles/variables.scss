@@ -4,8 +4,11 @@ $primary-light: #40a9ff;
 $primary-dark: #096dd9;
 
 $success-color: #52c41a;
+$success-light: #73d13d;
 $warning-color: #faad14;
+$warning-light: #ffc53d;
 $error-color: #f5222d;
+$error-light: #ff4d4f;
 $info-color: #1890ff;
 
 $text-color: #333;
@@ -18,10 +21,29 @@ $border-color-light: #f0f0f0;
 $background-color: #f5f5f5;
 $background-color-light: #fafafa;
 
-// 主题色 - 晚晴主题
+// 主题色 - 晚晴主题（温暖橙色系）
 $wanqing-primary: #ff9800;
 $wanqing-secondary: #ff7043;
 $wanqing-accent: #ffca28;
+$wanqing-pink: #f06292;
+$wanqing-purple: #ab47bc;
+$wanqing-teal: #26a69a;
+$wanqing-blue: #42a5f5;
+$wanqing-green: #66bb6a;
+
+// 渐变色
+$gradient-warm: linear-gradient(135deg, #ff9800 0%, #ff7043 100%);
+$gradient-sunset: linear-gradient(135deg, #f06292 0%, #ff7043 50%, #ffca28 100%);
+$gradient-ocean: linear-gradient(135deg, #42a5f5 0%, #26a69a 100%);
+$gradient-forest: linear-gradient(135deg, #66bb6a 0%, #42a5f5 100%);
+$gradient-candy: linear-gradient(135deg, #f06292 0%, #ab47bc 100%);
+
+// 装饰色
+$decoration-gold: #ffd700;
+$decoration-coral: #ff6b6b;
+$decoration-mint: #98d8c8;
+$decoration-lavender: #e0bbe4;
+$decoration-peach: #ffc3a0;
 
 // 间距系统
 $spacing-xs: 20px;

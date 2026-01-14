@@ -1,0 +1,65 @@
+@import '@/assets/styles/variables.scss';
+
+.welcome-section {
+  padding: 60rpx 32rpx 40rpx;
+  background: linear-gradient(135deg, rgba(255, 152, 0, 0.05) 0%, rgba(255, 112, 67, 0.05) 100%);
+  margin-bottom: 16rpx;
+  position: relative;
+  overflow: hidden;
+
+  // 装饰圆点
+  &::before {
+    content: '';
+    position: absolute;
+    top: -20rpx;
+    right: -20rpx;
+    width: 120rpx;
+    height: 120rpx;
+    background: radial-gradient(circle, rgba(255, 202, 40, 0.3) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -30rpx;
+    left: -30rpx;
+    width: 80rpx;
+    height: 80rpx;
+    background: radial-gradient(circle, rgba(240, 98, 146, 0.2) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+}
+
+.welcome-text {
+  display: block;
+  font-size: 40rpx;
+  color: #333;
+  font-weight: 600;
+  margin-bottom: 12rpx;
+  position: relative;
+  z-index: 1;
+
+  // 渐变文字效果
+  background: $gradient-warm;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.welcome-subtitle {
+  display: block;
+  font-size: 28rpx;
+  color: #666;
+  position: relative;
+  z-index: 1;
+
+  // 添加装饰图标
+  &::before {
+    content: '🌸 ';
+  }
+
+  &::after {
+    content: ' 🌺';
+  }
+}

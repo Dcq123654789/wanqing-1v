@@ -8,7 +8,7 @@ function Care() {
         {/* 头部背景 */}
         <View className="care-header">
           <Image
-            src={require('../../../assets/images/backgrounds/care-bg.jpg')}
+            src={require('../../assets/images/backgrounds/care-bg.jpg')}
             className="header-bg"
             mode="aspectFill"
           />
@@ -75,7 +75,7 @@ function Care() {
           {/* 推荐插图 */}
           <View className="illustration-card">
             <Image
-              src={require('../../../assets/images/illustrations/nature-illustration.png')}
+              src={require('../../assets/images/illustrations/nature-illustration.png')}
               className="illustration-image"
               mode="aspectFill"
             />

@@ -34,7 +34,7 @@ function Profile() {
         {/* 头部背景 */}
         <View className="profile-header">
           <Image
-            src={require('../../../assets/images/backgrounds/profile-bg.jpg')}
+            src={require('../../assets/images/backgrounds/profile-bg.jpg')}
             className="header-bg"
             mode="aspectFill"
           />
@@ -43,7 +43,7 @@ function Profile() {
           {/* 用户信息 */}
           <View className="user-info">
             <Image
-              src={userInfo?.avatar || require('../../../assets/images/icons/icon-login-user.png')}
+              src={userInfo?.avatar || require('../../assets/images/icons/icon-login-user.png')}
               className="user-avatar"
             />
             <Text className="user-name">{userInfo?.username || '未登录'}</Text>

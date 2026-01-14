@@ -8,7 +8,7 @@ function Joy() {
         {/* 头部背景 */}
         <View className="joy-header">
           <Image
-            src={require('../../../assets/images/backgrounds/joy-bg.jpg')}
+            src={require('../../assets/images/backgrounds/joy-bg.jpg')}
             className="header-bg"
             mode="aspectFill"
           />
@@ -40,7 +40,7 @@ function Joy() {
           <View className="activity-list">
             <View className="activity-card">
               <Image
-                src={require('../../../assets/images/illustrations/activity-illustration.png')}
+                src={require('../../assets/images/illustrations/activity-illustration.png')}
                 className="activity-image"
                 mode="aspectFill"
               />
@@ -56,7 +56,7 @@ function Joy() {
 
             <View className="activity-card">
               <Image
-                src={require('../../../assets/images/illustrations/community-illustration.png')}
+                src={require('../../assets/images/illustrations/community-illustration.png')}
                 className="activity-image"
                 mode="aspectFill"
               />

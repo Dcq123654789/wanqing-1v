@@ -1,0 +1,60 @@
+@import '@/assets/styles/variables.scss';
+
+.banner-swiper {
+  padding: 0 32rpx;
+  margin-bottom: 24rpx;
+}
+
+.banner-container {
+  height: 320rpx;
+  border-radius: 20rpx;
+  overflow: hidden;
+  box-shadow: 0 8rpx 24rpx rgba(255, 152, 0, 0.15);
+  border: 3rpx solid rgba(255, 152, 0, 0.1);
+  position: relative;
+
+  // 装饰边框
+  &::before {
+    content: '';
+    position: absolute;
+    top: 8rpx;
+    left: 8rpx;
+    right: 8rpx;
+    bottom: 8rpx;
+    border: 2rpx solid rgba(255, 255, 255, 0.3);
+    border-radius: 16rpx;
+    pointer-events: none;
+    z-index: 2;
+  }
+}
+
+.banner-item {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.banner-image {
+  width: 100%;
+  height: 100%;
+}
+
+.banner-title {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 24rpx 28rpx;
+  background: linear-gradient(to top, rgba(255, 87, 34, 0.9) 0%, rgba(255, 152, 0, 0.6) 50%, transparent 100%);
+  color: #fff;
+  font-size: 34rpx;
+  font-weight: 600;
+  text-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.2);
+
+  // 标题装饰图标
+  &::before {
+    content: '🎈 ';
+    font-size: 28rpx;
+  }
+}

@@ -1,0 +1,104 @@
+@import '@/assets/styles/variables.scss';
+
+.notification-bar {
+  display: flex;
+  align-items: center;
+  margin: 0 32rpx 24rpx;
+  padding: 20rpx 24rpx;
+  background: linear-gradient(135deg, rgba(255, 243, 224, 0.9) 0%, rgba(255, 235, 238, 0.6) 100%);
+  border-radius: 16rpx;
+  border: 2rpx solid rgba(255, 152, 0, 0.2);
+  box-shadow: 0 4rpx 12rpx rgba(255, 152, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+
+  // 装饰背景
+  &::before {
+    content: '';
+    position: absolute;
+    right: -30rpx;
+    top: -30rpx;
+    width: 100rpx;
+    height: 100rpx;
+    background: radial-gradient(circle, rgba(255, 152, 0, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+}
+
+.notification-icon {
+  font-size: 36rpx;
+  margin-right: 16rpx;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+  animation: ring 2s ease-in-out infinite;
+}
+
+@keyframes ring {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  10%, 30% {
+    transform: rotate(-10deg);
+  }
+  20%, 40% {
+    transform: rotate(10deg);
+  }
+}
+
+.notification-content {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+.notification-scroll {
+  height: 56rpx;
+}
+
+.notification-item {
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+}
+
+.notification-text {
+  font-size: 28rpx;
+  color: #666;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &--urgent {
+    color: #ff5722;
+    font-weight: 600;
+    background: linear-gradient(90deg, #ff5722, #ff9800);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    &::before {
+      content: '🔔 ';
+      font-size: 24rpx;
+      -webkit-text-fill-color: #ff5722;
+    }
+  }
+
+  &--activity {
+    color: #52c41a;
+    font-weight: 500;
+
+    &::before {
+      content: '🎊 ';
+      font-size: 24rpx;
+    }
+  }
+
+  &--info {
+    &::before {
+      content: '💡 ';
+      font-size: 24rpx;
+    }
+  }
+}
