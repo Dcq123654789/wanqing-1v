@@ -85,93 +85,77 @@ function Login() {
   }
 
   return (
-    <View className='login-page'>
-      {/* 背景图 */}
-      <View className='login-background'>
-        <Image
+    <View className="login-page">
+      <View className="login-background">
+      <Image
           src={require('../../assets/images/backgrounds/login-bg.png')}
-          className='bg-image'
-          mode='aspectFill'
+          className="bg-image"
+          mode="aspectFill"
         />
-        <View className='bg-overlay' />
+        <View className="bg-overlay" />
       </View>
 
-      {/* Logo */}
       <Image
         src={require('../../assets/images/icons/icon-logo.png')}
-        className='logo'
+        className="logo"
       />
 
-      {/* 登录表单 */}
-      <View className='login-container'>
-        <View className='login-header'>
-          <View className='app-name'>
-            <Text className='char-left'>晚</Text>
-            <Text>晴</Text>
-            <Text className='char-right'>好</Text>
-          </View>
-          <Text className='app-slogan'>养老服务，温暖相伴</Text>
+      <View className="login-container">
+        <View className="login-header">
+         
+          <Text className="app-slogan">温暖相伴，幸福晚年</Text>
         </View>
 
-        <View className='login-form'>
-          {/* 用户名输入 */}
-          <View className='form-item'>
-            <View className='input-wrapper'>
+        <View className="login-form">
+          <View className="form-item">
+            <View className="input-wrapper">
               <Image
                 src={require('../../assets/images/icons/icon-login-user.png')}
-                className='input-icon'
+                className="input-icon"
               />
               <Input
-                className='input-field'
-                placeholder='请输入用户名'
-                placeholderClass='input-placeholder'
+                className="input-field"
+                placeholder="请输入用户名"
                 value={state.username}
                 onInput={handleUsernameChange}
+                placeholderClass="input-placeholder"
               />
             </View>
           </View>
 
-          {/* 密码输入 */}
-          <View className='form-item'>
-            <View className='input-wrapper'>
+          <View className="form-item">
+            <View className="input-wrapper">
               <Image
                 src={require('../../assets/images/icons/icon-password.png')}
-                className='input-icon'
+                className="input-icon"
               />
               <Input
-                className='input-field'
-                placeholder='请输入密码'
-                placeholderClass='input-placeholder'
+                className="input-field"
+                placeholder="请输入密码"
                 password={!state.showPassword}
                 value={state.password}
                 onInput={handlePasswordChange}
+                placeholderClass="input-placeholder"
               />
               <Image
-                src={state.showPassword
-                  ? require('../../assets/images/icons/icon-eye.png')
-                  : require('../../assets/images/icons/icon-eye-off.png')
-                }
-                className='eye-icon'
+                src={require(`../../assets/images/icons/icon-eye${state.showPassword ? '-off' : ''}.png`)}
+                className="eye-icon"
                 onClick={togglePasswordVisibility}
               />
             </View>
           </View>
 
-          {/* 登录按钮 */}
           <Button
             className={`login-button ${state.loading ? 'loading' : ''}`}
             onClick={handleLogin}
             disabled={state.loading}
           >
-            {state.loading ? '登录中...' : '登录'}
+            {state.loading ? '登录中...' : '登录'}  
           </Button>
+        </View>
 
-          {/* 底部说明 */}
-          <View className='login-footer'>
-            <Text className='footer-text'>
-              首次登录？用户名：admin，密码：123456
-            </Text>
-          </View>
+        <View className="login-footer">
+          <Text className="footer-text">登录即表示同意《用户协议》和《隐私政策》</Text>
         </View>
       </View>
     </View>
