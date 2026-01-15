@@ -1,207 +1,660 @@
 @import '@/assets/styles/variables.scss';
 @import '@/assets/styles/mixins.scss';
 
+// 颐养页面专属颜色系统
+$care-primary: #1890ff;
+$care-secondary: #40a9ff;
+$care-gradient: linear-gradient(135deg, #1890ff 0%, #40a9ff 100%);
+$care-bg: #f0f5ff;
+
+// 五种主题色
+$color-blue: #1890ff;
+$color-green: #52c41a;
+$color-orange: #fa8c16;
+$color-purple: #722ed1;
+$color-red: #ff4d4f;
+
 .care-page {
   min-height: 100vh;
-  background-color: $background-color;
+  background-color: $care-bg;
+  display: flex;
+  flex-direction: column;
+}
+
+.status-bar {
+  background: $care-gradient;
+  flex-shrink: 0;
 }
 
 .care-scroll {
+  flex: 1;
   height: 100vh;
 }
 
-.care-header {
+// ========== 顶部欢迎区 ==========
+.welcome-header {
+  background: $care-gradient;
+  padding: $spacing-lg;
+  padding-top: $spacing-xl;
+  padding-bottom: 48px;
   position: relative;
-  height: 180px;
   overflow: hidden;
 
-  .header-bg {
-    width: 100%;
-    height: 100%;
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 300px;
+    height: 300px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
   }
 
-  .header-overlay {
+  &::after {
+    content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, rgba(255, 152, 0, 0.85) 0%, rgba(255, 112, 67, 0.9) 100%);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    bottom: -30%;
+    left: -10%;
+    width: 200px;
+    height: 200px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 50%;
+  }
 
-    .page-title {
-      font-size: $font-size-title;
+  .welcome-content {
+    position: relative;
+    z-index: 1;
+
+    .welcome-title {
+      font-size: 48px;
       font-weight: $font-weight-bold;
       color: #fff;
+      display: block;
       margin-bottom: $spacing-xs;
+      letter-spacing: 2px;
     }
 
-    .page-subtitle {
-      font-size: $font-size-md;
+    .welcome-subtitle {
+      font-size: 28px;
       color: rgba(255, 255, 255, 0.9);
+      display: block;
+      letter-spacing: 1px;
+    }
+  }
+
+  .welcome-decoration {
+    position: absolute;
+    top: $spacing-lg;
+    right: $spacing-lg;
+    z-index: 1;
+
+    .decoration-icon {
+      font-size: 64px;
+      opacity: 0.3;
     }
   }
 }
 
-.content-container {
-  padding: $spacing-md;
-  padding-bottom: $spacing-xxl;
-}
-
-.health-card {
-  background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%);
-  border-radius: $border-radius-lg;
+// ========== 健康数据大卡片 ==========
+.health-hero-card {
+  background: #fff;
+  border-radius: 24px;
   padding: $spacing-lg;
-  margin-bottom: $spacing-md;
-  box-shadow: $shadow-md;
+  margin: (-24px) $spacing-md $spacing-lg;
+  box-shadow: 0 8px 24px rgba(24, 144, 255, 0.15);
+  position: relative;
+  z-index: 2;
+  cursor: pointer;
+  transition: all $transition-duration $transition-timing;
 
-  .health-header {
+  &:active {
+    transform: scale(0.98);
+    box-shadow: 0 4px 16px rgba(24, 144, 255, 0.12);
+  }
+
+  .health-hero-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: $spacing-lg;
 
-    .health-title {
-      font-size: $font-size-lg;
-      font-weight: $font-weight-bold;
-      color: #fff;
+    .health-title-section {
+      .health-hero-title {
+        font-size: 36px;
+        font-weight: $font-weight-bold;
+        color: $text-color;
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      .health-hero-date {
+        font-size: $font-size-sm;
+        color: $text-color-secondary;
+        display: block;
+      }
     }
 
-    .health-date {
-      font-size: $font-size-sm;
-      color: rgba(255, 255, 255, 0.8);
+    .trend-badge {
+      background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%);
+      padding: 8px 16px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      .trend-icon {
+        font-size: 24px;
+      }
+
+      .trend-text {
+        font-size: $font-size-sm;
+        color: #fff;
+        font-weight: $font-weight-medium;
+      }
     }
   }
 
-  .health-stats {
+  .health-hero-stats {
     display: flex;
     justify-content: space-around;
-    align-items: center;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: $border-radius-md;
-    padding: $spacing-lg 0;
+    align-items: stretch;
+    gap: $spacing-sm;
 
-    .stat-item {
+    .hero-stat-item {
+      flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
+      position: relative;
 
-      .stat-value {
-        font-size: 20px;
-        font-weight: $font-weight-bold;
-        color: #fff;
-        margin-bottom: $spacing-xs;
+      .stat-icon-wrapper {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        margin-bottom: $spacing-sm;
+
+        &.blue {
+          background: linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%);
+        }
+
+        &.purple {
+          background: linear-gradient(135deg, #f9f0ff 0%, #efdbff 100%);
+        }
+
+        &.red {
+          background: linear-gradient(135deg, #fff1f0 0%, #ffccc7 100%);
+        }
       }
 
-      .stat-label {
-        font-size: $font-size-sm;
-        color: rgba(255, 255, 255, 0.9);
+      .stat-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        .hero-stat-value {
+          font-size: 32px;
+          font-weight: $font-weight-bold;
+          color: $text-color;
+          margin-bottom: 4px;
+        }
+
+        .hero-stat-label {
+          font-size: $font-size-sm;
+          color: $text-color-secondary;
+        }
+      }
+
+      .stat-trend {
+        position: absolute;
+        top: 0;
+        right: 8px;
+        font-size: 24px;
+        color: #52c41a;
+        font-weight: bold;
+      }
+
+      .stat-quality {
+        position: absolute;
+        top: 0;
+        right: 8px;
+        font-size: $font-size-xs;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-weight: $font-weight-medium;
+
+        &.good {
+          background: #f6ffed;
+          color: #52c41a;
+          border: 1px solid #b7eb8f;
+        }
+      }
+
+      .stat-status {
+        position: absolute;
+        top: 0;
+        right: 8px;
+        font-size: $font-size-xs;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-weight: $font-weight-medium;
+
+        &.normal {
+          background: #e6f7ff;
+          color: #1890ff;
+          border: 1px solid #91d5ff;
+        }
       }
     }
 
-    .stat-divider {
+    .hero-stat-divider {
       width: 1px;
-      height: 40px;
-      background: rgba(255, 255, 255, 0.3);
+      background: #f0f0f0;
     }
   }
 }
 
-.service-section {
-  background: #fff;
-  border-radius: $border-radius-lg;
-  padding: $spacing-lg;
+// ========== 通用区块标题 ==========
+.section-title {
+  font-size: 36px;
+  font-weight: $font-weight-bold;
+  color: $text-color;
   margin-bottom: $spacing-md;
-  box-shadow: $shadow-sm;
+  padding-left: $spacing-xs;
+  position: relative;
+  padding-left: 20px;
 
-  .section-title {
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 32px;
+    background: $care-gradient;
+    border-radius: 3px;
+  }
+}
+
+// ========== 快速检测区 ==========
+.quick-test-section {
+  padding: 0 $spacing-md $spacing-lg;
+
+  .quick-test-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: $spacing-sm;
+  }
+}
+
+.quick-test-card {
+  background: #fff;
+  border-radius: 16px;
+  border: 2px solid transparent;
+  padding: $spacing-sm;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  transition: all $transition-duration $transition-timing;
+  cursor: pointer;
+  min-height: 180px;
+  justify-content: center;
+
+  &:active {
+    transform: scale(0.95);
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .test-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: $spacing-sm;
+
+    .test-emoji {
+      font-size: 36px;
+    }
+  }
+
+  .test-name {
+    font-size: $font-size-md;
+    color: $text-color;
+    font-weight: $font-weight-medium;
+    margin-bottom: $spacing-xs;
+  }
+
+  .test-value-row {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    margin-bottom: $spacing-xs;
+
+    .test-value {
+      font-size: 32px;
+      font-weight: $font-weight-bold;
+    }
+
+    .test-unit {
+      font-size: $font-size-sm;
+      color: $text-color-secondary;
+    }
+  }
+
+  .test-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #52c41a;
+    }
+
+    .status-text {
+      font-size: $font-size-xs;
+      color: #52c41a;
+      font-weight: $font-weight-medium;
+    }
+  }
+}
+
+// ========== 健康服务网格 ==========
+.service-grid-section {
+  padding: 0 $spacing-md $spacing-lg;
+
+  .service-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: $spacing-md;
+  }
+}
+
+.service-card {
+  border-radius: 20px;
+  padding: $spacing-lg;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  transition: all $transition-duration $transition-timing;
+  cursor: pointer;
+  min-height: 200px;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+
+  &:active {
+    transform: scale(0.95);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .service-icon {
+    font-size: 64px;
+    margin-bottom: $spacing-md;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  }
+
+  .service-title {
     font-size: $font-size-lg;
     font-weight: $font-weight-bold;
-    color: $text-color;
-    margin-bottom: $spacing-md;
+    color: #fff;
+    margin-bottom: $spacing-xs;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .service-desc {
+    font-size: $font-size-sm;
+    color: rgba(255, 255, 255, 0.95);
+    line-height: 1.5;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+
+  .service-arrow {
+    position: absolute;
+    bottom: $spacing-md;
+    right: $spacing-md;
+    font-size: 32px;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: bold;
   }
 }
 
-.service-list {
+// ========== 健康资讯卡片 ==========
+.article-section {
+  padding: 0 $spacing-md $spacing-lg;
+
+  .article-list {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+  }
+}
+
+.article-card {
+  background: #fff;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: all $transition-duration $transition-timing;
+
+  &:active {
+    transform: scale(0.98);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  }
+
+  .article-image {
+    width: 100%;
+    height: 200px;
+    display: block;
+  }
+
+  .article-image-placeholder {
+    width: 100%;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .placeholder-icon {
+      font-size: 64px;
+      opacity: 0.5;
+    }
+  }
+
+  .article-content {
+    padding: $spacing-md;
+
+    .article-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: $spacing-sm;
+
+      .article-tag {
+        font-size: $font-size-xs;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-weight: $font-weight-medium;
+      }
+
+      .article-read-time {
+        font-size: $font-size-xs;
+        color: $text-color-placeholder;
+      }
+    }
+
+    .article-title {
+      font-size: $font-size-lg;
+      font-weight: $font-weight-bold;
+      color: $text-color;
+      margin-bottom: $spacing-xs;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .article-desc {
+      font-size: $font-size-md;
+      color: $text-color-secondary;
+      line-height: 1.6;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+  }
+}
+
+// ========== 养生建议 ==========
+.wellness-tips-section {
+  padding: 0 $spacing-md $spacing-lg;
+
+  .wellness-tips-list {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+  }
+}
+
+.wellness-tip-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: $spacing-md;
+  display: flex;
+  gap: $spacing-md;
+  border-left: 4px solid;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  transition: all $transition-duration $transition-timing;
+
+  &:active {
+    transform: translateX(4px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  }
+
+  .tip-icon-wrapper {
+    width: 72px;
+    height: 72px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    .tip-icon {
+      font-size: 40px;
+    }
+  }
+
+  .tip-content {
+    flex: 1;
+
+    .tip-title {
+      font-size: $font-size-lg;
+      font-weight: $font-weight-bold;
+      margin-bottom: $spacing-sm;
+      display: block;
+    }
+
+    .tip-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: $spacing-xs;
+
+      .tip-tag {
+        font-size: $font-size-sm;
+        color: $text-color-secondary;
+        background: #f5f5f5;
+        padding: 6px 12px;
+        border-radius: 8px;
+        border: 1px solid #f0f0f0;
+      }
+    }
+  }
+}
+
+// ========== 健康小贴士 ==========
+.health-tips-section {
+  padding: 0 $spacing-md $spacing-lg;
   display: flex;
   flex-direction: column;
   gap: $spacing-md;
 }
 
-.service-item {
-  display: flex;
-  align-items: center;
+.health-tip-card {
+  background: #fff;
+  border-radius: 16px;
   padding: $spacing-md;
-  background: $background-color;
-  border-radius: $border-radius-md;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
   transition: all $transition-duration $transition-timing;
 
   &:active {
     transform: scale(0.98);
   }
 
-  .service-icon {
-    width: 67px;
-    height: 67px;
-    border-radius: $border-radius-circle;
-    background: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 34px;
-    margin-right: $spacing-md;
+  &.importance-high {
+    background: linear-gradient(135deg, #fff7e6 0%, #ffe7ba 100%);
+    border-left: 4px solid #fa8c16;
   }
 
-  .service-content {
-    flex: 1;
+  &.importance-medium {
+    background: linear-gradient(135deg, #f6ffed 0%, #d9f7be 100%);
+    border-left: 4px solid #52c41a;
+  }
 
-    .service-title {
-      font-size: $font-size-md;
-      font-weight: $font-weight-medium;
+  &.importance-low {
+    background: linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%);
+    border-left: 4px solid #1890ff;
+  }
+
+  .tip-header {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    margin-bottom: $spacing-sm;
+
+    .tip-big-icon {
+      font-size: 40px;
+    }
+
+    .tip-head-title {
+      flex: 1;
+      font-size: $font-size-lg;
+      font-weight: $font-weight-bold;
       color: $text-color;
-      margin-bottom: $spacing-xs;
     }
 
-    .service-desc {
-      font-size: $font-size-sm;
-      color: $text-color-secondary;
+    .urgent-badge {
+      background: #ff4d4f;
+      color: #fff;
+      font-size: $font-size-xs;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-weight: $font-weight-medium;
     }
+  }
+
+  .tip-body-text {
+    font-size: $font-size-md;
+    color: $text-color;
+    line-height: 1.8;
   }
 }
 
-.illustration-card {
-  position: relative;
-  border-radius: $border-radius-lg;
-  overflow: hidden;
-  height: 224px;
-
-  .illustration-image {
-    width: 100%;
-    height: 100%;
-  }
-
-  .illustration-overlay {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
-    padding: $spacing-lg;
-    padding-top: 40px;
-
-    .illustration-title {
-      font-size: $font-size-lg;
-      font-weight: $font-weight-medium;
-      color: #fff;
-      margin-bottom: $spacing-xs;
-    }
-
-    .illustration-desc {
-      font-size: $font-size-sm;
-      color: rgba(255, 255, 255, 0.9);
-    }
-  }
+// ========== 底部间距 ==========
+.bottom-spacer {
+  height: 40px;
 }

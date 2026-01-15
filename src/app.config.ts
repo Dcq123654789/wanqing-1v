@@ -4,7 +4,9 @@ export default {
     'pages/home/index',
     'pages/joy/index',
     'pages/care/index',
-    'pages/profile/index'
+    'pages/profile/index',
+    'pages/login/agreement/index',
+    'pages/login/privacy/index'
   ],
   window: {
     backgroundTextStyle: 'light',

@@ -8,7 +8,9 @@
       "Bash(npm run build:*)",
       "Bash(npm run dev:weapp:*)",
       "WebSearch",
-      "Bash(npm run build:weapp:*)"
+      "Bash(npm run build:weapp:*)",
+      "Bash(move:*)",
+      "Bash(test:*)"
     ]
   }
 }

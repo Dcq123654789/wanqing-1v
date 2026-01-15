@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { View, Text, Image, ScrollView } from '@tarojs/components'
 import { useUserStore } from '@/store/userStore'
 import Taro from '@tarojs/taro'
@@ -5,6 +6,12 @@ import './index.scss'
 
 function Profile() {
   const { userInfo, logout } = useUserStore()
+  const [statusBarHeight, setStatusBarHeight] = useState(0)
+
+  useEffect(() => {
+    const systemInfo = Taro.getSystemInfoSync()
+    setStatusBarHeight(systemInfo.statusBarHeight || 0)
+  }, [])
 
   const handleLogout = () => {
     Taro.showModal({
@@ -30,6 +37,9 @@ function Profile() {
 
   return (
     <View className="profile-page">
+      {/* 状态栏占位 */}
+      <View className="status-bar" style={{ height: `${statusBarHeight}px` }} />
+
       <ScrollView scrollY className="profile-scroll">
         {/* 头部背景 */}
         <View className="profile-header">

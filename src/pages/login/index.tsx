@@ -1,165 +1,199 @@
-import { useState } from 'react'
-import { View, Image, Input, Button, Text } from '@tarojs/components'
-import Taro from '@tarojs/taro'
-import { useUserStore } from '@/store/userStore'
-import './index.scss'
+import React, { useState } from "react";
+import { View, Image, Button, Text } from "@tarojs/components";
+import Taro, { useDidShow } from "@tarojs/taro";
+import { useUserStore } from "@/store/userStore";
+import "./index.scss";
 
 interface LoginState {
-  username: string
-  password: string
-  showPassword: boolean
-  loading: boolean
+  loading: boolean;
+  agreed: boolean;
+  pageTransition: boolean;
 }
 
 function Login() {
   const [state, setState] = useState<LoginState>({
-    username: '',
-    password: '',
-    showPassword: false,
-    loading: false
-  })
+    loading: false,
+    agreed: true,
+    pageTransition: false,
+  });
 
-  const { login } = useUserStore()
+  const { login } = useUserStore();
 
-  const handleUsernameChange = (e: any) => {
-    setState(prev => ({ ...prev, username: e.detail.value }))
-  }
+  // 监听页面跳转完成事件
+  useDidShow(() => {
+    // 如果是从其他页面返回，隐藏跳转遮罩
+    if (state.pageTransition) {
+      setState((prev) => ({ ...prev, pageTransition: false }));
+    }
+  });
 
-  const handlePasswordChange = (e: any) => {
-    setState(prev => ({ ...prev, password: e.detail.value }))
-  }
+  // 监听目标页面加载完成事件
+  React.useEffect(() => {
+    const handleHideTransition = () => {
+      console.log("收到隐藏遮罩事件");
+      setState((prev) => ({ ...prev, pageTransition: false }));
+    };
 
-  const togglePasswordVisibility = () => {
-    setState(prev => ({ ...prev, showPassword: !prev.showPassword }))
-  }
+    Taro.eventCenter.on("hidePageTransition", handleHideTransition);
 
-  const handleLogin = async () => {
-    const { username, password } = state
+    return () => {
+      Taro.eventCenter.off("hidePageTransition", handleHideTransition);
+    };
+  }, []);
 
-    if (!username.trim()) {
+  // 跳转到用户协议
+  const handleGoToAgreement = () => {
+    setState((prev) => ({ ...prev, pageTransition: true }));
+
+    // 延迟跳转，让loading遮罩先显示
+    setTimeout(() => {
+      Taro.navigateTo({
+        url: "/pages/login/agreement/index",
+      });
+
+      // 页面跳转完成后延迟隐藏遮罩，确保新页面完全加载
+      setTimeout(() => {
+        setState((prev) => ({ ...prev, pageTransition: false }));
+      }, 1200);
+    }, 50);
+  };
+
+  // 跳转到隐私政策
+  const handleGoToPrivacy = () => {
+    setState((prev) => ({ ...prev, pageTransition: true }));
+
+    // 延迟跳转，让loading遮罩先显示
+    setTimeout(() => {
+      Taro.navigateTo({
+        url: "/pages/login/privacy/index",
+      });
+
+      // 页面跳转完成后延迟隐藏遮罩，确保新页面完全加载
+      setTimeout(() => {
+        setState((prev) => ({ ...prev, pageTransition: false }));
+      }, 1200);
+    }, 50);
+  };
+
+  // 微信一键登录
+  const handleWechatLogin = async () => {
+    if (!state.agreed) {
       Taro.showToast({
-        title: '请输入用户名',
-        icon: 'none'
-      })
-      return
+        title: "请先阅读并同意用户协议和隐私政策",
+        icon: "none",
+        duration: 2000,
+      });
+      return;
     }
 
-    if (!password.trim()) {
-      Taro.showToast({
-        title: '请输入密码',
-        icon: 'none'
-      })
-      return
-    }
-
-    setState(prev => ({ ...prev, loading: true }))
+    setState((prev) => ({ ...prev, loading: true }));
 
     try {
-      const success = await login(username, password)
+      // 调用微信登录
+      const res = await Taro.login({
+        provider: "weixin",
+      });
 
-      if (success) {
-        Taro.showToast({
-          title: '登录成功',
-          icon: 'success'
-        })
+      if (res.code) {
+        // TODO: 将 res.code 发送到后端服务器，换取用户信息
+        // 这里暂时使用本地登录模拟
+        const success = await login("wechat_user", res.code);
 
-        setTimeout(() => {
-          Taro.switchTab({
-            url: '/pages/home/index'
-          })
-        }, 1000)
+        if (success) {
+          Taro.showToast({
+            title: "登录成功",
+            icon: "success",
+          });
+
+          setTimeout(() => {
+            Taro.switchTab({
+              url: "/pages/home/index",
+            });
+          }, 1000);
+        } else {
+          Taro.showToast({
+            title: "登录失败",
+            icon: "error",
+          });
+        }
       } else {
         Taro.showToast({
-          title: '登录失败',
-          icon: 'error'
-        })
+          title: "微信授权失败",
+          icon: "none",
+        });
       }
     } catch (error) {
+      console.error("微信登录失败:", error);
       Taro.showToast({
-        title: '登录失败',
-        icon: 'error'
-      })
+        title: "登录失败",
+        icon: "error",
+      });
     } finally {
-      setState(prev => ({ ...prev, loading: false }))
+      setState((prev) => ({ ...prev, loading: false }));
     }
-  }
+  };
 
   return (
     <View className="login-page">
+      {/* 页面跳转时的全屏loading遮罩 */}
+      {state.pageTransition && <View className="page-transition-overlay" />}
       <View className="login-background">
-      <Image
-          src={require('../../assets/images/backgrounds/login-bg.png')}
+        <Image
+          src={require("../../assets/images/backgrounds/login-bg.png")}
           className="bg-image"
           mode="aspectFill"
         />
         <View className="bg-overlay" />
       </View>
 
-      <Image
-        src={require('../../assets/images/icons/icon-logo.png')}
-        className="logo"
-      />
-
       <View className="login-container">
-        <View className="login-header">
-         
-          <Text className="app-slogan">温暖相伴，幸福晚年</Text>
-        </View>
-
-        <View className="login-form">
-          <View className="form-item">
-            <View className="input-wrapper">
+        <View className="login-content">
+          <View className="login-footer">
+            <View className="welcome-section">
+              <Text className="app-slogan">温暖相伴，幸福晚年</Text>
+              <Text className="welcome-desc">智能养老服务平台</Text>
+            </View>
+            <Button
+              className={`wechat-login-button ${
+                state.loading ? "loading" : ""
+              } ${!state.agreed ? "disabled" : ""}`}
+              onClick={handleWechatLogin}
+              disabled={state.loading || !state.agreed}
+            >
               <Image
-                src={require('../../assets/images/icons/icon-login-user.png')}
-                className="input-icon"
+                src={require("../../assets/images/icons/icon-wechat.png")}
+                className="wechat-icon"
               />
-              <Input
-                className="input-field"
-                placeholder="请输入用户名"
-                value={state.username}
-                onInput={handleUsernameChange}
-                placeholderClass="input-placeholder"
-              />
+              <Text className="wechat-login-text">
+                {state.loading ? "登录中..." : "微信一键登录"}
+              </Text>
+            </Button>
+
+            <View className="agreement-section">
+              <View
+                className={`checkbox ${state.agreed ? "checked" : ""}`}
+                onClick={() =>
+                  setState((prev) => ({ ...prev, agreed: !prev.agreed }))
+                }
+              >
+                {state.agreed && <Text className="checkbox-icon">✓</Text>}
+              </View>
+              <Text className="footer-text">
+                我已阅读并同意
+                <Text className="link-text" onClick={handleGoToAgreement}>
+                  《用户协议》
+                </Text>
+                和
+                <Text className="link-text" onClick={handleGoToPrivacy}>
+                  《隐私政策》
+                </Text>
+              </Text>
             </View>
           </View>
-
-          <View className="form-item">
-            <View className="input-wrapper">
-              <Image
-                src={require('../../assets/images/icons/icon-password.png')}
-                className="input-icon"
-              />
-              <Input
-                className="input-field"
-                placeholder="请输入密码"
-                password={!state.showPassword}
-                value={state.password}
-                onInput={handlePasswordChange}
-                placeholderClass="input-placeholder"
-              />
-              <Image
-                src={require(`../../assets/images/icons/icon-eye${state.showPassword ? '-off' : ''}.png`)}
-                className="eye-icon"
-                onClick={togglePasswordVisibility}
-              />
-            </View>
-          </View>
-
-          <Button
-            className={`login-button ${state.loading ? 'loading' : ''}`}
-            onClick={handleLogin}
-            disabled={state.loading}
-          >
-            {state.loading ? '登录中...' : '登录'}  
-          </Button>
-        </View>
-
-        <View className="login-footer">
-          <Text className="footer-text">登录即表示同意《用户协议》和《隐私政策》</Text>
         </View>
       </View>
     </View>
-  )
+  );
 }
 
-export default Login
+export default Login;
