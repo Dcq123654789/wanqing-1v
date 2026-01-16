@@ -1,65 +1,66 @@
 @import '@/assets/styles/variables.scss';
 
 .welcome-section {
-  padding: 60rpx 32rpx 40rpx;
-  background: linear-gradient(135deg, rgba(255, 152, 0, 0.05) 0%, rgba(255, 112, 67, 0.05) 100%);
-  margin-bottom: 16rpx;
+  padding: 48rpx 32rpx;
+  background: linear-gradient(135deg, #FF8C00 0%, #FFA500 100%);
+  margin-bottom: 0;
   position: relative;
   overflow: hidden;
+}
 
-  // 装饰圆点
-  &::before {
-    content: '';
-    position: absolute;
-    top: -20rpx;
-    right: -20rpx;
-    width: 120rpx;
-    height: 120rpx;
-    background: radial-gradient(circle, rgba(255, 202, 40, 0.3) 0%, transparent 70%);
-    border-radius: 50%;
-  }
+.welcome-content {
+  position: relative;
+  z-index: 1;
+}
 
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: -30rpx;
-    left: -30rpx;
-    width: 80rpx;
-    height: 80rpx;
-    background: radial-gradient(circle, rgba(240, 98, 146, 0.2) 0%, transparent 70%);
-    border-radius: 50%;
-  }
+// 装饰圆点（改为暖色调）
+.welcome-section::before {
+  content: '';
+  position: absolute;
+  top: -40rpx;
+  right: -40rpx;
+  width: 200rpx;
+  height: 200rpx;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.welcome-section::after {
+  content: '';
+  position: absolute;
+  bottom: -60rpx;
+  left: -60rpx;
+  width: 160rpx;
+  height: 160rpx;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+  border-radius: 50%;
 }
 
 .welcome-text {
   display: block;
-  font-size: 40rpx;
-  color: #333;
+  font-size: 44rpx;
+  color: #fff;
   font-weight: 600;
-  margin-bottom: 12rpx;
-  position: relative;
-  z-index: 1;
-
-  // 渐变文字效果
-  background: $gradient-warm;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  margin-bottom: 20rpx;
+  text-shadow: 0 4rpx 8rpx rgba(0, 0, 0, 0.1);
 }
 
-.welcome-subtitle {
-  display: block;
+.weather-info {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 16rpx 24rpx;
+  border-radius: 32rpx;
+  backdrop-filter: blur(10rpx);
+}
+
+.weather-icon {
+  font-size: 36rpx;
+  margin-right: 12rpx;
+}
+
+.weather-text {
   font-size: 28rpx;
-  color: #666;
-  position: relative;
-  z-index: 1;
-
-  // 添加装饰图标
-  &::before {
-    content: '🌸 ';
-  }
-
-  &::after {
-    content: ' 🌺';
-  }
+  color: #fff;
+  font-weight: 400;
 }

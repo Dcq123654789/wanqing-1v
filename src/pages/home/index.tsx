@@ -1,75 +1,140 @@
-import { View, Text, ScrollView } from '@tarojs/components'
-import Taro from '@tarojs/taro'
-import WelcomeSection from './components/WelcomeSection'
-import BannerSwiper from './components/BannerSwiper'
-import ServiceGrid from './components/ServiceGrid'
-import NotificationBar from './components/NotificationBar'
-import ActivityCard from './components/ActivityCard'
-import { mockBanners, mockServices, mockNotifications, mockActivities } from './mockData'
-import { Banner, ServiceEntry, Activity } from './types'
-import './index.scss'
+import { View, Text, ScrollView } from "@tarojs/components";
+import Taro, { useDidShow } from "@tarojs/taro";
+import { useState, useEffect } from "react";
+import HeaderSection from "./components/HeaderSection";
+import NotificationBar from "./components/NotificationBar";
+import QuickNav from "./components/QuickNav";
+import BannerSwiper from "./components/BannerSwiper";
+import { mockBanners, mockNotifications } from "./mockData";
+import { Banner, Community } from "./types";
+import "./index.scss";
+
+const STORAGE_KEY = "selectedCommunity";
 
 function Home() {
-  // 处理轮播图点击
-  const handleBannerClick = (banner: Banner) => {
-    console.log('点击轮播图:', banner)
-  }
+  const [currentCommunity, setCurrentCommunity] = useState<Community | null>(
+    null
+  );
+  const [showGuideModal, setShowGuideModal] = useState(false);
 
-  // 处理服务入口点击
-  const handleServiceClick = (service: ServiceEntry) => {
-    console.log('点击服务:', service)
-  }
+  // 初始化：检查是否有选择的社区
+  useEffect(() => {
+    checkSelectedCommunity();
+  }, []);
+
+  // 页面显示时重新检查社区（从社区选择页返回时刷新）
+  useDidShow(() => {
+    checkSelectedCommunity();
+  });
+
+  // 检查本地存储的社区
+  const checkSelectedCommunity = () => {
+    try {
+      const saved = Taro.getStorageSync(STORAGE_KEY);
+      if (saved) {
+        setCurrentCommunity(saved);
+      } else {
+        // 没有选择过社区，显示引导弹窗
+        setShowGuideModal(true);
+      }
+    } catch (e) {
+      console.error("读取社区信息失败:", e);
+      setShowGuideModal(true);
+    }
+  };
+
+  // 处理社区切换
+  const handleCommunityChange = () => {
+    Taro.navigateTo({
+      url: "/pages/community-select/index",
+    });
+  };
 
   // 处理活动点击
-  const handleActivityClick = (activity: Activity) => {
+  const handleBannerClick = (banner: Banner) => {
+    console.log("点击活动:", banner);
+  };
+
+  // 处理通知点击
+  const handleNotificationClick = () => {
     Taro.showToast({
-      title: `查看活动：${activity.title}`,
-      icon: 'none'
-    })
-  }
+      title: "查看通知详情",
+      icon: "none",
+    });
+  };
+
+  // 跳转到社区选择页面
+  const handleGoToSelect = () => {
+    setShowGuideModal(false);
+    Taro.navigateTo({
+      url: "/pages/community-select/index",
+    });
+  };
 
   return (
     <View className="home-page">
-      <ScrollView scrollY className="home-scroll">
-        {/* 欢迎区 */}
-        <WelcomeSection />
-
-        {/* 轮播海报 */}
-        <BannerSwiper
-          data={mockBanners}
-          onItemClick={handleBannerClick}
+      {/* 顶部区域（包含状态栏、导航栏和欢迎区） */}
+      <View className="home-header">
+        <HeaderSection
+          communityName={currentCommunity?.name || "晚晴社区"}
+          onCommunityChange={handleCommunityChange}
         />
+      </View>
 
+      {/* 可滚动内容区 */}
+      <ScrollView scrollY className="home-scroll">
         {/* 通知栏 */}
-        <NotificationBar data={mockNotifications} />
-
-        {/* 服务入口 */}
-        <View className="section">
-          <Text className="section-title">服务中心</Text>
-          <ServiceGrid
-            data={mockServices}
-            onItemClick={handleServiceClick}
+        <View className="notification-wrapper">
+          <NotificationBar
+            data={mockNotifications}
+            onClick={handleNotificationClick}
           />
         </View>
 
-        {/* 活动推荐 */}
+        {/* 快捷导航栏（8宫格） */}
         <View className="section">
-          <Text className="section-title">为您推荐</Text>
-          <ScrollView scrollX className="activities-scroll">
-            <View className="activities-list">
-              {mockActivities.map(activity => (
-                <ActivityCard
-                  key={activity.id}
-                  data={activity}
-                  onClick={handleActivityClick}
-                />
-              ))}
-            </View>
-          </ScrollView>
+          <Text className="section-title">快捷服务1</Text>
+          <QuickNav />
+        </View>
+
+        {/* 精彩活动轮播图 */}
+        <View className="section">
+          <Text className="section-title">精彩活动</Text>
+          <BannerSwiper data={mockBanners} onItemClick={handleBannerClick} />
         </View>
       </ScrollView>
+
+      {/* 首次选择社区引导弹窗 */}
+      {showGuideModal && (
+        <View className="guide-modal" onClick={() => setShowGuideModal(false)}>
+          <View
+            className="guide-modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <View className="guide-modal-icon">🏘️</View>
+            <Text className="guide-modal-title">欢迎来到晚晴</Text>
+            <Text className="guide-modal-desc">
+              请先选择您所在的社区，以便为您提供更精准的服务
+            </Text>
+            <View className="guide-modal-buttons">
+              <View
+                className="guide-modal-btn guide-modal-btn-primary"
+                onClick={handleGoToSelect}
+              >
+                <Text>去选择社区</Text>
+              </View>
+              <View
+                className="guide-modal-btn guide-modal-btn-secondary"
+                onClick={() => setShowGuideModal(false)}
+              >
+                <Text>稍后再说</Text>
+              </View>
+            </View>
+          </View>
+        </View>
+      )}
     </View>
-  )
+  );
 }
 
-export default Home
+export default Home;

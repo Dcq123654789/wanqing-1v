@@ -1,78 +1,151 @@
 @import '@/assets/styles/variables.scss';
 @import '@/assets/styles/mixins.scss';
 
-.home-page {
-  min-height: 100vh;
-  background: linear-gradient(180deg, #fffbf7 0%, #fff9f5 25%, #fff7ed 50%, #fef3f2 75%, #fef2f2 100%);
-  position: relative;
+// 首页颜色系统 - 橙色系
+$home-primary: #ff9800;
+$home-secondary: #ffb74d;
+$home-bg-start: #fff8f0;
+$home-bg-mid: #fffbf5;
+$home-bg-end: #fffef8;
 
-  // 顶部装饰背景 - 更柔和的暖色渐变
-  &::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 500rpx;
-    background: linear-gradient(180deg, rgba(255, 152, 0, 0.06) 0%, rgba(255, 112, 67, 0.04) 50%, transparent 100%);
-    border-radius: 0 0 60% 60% / 0 0 120rpx 120rpx;
-    z-index: 0;
-  }
+.home-page {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, $home-bg-start 0%, $home-bg-mid 50%, $home-bg-end 100%);
+  overflow: hidden;
+}
+
+// 顶部区域（包含状态栏、导航栏和欢迎区）- 不固定
+.home-header {
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
 }
 
 .home-scroll {
-  height: 100vh;
+  flex: 1;
   padding-bottom: 32rpx;
-  padding-top: 10vh; // 向下偏移 10%
-  position: relative;
-  z-index: 1;
+}
+
+// 通知栏包裹层 - 添加上边距
+.notification-wrapper {
+  padding: 40rpx 32rpx 0;
 }
 
 // 区域容器
 .section {
-  margin-bottom: 24rpx;
+  margin-bottom: 32rpx;
+  padding: 0 32rpx;
 }
 
 .section-title {
-  display: block;
-  font-size: 38rpx;
-  color: #333;
+  display: flex;
+  align-items: center;
+  font-size: 36rpx;
+  color: $home-primary;
   font-weight: 600;
-  padding: 0 32rpx;
-  margin-bottom: 20rpx;
+  margin-bottom: 24rpx;
   position: relative;
+  padding-left: 24rpx;
 
   // 标题装饰点
   &::before {
     content: '';
     position: absolute;
-    left: 20rpx;
+    left: 0;
     top: 50%;
     transform: translateY(-50%);
-    width: 8rpx;
+    width: 6rpx;
     height: 32rpx;
-    background: $gradient-warm;
-    border-radius: 4rpx;
-  }
-
-  // 标题右侧装饰
-  &::after {
-    content: '✨';
-    position: absolute;
-    right: 32rpx;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 28rpx;
+    background: linear-gradient(180deg, $home-primary 0%, $home-secondary 100%);
+    border-radius: 3rpx;
   }
 }
 
-// 活动推荐区域
-.activities-scroll {
-  white-space: nowrap;
-  padding: 0 32rpx;
-}
-
-.activities-list {
+// 引导弹窗
+.guide-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
-  padding-right: 32rpx;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 32rpx;
+}
+
+.guide-modal-content {
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 48rpx 40rpx;
+  width: 100%;
+  max-width: 560rpx;
+  text-align: center;
+}
+
+.guide-modal-icon {
+  font-size: 96rpx;
+  margin-bottom: 24rpx;
+}
+
+.guide-modal-title {
+  display: block;
+  font-size: 40rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 16rpx;
+}
+
+.guide-modal-desc {
+  display: block;
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 40rpx;
+}
+
+.guide-modal-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.guide-modal-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 88rpx;
+  border-radius: 44rpx;
+  font-size: 32rpx;
+  transition: all 0.2s;
+
+  text {
+    font-weight: 500;
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.guide-modal-btn-primary {
+  background: linear-gradient(135deg, $home-primary 0%, $home-secondary 100%);
+  color: #fff;
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.guide-modal-btn-secondary {
+  background: #f5f5f5;
+  color: #666;
+
+  &:active {
+    background: #ebebeb;
+  }
 }

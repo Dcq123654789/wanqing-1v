@@ -2,7 +2,7 @@
  * 首页虚拟数据
  */
 
-import { Banner, ServiceEntry, Notification, Activity } from './types'
+import { Banner, ServiceEntry, Notification, Activity, Community } from './types'
 
 // 轮播海报数据
 export const mockBanners: Banner[] = [
@@ -124,5 +124,37 @@ export const mockActivities: Activity[] = [
     time: '周五 9:00',
     location: '健康中心',
     tag: '服务'
+  }
+]
+
+// 社区数据
+export const mockCommunities: Community[] = [
+  {
+    id: '1',
+    name: '晚晴社区',
+    address: '北京市朝阳区晚晴路123号',
+    latitude: 39.908823,
+    longitude: 116.397470
+  },
+  {
+    id: '2',
+    name: '阳光花园',
+    address: '北京市海淀区阳光大道456号',
+    latitude: 39.928823,
+    longitude: 116.397470
+  },
+  {
+    id: '3',
+    name: '幸福家园',
+    address: '北京市西城区幸福街789号',
+    latitude: 39.908823,
+    longitude: 116.417470
+  },
+  {
+    id: '4',
+    name: '朝霞社区',
+    address: '北京市东城区朝霞街100号',
+    latitude: 39.918823,
+    longitude: 116.407470
   }
 ]

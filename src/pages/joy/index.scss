@@ -111,99 +111,90 @@ $joy-bg-end: #fef2f2;
   gap: 24rpx;
 }
 
-// 通用卡片样式
-.travel-card,
-.activity-card,
-.social-card,
-.online-card {
-  background: #fff;
+// 旅游轮播图容器
+.travel-swiper-container {
+  width: 100%;
+  height: 480rpx;
   border-radius: 16rpx;
   overflow: hidden;
   box-shadow: 0 4rpx 16rpx rgba(82, 196, 26, 0.12);
-  transition: all 0.3s ease;
-
-  &:active {
-    transform: scale(0.98);
-    box-shadow: 0 2rpx 8rpx rgba(82, 196, 26, 0.08);
-  }
-
-  .card-image {
-    width: 100%;
-    height: 320rpx;
-    display: block;
-  }
-
-  .card-content {
-    padding: 24rpx;
-  }
-
-  .card-title {
-    font-size: 34rpx;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 12rpx;
-    display: block;
-  }
-
-  .card-desc {
-    font-size: 28rpx;
-    color: #666;
-    margin-bottom: 16rpx;
-    display: block;
-    line-height: 1.5;
-  }
-
-  .card-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16rpx;
-    align-items: center;
-
-    .meta-text {
-      font-size: 26rpx;
-      color: #999;
-    }
-  }
 }
 
-// 旅游卡片特有样式
-.travel-card {
-  .card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 12rpx;
+.travel-swiper {
+  width: 100%;
+  height: 100%;
+}
 
-    .card-title {
-      flex: 1;
-      margin-bottom: 0;
-    }
+.travel-swiper-item {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
 
-    .card-price {
-      font-size: 32rpx;
-      font-weight: 600;
-      color: #ff4d4f;
-      white-space: nowrap;
-      margin-left: 16rpx;
-    }
-  }
+.travel-swiper-image {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
 
-  .tag-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12rpx;
-    margin-left: auto;
+.travel-swiper-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.3) 60%, transparent 100%);
+  padding: 32rpx 24rpx;
+  color: #fff;
+}
 
-    .tag {
-      display: inline-block;
-      padding: 6rpx 16rpx;
-      background: linear-gradient(135deg, rgba(82, 196, 26, 0.1) 0%, rgba(115, 211, 61, 0.1) 100%);
-      color: $joy-primary;
-      font-size: 24rpx;
-      border-radius: 12rpx;
-      border: 1rpx solid rgba(82, 196, 26, 0.2);
-    }
-  }
+.travel-swiper-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  margin-bottom: 12rpx;
+  display: block;
+  text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.3);
+}
+
+.travel-swiper-desc {
+  font-size: 26rpx;
+  opacity: 0.9;
+  margin-bottom: 16rpx;
+  display: block;
+  line-height: 1.4;
+}
+
+.travel-swiper-footer {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  margin-bottom: 12rpx;
+}
+
+.travel-swiper-price {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #ff4d4f;
+}
+
+.travel-swiper-duration {
+  font-size: 24rpx;
+  opacity: 0.9;
+}
+
+.travel-swiper-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.travel-tag {
+  display: inline-block;
+  padding: 6rpx 16rpx;
+  background: rgba(82, 196, 26, 0.25);
+  color: #fff;
+  font-size: 22rpx;
+  border-radius: 12rpx;
+  backdrop-filter: blur(4rpx);
 }
 
 // 底部留白（避免内容被 tabbar 遮挡）

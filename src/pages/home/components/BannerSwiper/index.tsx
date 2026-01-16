@@ -1,4 +1,4 @@
-import { View, Swiper, SwiperItem, Image } from '@tarojs/components'
+import { View, Swiper, SwiperItem, Image, Text } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { Banner } from '../../types'
 import './index.scss'
@@ -14,7 +14,7 @@ interface BannerSwiperProps {
 function BannerSwiper({
   data,
   autoplay = true,
-  interval = 3000,
+  interval = 4000,
   onChange,
   onItemClick
 }: BannerSwiperProps) {
@@ -36,6 +36,8 @@ function BannerSwiper({
     }
   }
 
+  if (data.length === 0) return null
+
   return (
     <View className="banner-swiper">
       <Swiper
@@ -45,7 +47,7 @@ function BannerSwiper({
         circular
         indicatorDots
         indicatorColor="rgba(255, 255, 255, 0.5)"
-        indicatorActiveColor="#ff9800"
+        indicatorActiveColor="#FF8C00"
         onChange={handleChange}
       >
         {data.map((item) => (
@@ -57,7 +59,12 @@ function BannerSwiper({
                 className="banner-image"
                 lazyLoad
               />
-              <View className="banner-title">{item.title}</View>
+              <View className="banner-overlay">
+                <Text className="banner-title">{item.title}</Text>
+                {item.subtitle && (
+                  <Text className="banner-subtitle">{item.subtitle}</Text>
+                )}
+              </View>
             </View>
           </SwiperItem>
         ))}

@@ -46,6 +46,16 @@ export interface OnlineEvent {
   description: string
 }
 
+// 商品
+export interface Product {
+  id: string
+  image: string
+  name: string
+  price?: string
+  tag?: string
+  link: string
+}
+
 // 旅游线路数据
 export const mockTravelRoutes: TravelRoute[] = [
   {
@@ -167,5 +177,49 @@ export const mockOnlineEvents: OnlineEvent[] = [
     platform: '视频会议',
     joinMethod: '群内通知链接',
     description: '在线唱歌、K歌活动，展示才艺，增进友谊'
+  }
+]
+
+// 热门商品数据
+export const mockProducts: Product[] = [
+  {
+    id: '1',
+    image: require('@/assets/images/joy/online/calligraphy-class.jpg'),
+    name: '多功能健康监测仪',
+    price: '¥299',
+    tag: '热卖',
+    link: '/pages/product/detail'
+  },
+  {
+    id: '2',
+    image: require('@/assets/images/joy/online/health-lecture.jpg'),
+    name: '智能按摩肩颈仪',
+    price: '¥199',
+    tag: '新品',
+    link: '/pages/product/detail'
+  },
+  {
+    id: '3',
+    image: require('@/assets/images/joy/online/singing.jpg'),
+    name: '老年营养奶粉',
+    price: '¥128',
+    tag: '推荐',
+    link: '/pages/product/detail'
+  },
+  {
+    id: '4',
+    image: require('@/assets/images/joy/online/calligraphy-class.jpg'),
+    name: '足浴盆恒温加热',
+    price: '¥359',
+    tag: '限时',
+    link: '/pages/product/detail'
+  },
+  {
+    id: '5',
+    image: require('@/assets/images/joy/online/health-lecture.jpg'),
+    name: '养生艾灸盒套装',
+    price: '¥88',
+    tag: '热卖',
+    link: '/pages/product/detail'
   }
 ]

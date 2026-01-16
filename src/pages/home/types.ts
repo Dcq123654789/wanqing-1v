@@ -37,3 +37,13 @@ export interface Activity {
   tag: string
   link?: string
 }
+
+// 社区
+export interface Community {
+  id: string
+  name: string
+  address: string
+  latitude: number
+  longitude: number
+  coverImage?: string
+}

@@ -207,29 +207,7 @@ export const mockWellnessTips: WellnessTip[] = [
 ]
 
 // 健康小贴士
-export const mockHealthTips: HealthTip[] = [
-  {
-    id: '1',
-    icon: '💡',
-    title: '今日提醒',
-    content: '春季气候多变，注意保暖防寒，适时增减衣物，预防感冒。',
-    importance: 'high'
-  },
-  {
-    id: '2',
-    icon: '🍵',
-    title: '养生小知识',
-    content: '每天喝一杯温水，有助于促进新陈代谢，清理肠胃。',
-    importance: 'medium'
-  },
-  {
-    id: '3',
-    icon: '🧘',
-    title: '心理健康',
-    content: '保持心情愉悦，多参加社交活动，有益身心健康。',
-    importance: 'medium'
-  }
-]
+export const mockHealthTips: HealthTip[] = []
 
 // 旧版兼容导出
 export const mockHealthDataOld = {

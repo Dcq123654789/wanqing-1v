@@ -1,13 +1,10 @@
-import { View, Text, Image, ScrollView } from '@tarojs/components'
+import { View, Text, Image, ScrollView, Swiper, SwiperItem } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { useState, useEffect } from 'react'
-import {
-  mockTravelRoutes,
-  mockActivities,
-  mockSocialEvents,
-  mockOnlineEvents
-} from './mockData'
-import type { TravelRoute, Activity, SocialEvent, OnlineEvent } from './mockData'
+import { mockTravelRoutes, mockProducts } from './mockData'
+import type { TravelRoute, Product } from './mockData'
+import ServiceStrip from './components/ServiceStrip'
+import ProductBanner from './components/ProductBanner'
 import './index.scss'
 
 function Joy() {
@@ -17,6 +14,15 @@ function Joy() {
     const systemInfo = Taro.getSystemInfoSync()
     setStatusBarHeight(systemInfo.statusBarHeight || 0)
   }, [])
+
+  // 处理商品点击
+  const handleProductClick = (product: Product) => {
+    console.log("点击商品:", product)
+    Taro.showToast({
+      title: `查看${product.name}`,
+      icon: "none",
+    })
+  }
 
   // 处理旅游线路点击
   const handleTravelClick = (route: TravelRoute) => {
@@ -28,45 +34,6 @@ function Joy() {
     // TODO: 跳转到详情页
     // Taro.navigateTo({
     //   url: `/pages/joy/travel-detail/index?id=${route.id}`
-    // })
-  }
-
-  // 处理兴趣活动点击
-  const handleActivityClick = (activity: Activity) => {
-    Taro.showToast({
-      title: `查看详情：${activity.title}`,
-      icon: 'none',
-      duration: 2000
-    })
-    // TODO: 跳转到详情页
-    // Taro.navigateTo({
-    //   url: `/pages/joy/activity-detail/index?id=${activity.id}`
-    // })
-  }
-
-  // 处理社交聚会点击
-  const handleSocialClick = (event: SocialEvent) => {
-    Taro.showToast({
-      title: `查看详情：${event.title}`,
-      icon: 'none',
-      duration: 2000
-    })
-    // TODO: 跳转到详情页
-    // Taro.navigateTo({
-    //   url: `/pages/joy/social-detail/index?id=${event.id}`
-    // })
-  }
-
-  // 处理线上活动点击
-  const handleOnlineClick = (event: OnlineEvent) => {
-    Taro.showToast({
-      title: `查看详情：${event.title}`,
-      icon: 'none',
-      duration: 2000
-    })
-    // TODO: 跳转到详情页
-    // Taro.navigateTo({
-    //   url: `/pages/joy/online-detail/index?id=${event.id}`
     // })
   }
 
@@ -89,136 +56,62 @@ function Joy() {
           </View>
         </View>
 
-        {/* 精选旅游区 */}
+        {/* 业务入口条 */}
+        <ServiceStrip />
+
+        {/* 热门商品轮播图 */}
+        <View className="content-section">
+          <View className="section-header">
+            <Text className="section-title">热门商品</Text>
+            <Text className="section-icon">🛍️</Text>
+          </View>
+          <ProductBanner data={mockProducts} onItemClick={handleProductClick} />
+        </View>
+
+        {/* 精选旅游轮播图 */}
         <View className="content-section">
           <View className="section-header">
             <Text className="section-title">精选旅游</Text>
             <Text className="section-icon">✈️</Text>
           </View>
-          <View className="card-list">
-            {mockTravelRoutes.map((route) => (
-              <View
-                key={route.id}
-                className="travel-card"
-                onClick={() => handleTravelClick(route)}
-              >
-                <Image
-                  src={route.image}
-                  className="card-image"
-                  mode="aspectFill"
-                />
-                <View className="card-content">
-                  <View className="card-header">
-                    <Text className="card-title">{route.name}</Text>
-                    <Text className="card-price">¥{route.price}起</Text>
-                  </View>
-                  <Text className="card-desc">{route.description}</Text>
-                  <View className="card-meta">
-                    <Text className="meta-text">⏱ {route.duration}</Text>
-                    <View className="tag-list">
-                      {route.tags.map((tag, index) => (
-                        <Text key={index} className="tag">{tag}</Text>
-                      ))}
+          <View className="travel-swiper-container">
+            <Swiper
+              className="travel-swiper"
+              autoplay
+              interval={4000}
+              circular
+              indicatorDots
+              indicatorColor="rgba(255, 255, 255, 0.5)"
+              indicatorActiveColor="#FF8C00"
+            >
+              {mockTravelRoutes.map((route) => (
+                <SwiperItem key={route.id}>
+                  <View
+                    className="travel-swiper-item"
+                    onClick={() => handleTravelClick(route)}
+                  >
+                    <Image
+                      src={route.image}
+                      className="travel-swiper-image"
+                      mode="aspectFill"
+                    />
+                    <View className="travel-swiper-overlay">
+                      <Text className="travel-swiper-title">{route.name}</Text>
+                      <Text className="travel-swiper-desc">{route.description}</Text>
+                      <View className="travel-swiper-footer">
+                        <Text className="travel-swiper-price">¥{route.price}起</Text>
+                        <Text className="travel-swiper-duration">⏱ {route.duration}</Text>
+                      </View>
+                      <View className="travel-swiper-tags">
+                        {route.tags.map((tag, index) => (
+                          <Text key={index} className="travel-tag">{tag}</Text>
+                        ))}
+                      </View>
                     </View>
                   </View>
-                </View>
-              </View>
-            ))}
-          </View>
-        </View>
-
-        {/* 兴趣活动区 */}
-        <View className="content-section">
-          <View className="section-header">
-            <Text className="section-title">兴趣活动</Text>
-            <Text className="section-icon">🎨</Text>
-          </View>
-          <View className="card-list">
-            {mockActivities.map((activity) => (
-              <View
-                key={activity.id}
-                className="activity-card"
-                onClick={() => handleActivityClick(activity)}
-              >
-                <Image
-                  src={activity.image}
-                  className="card-image"
-                  mode="aspectFill"
-                />
-                <View className="card-content">
-                  <Text className="card-title">{activity.title}</Text>
-                  <Text className="card-desc">{activity.description}</Text>
-                  <View className="card-meta">
-                    <Text className="meta-text">📅 {activity.time}</Text>
-                    <Text className="meta-text">📍 {activity.location}</Text>
-                  </View>
-                </View>
-              </View>
-            ))}
-          </View>
-        </View>
-
-        {/* 社交聚会区 */}
-        <View className="content-section">
-          <View className="section-header">
-            <Text className="section-title">社交聚会</Text>
-            <Text className="section-icon">👥</Text>
-          </View>
-          <View className="card-list">
-            {mockSocialEvents.map((event) => (
-              <View
-                key={event.id}
-                className="social-card"
-                onClick={() => handleSocialClick(event)}
-              >
-                <Image
-                  src={event.image}
-                  className="card-image"
-                  mode="aspectFill"
-                />
-                <View className="card-content">
-                  <Text className="card-title">{event.title}</Text>
-                  <Text className="card-desc">{event.description}</Text>
-                  <View className="card-meta">
-                    <Text className="meta-text">📅 {event.time}</Text>
-                    <Text className="meta-text">📍 {event.location}</Text>
-                    <Text className="meta-text">👥 限{event.maxParticipants}人</Text>
-                  </View>
-                </View>
-              </View>
-            ))}
-          </View>
-        </View>
-
-        {/* 线上活动区 */}
-        <View className="content-section">
-          <View className="section-header">
-            <Text className="section-title">线上活动</Text>
-            <Text className="section-icon">💻</Text>
-          </View>
-          <View className="card-list">
-            {mockOnlineEvents.map((event) => (
-              <View
-                key={event.id}
-                className="online-card"
-                onClick={() => handleOnlineClick(event)}
-              >
-                <Image
-                  src={event.image}
-                  className="card-image"
-                  mode="aspectFill"
-                />
-                <View className="card-content">
-                  <Text className="card-title">{event.title}</Text>
-                  <Text className="card-desc">{event.description}</Text>
-                  <View className="card-meta">
-                    <Text className="meta-text">📅 {event.time}</Text>
-                    <Text className="meta-text">💻 {event.platform}</Text>
-                    <Text className="meta-text">🔗 {event.joinMethod}</Text>
-                  </View>
-                </View>
-              </View>
-            ))}
+                </SwiperItem>
+              ))}
+            </Swiper>
           </View>
         </View>
       </ScrollView>
