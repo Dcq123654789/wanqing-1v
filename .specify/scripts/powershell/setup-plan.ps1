@@ -1,5 +1,5 @@
 #!/usr/bin/env pwsh
-# 为功能设置实施计划
+# Setup implementation plan for a feature
 
 [CmdletBinding()]
 param(
@@ -9,42 +9,42 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-# 如果请求则显示帮助
+# Show help if requested
 if ($Help) {
-    Write-Output "用法: ./setup-plan.ps1 [-Json] [-Help]"
-    Write-Output "  -Json     以 JSON 格式输出结果"
-    Write-Output "  -Help     显示此帮助消息"
+    Write-Output "Usage: ./setup-plan.ps1 [-Json] [-Help]"
+    Write-Output "  -Json     Output results in JSON format"
+    Write-Output "  -Help     Show this help message"
     exit 0
 }
 
-# 加载公共函数
+# Load common functions
 . "$PSScriptRoot/common.ps1"
 
-# 从公共函数获取所有路径和变量
+# Get all paths and variables from common functions
 $paths = Get-FeaturePathsEnv
 
-# 检查我们是否在正确的功能分支上（仅针对 git 仓库）
-if (-not (Test-FeatureBranch -Branch $paths.CURRENT_BRANCH -HasGit $paths.HAS_GIT)) {
-    exit 1
+# Check if we're on a proper feature branch (only for git repos)
+if (-not (Test-FeatureBranch -Branch $paths.CURRENT_BRANCH -HasGit $paths.HAS_GIT)) { 
+    exit 1 
 }
 
-# 确保功能目录存在
+# Ensure the feature directory exists
 New-Item -ItemType Directory -Path $paths.FEATURE_DIR -Force | Out-Null
 
-# 如果计划模板存在则复制，否则记录或创建空文件
+# Copy plan template if it exists, otherwise note it or create empty file
 $template = Join-Path $paths.REPO_ROOT '.specify/templates/plan-template.md'
-if (Test-Path $template) {
+if (Test-Path $template) { 
     Copy-Item $template $paths.IMPL_PLAN -Force
-    Write-Output "已将计划模板复制到 $($paths.IMPL_PLAN)"
+    Write-Output "Copied plan template to $($paths.IMPL_PLAN)"
 } else {
-    Write-Warning "在 $template 未找到计划模板"
-    # 如果模板不存在则创建基本计划文件
+    Write-Warning "Plan template not found at $template"
+    # Create a basic plan file if template doesn't exist
     New-Item -ItemType File -Path $paths.IMPL_PLAN -Force | Out-Null
 }
 
-# 输出结果
+# Output results
 if ($Json) {
-    $result = [PSCustomObject]@{
+    $result = [PSCustomObject]@{ 
         FEATURE_SPEC = $paths.FEATURE_SPEC
         IMPL_PLAN = $paths.IMPL_PLAN
         SPECS_DIR = $paths.FEATURE_DIR

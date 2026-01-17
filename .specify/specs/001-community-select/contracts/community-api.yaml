@@ -1,0 +1,370 @@
+openapi: 3.0.0
+info:
+  title: 社区选择 API
+  description: 晚晴小程序社区选择功能的 API 接口定义
+  version: 1.0.0
+
+servers:
+  - url: https://api.wanqing.example.com/v1
+    description: 生产环境
+  - url: https://api-staging.wanqing.example.com/v1
+    description: 测试环境
+
+tags:
+  - name: communities
+    description: 社区相关接口
+
+paths:
+  /communities:
+    get:
+      summary: 获取社区列表
+      description: 获取所有可选社区列表，支持按距离筛选和排序
+      operationId: getCommunities
+      tags:
+        - communities
+      parameters:
+        - name: lat
+          in: query
+          description: 用户纬度（用于按距离计算）
+          required: false
+          schema:
+            type: number
+            format: float
+            minimum: -90
+            maximum: 90
+          example: 39.9042
+        - name: lng
+          in: query
+          description: 用户经度（用于按距离计算）
+          required: false
+          schema:
+            type: number
+            format: float
+            minimum: -180
+            maximum: 180
+          example: 116.4074
+        - name: radius
+          in: query
+          description: 搜索半径（单位：公里）
+          required: false
+          schema:
+            type: number
+            format: float
+            minimum: 0.1
+            maximum: 100
+            default: 50
+          example: 10
+        - name: status
+          in: query
+          description: 筛选运营状态
+          required: false
+          schema:
+            type: string
+            enum: [active, inactive, all]
+            default: active
+          example: active
+        - name: sort_by
+          in: query
+          description: 排序字段
+          required: false
+          schema:
+            type: string
+            enum: [distance, name, created_at]
+            default: distance
+          example: distance
+        - name: page
+          in: query
+          description: 页码（从1开始）
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          example: 1
+        - name: page_size
+          in: query
+          description: 每页数量
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          example: 20
+      responses:
+        '200':
+          description: 成功返回社区列表
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    required:
+                      - communities
+                      - total
+                      - page
+                      - pageSize
+                    properties:
+                      communities:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Community'
+                      total:
+                        type: integer
+                        description: 社区总数
+                        example: 200
+                      page:
+                        type: integer
+                        description: 当前页码
+                        example: 1
+                      pageSize:
+                        type: integer
+                        description: 每页数量
+                        example: 20
+                      cachedAt:
+                        type: integer
+                        description: 缓存时间戳（毫秒）
+                        example: 1705392000000
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /communities/{communityId}:
+    get:
+      summary: 获取社区详情
+      description: 根据社区 ID 获取详细信息
+      operationId: getCommunityById
+      tags:
+        - communities
+      parameters:
+        - name: communityId
+          in: path
+          description: 社区 ID
+          required: true
+          schema:
+            type: string
+          example: comm_001
+      responses:
+        '200':
+          description: 成功返回社区详情
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Community'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /communities/{communityId}/select:
+    post:
+      summary: 选择社区
+      description: 用户选择指定社区（记录用户选择行为，可选）
+      operationId: selectCommunity
+      tags:
+        - communities
+      parameters:
+        - name: communityId
+          in: path
+          description: 社区 ID
+          required: true
+          schema:
+            type: string
+          example: comm_001
+      responses:
+        '200':
+          description: 成功选择社区
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    required:
+                      - communityId
+                      - selectedAt
+                    properties:
+                      communityId:
+                        type: string
+                        example: comm_001
+                      selectedAt:
+                        type: integer
+                        description: 选择时间戳（毫秒）
+                        example: 1705392000000
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    Community:
+      type: object
+      required:
+        - id
+        - name
+        - fullAddress
+        - shortAddress
+        - latitude
+        - longitude
+        - serviceRange
+        - status
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          description: 社区唯一标识符
+          example: comm_001
+        name:
+          type: string
+          description: 社区名称
+          minLength: 2
+          maxLength: 50
+          example: 阳光花园
+        fullAddress:
+          type: string
+          description: 完整地址
+          example: 北京市朝阳区xxx路123号
+        shortAddress:
+          type: string
+          description: 简短地址（用于列表显示）
+          example: 朝阳区xxx路
+        latitude:
+          type: number
+          format: float
+          description: 纬度
+          minimum: -90
+          maximum: 90
+          example: 39.9042
+        longitude:
+          type: number
+          format: float
+          description: 经度
+          minimum: -180
+          maximum: 180
+          example: 116.4074
+        serviceRange:
+          type: string
+          description: 服务范围描述
+          example: 覆盖3公里以内
+        status:
+          type: string
+          enum: [active, inactive]
+          description: 运营状态
+          example: active
+        createdAt:
+          type: integer
+          description: 创建时间戳（毫秒）
+          example: 1705392000000
+        updatedAt:
+          type: integer
+          description: 更新时间戳（毫秒）
+          example: 1705392000000
+        distance:
+          type: number
+          format: float
+          description: 距离用户的距离（单位：公里，仅当提供位置参数时返回）
+          example: 2.5
+
+    Error:
+      type: object
+      required:
+        - success
+        - error
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          required:
+            - code
+            - message
+          properties:
+            code:
+              type: string
+              description: 错误代码
+              example: INVALID_PARAMS
+            message:
+              type: string
+              description: 错误消息
+              example: 参数验证失败
+            details:
+              type: object
+              description: 错误详情（可选）
+              additionalProperties: true
+
+  responses:
+    BadRequest:
+      description: 请求参数错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            success: false
+            error:
+              code: INVALID_PARAMS
+              message: 参数验证失败
+              details:
+                lat: 纬度参数无效
+
+    NotFound:
+      description: 资源未找到
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            success: false
+            error:
+              code: NOT_FOUND
+              message: 社区不存在
+
+    InternalServerError:
+      description: 服务器内部错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            success: false
+            error:
+              code: INTERNAL_ERROR
+              message: 服务器内部错误，请稍后重试
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT 认证（如果需要）
+
+security:
+  - BearerAuth: []
