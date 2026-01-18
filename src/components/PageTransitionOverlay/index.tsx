@@ -26,7 +26,11 @@ function PageTransitionOverlay() {
 
   if (!isVisible) return null
 
-  return <View className="page-transition-overlay" />
+  return (
+    <View className="page-transition-overlay">
+      <View className="loading-line" />
+    </View>
+  )
 }
 
 export default PageTransitionOverlay

@@ -9,17 +9,15 @@
   background: #ffffff;
   z-index: 9999;
   overflow: hidden;
+}
 
-  // 顶部加载进度条
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 4px;
-    background: linear-gradient(90deg, $primary-color, #ffb74d);
-    animation: loading-line 1.2s ease-in-out infinite;
-  }
+.loading-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 4px;
+  background: linear-gradient(90deg, $wanqing-primary, #ffb74d);
+  animation: loading-line 1.2s ease-in-out infinite;
 }
 
 @keyframes loading-line {
