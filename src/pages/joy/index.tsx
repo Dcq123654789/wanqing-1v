@@ -7,6 +7,8 @@ import ServiceStrip from './components/ServiceStrip'
 import ProductBanner from './components/ProductBanner'
 import './index.scss'
 
+import { navigateTo } from "@/utils/navigation";
+
 function Joy() {
   const [statusBarHeight, setStatusBarHeight] = useState(0)
 

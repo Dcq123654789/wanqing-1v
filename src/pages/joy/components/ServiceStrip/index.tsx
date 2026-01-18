@@ -2,6 +2,8 @@ import { View, Text } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import './index.scss'
 
+import PageTransitionOverlay from "@/components/PageTransitionOverlay";
+import { navigateTo } from "@/utils/navigation";
 interface ServiceItem {
   id: string
   icon: string
@@ -63,12 +65,12 @@ function ServiceStrip({ data = defaultServiceData }: ServiceStripProps) {
       })
       return
     }
-
-    Taro.navigateTo({ url: item.route })
+   navigateTo( item.route); 
   }
 
   return (
     <View className="service-strip">
+      <PageTransitionOverlay />
       {data.map((item) => (
         <View
           key={item.id}

@@ -16,9 +16,21 @@ export default {
     navigationBarTitleText: '晚晴',
     navigationBarTextStyle: 'black'
   },
+  requiredPrivateInfos: ['getLocation'],
   permission: {
     'scope.userLocation': {
       desc: '您的位置信息将用于提供周边服务'
+    }
+  },
+  // 预下载配置 - 显著提升页面切换速度
+  preloadRule: {
+    'pages/home/index': {
+      network: 'all',
+      packages: ['pages/joy', 'pages/care']
+    },
+    'pages/joy/index': {
+      network: 'all',
+      packages: ['pages/home', 'pages/care']
     }
   },
   tabBar: {

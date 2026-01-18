@@ -58,28 +58,11 @@ function CommunityActivity() {
   }
 
   // 返回上一页
-  const handleBack = () => {
-    if (getCurrentPages().length > 1) {
-      Taro.navigateBack()
-    } else {
-      Taro.switchTab({ url: '/pages/joy/index' })
-    }
-  }
+ 
 
   return (
     <View className="community-activity-page">
-      {/* 状态栏占位 */}
-      <View className="status-bar" style={{ height: `${statusBarHeight}px` }} />
-
-      {/* 自定义导航栏 */}
-      <View className="custom-navbar">
-        <View className="navbar-back" onClick={handleBack}>
-          <Text className="back-icon">←</Text>
-        </View>
-        <Text className="navbar-title">社区活动</Text>
-        <View className="navbar-placeholder"></View>
-      </View>
-
+      {/* 状态栏占位 */} 
       <ScrollView scrollY className="activity-scroll">
         {/* 分类标签栏 */}
         <View className="tabs-container">

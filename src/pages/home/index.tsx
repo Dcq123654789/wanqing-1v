@@ -5,6 +5,8 @@ import HeaderSection from "./components/HeaderSection";
 import NotificationBar from "./components/NotificationBar";
 import QuickNav from "./components/QuickNav";
 import BannerSwiper from "./components/BannerSwiper";
+import PageTransitionOverlay from "@/components/PageTransitionOverlay";
+import { navigateTo } from "@/utils/navigation";
 import { mockBanners, mockNotifications } from "./mockData";
 import { Banner, Community } from "./types";
 import "./index.scss";
@@ -43,12 +45,10 @@ function Home() {
     }
   };
 
-  // 处理社区切换
+  // 处理社区切换 - 使用新的跳转方法
   const handleCommunityChange = () => {
-    Taro.navigateTo({
-      url: "/pages/home/data/community-select/index",
-    });
-  };
+    navigateTo("/pages/home/data/community-select/index");
+  }; 
 
   // 处理活动点击
   const handleBannerClick = (banner: Banner) => {
@@ -63,16 +63,17 @@ function Home() {
     });
   };
 
-  // 跳转到社区选择页面
+  // 跳转到社区选择页面 - 使用新的跳转方法
   const handleGoToSelect = () => {
     setShowGuideModal(false);
-    Taro.navigateTo({
-      url: "/pages/home/data/community-select/index",
-    });
+    navigateTo("/pages/home/data/community-select/index");
   };
 
   return (
     <View className="home-page">
+      {/* 全局页面过渡遮罩 */}
+      <PageTransitionOverlay />
+
       {/* 顶部区域（包含状态栏、导航栏和欢迎区） */}
       <View className="home-header">
         <HeaderSection
@@ -93,7 +94,7 @@ function Home() {
 
         {/* 快捷导航栏（8宫格） */}
         <View className="section">
-          <Text className="section-title">快捷服务1</Text>
+          <Text className="section-title">快捷服务</Text>
           <QuickNav />
         </View>
 
