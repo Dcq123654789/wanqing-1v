@@ -2,7 +2,7 @@ export default {
   pages: [
     'pages/login/index',
     'pages/home/index',
-    'pages/community-select/index',
+    'pages/home/data/community-select/index',
     'pages/joy/index',
     'pages/joy/components/CommunityActivity/index',
     'pages/care/index',
@@ -19,9 +19,6 @@ export default {
   permission: {
     'scope.userLocation': {
       desc: '您的位置信息将用于提供周边服务'
-    },
-    'scope.werun': {
-      desc: '您的微信运动步数将用于健康管理'
     }
   },
   tabBar: {

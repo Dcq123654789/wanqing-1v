@@ -1,5 +1,5 @@
 #!/usr/bin/env pwsh
-# 创建新功能
+# Create a new feature
 [CmdletBinding()]
 param(
     [switch]$Json,
@@ -11,32 +11,33 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 
-# 如果请求则显示帮助
+# Show help if requested
 if ($Help) {
-    Write-Host "用法: ./create-new-feature.ps1 [-Json] [-ShortName <name>] [-Number N] <feature description>"
+    Write-Host "Usage: ./create-new-feature.ps1 [-Json] [-ShortName <name>] [-Number N] <feature description>"
     Write-Host ""
-    Write-Host "选项:"
-    Write-Host "  -Json               以 JSON 格式输出"
-    Write-Host "  -ShortName <name>   为分支提供自定义短名称（2-4个词）"
-    Write-Host "  -Number N           手动指定分支编号（覆盖自动检测）"
-    Write-Host "  -Help               显示此帮助消息"
+    Write-Host "Options:"
+    Write-Host "  -Json               Output in JSON format"
+    Write-Host "  -ShortName <name>   Provide a custom short name (2-4 words) for the branch"
+    Write-Host "  -Number N           Specify branch number manually (overrides auto-detection)"
+    Write-Host "  -Help               Show this help message"
     Write-Host ""
-    Write-Host "示例:"
-    Write-Host "  ./create-new-feature.ps1 '添加用户认证系统' -ShortName 'user-auth'"
-    Write-Host "  ./create-new-feature.ps1 '为 API 实现 OAuth2 集成'"
+    Write-Host "Examples:"
+    Write-Host "  ./create-new-feature.ps1 'Add user authentication system' -ShortName 'user-auth'"
+    Write-Host "  ./create-new-feature.ps1 'Implement OAuth2 integration for API'"
     exit 0
 }
 
-# 检查是否提供了功能描述
+# Check if feature description provided
 if (-not $FeatureDescription -or $FeatureDescription.Count -eq 0) {
-    Write-Error "用法: ./create-new-feature.ps1 [-Json] [-ShortName <name>] <feature description>"
+    Write-Error "Usage: ./create-new-feature.ps1 [-Json] [-ShortName <name>] <feature description>"
     exit 1
 }
 
 $featureDesc = ($FeatureDescription -join ' ').Trim()
 
-# 解析仓库根目录。优先使用 git 信息，但回退到搜索仓库标记符，
-# 以便工作流在使用 --no-git 初始化的仓库中仍然有效。
+# Resolve repository root. Prefer git information when available, but fall back
+# to searching for repository markers so the workflow still functions in repositories that
+# were initialized with --no-git.
 function Find-RepositoryRoot {
     param(
         [string]$StartDir,
@@ -51,7 +52,7 @@ function Find-RepositoryRoot {
         }
         $parent = Split-Path $current -Parent
         if ($parent -eq $current) {
-            # 到达文件系统根目录仍未找到标记符
+            # Reached filesystem root without finding markers
             return $null
         }
         $current = $parent
@@ -60,7 +61,7 @@ function Find-RepositoryRoot {
 
 function Get-HighestNumberFromSpecs {
     param([string]$SpecsDir)
-
+    
     $highest = 0
     if (Test-Path $SpecsDir) {
         Get-ChildItem -Path $SpecsDir -Directory | ForEach-Object {
@@ -75,16 +76,16 @@ function Get-HighestNumberFromSpecs {
 
 function Get-HighestNumberFromBranches {
     param()
-
+    
     $highest = 0
     try {
         $branches = git branch -a 2>$null
         if ($LASTEXITCODE -eq 0) {
             foreach ($branch in $branches) {
-                # 清理分支名称: 移除前导标记和远程前缀
+                # Clean branch name: remove leading markers and remote prefixes
                 $cleanBranch = $branch.Trim() -replace '^\*?\s+', '' -replace '^remotes/[^/]+/', ''
-
-                # 如果分支匹配 ###-* 模式则提取功能编号
+                
+                # Extract feature number if branch matches pattern ###-*
                 if ($cleanBranch -match '^(\d+)-') {
                     $num = [int]$matches[1]
                     if ($num -gt $highest) { $highest = $num }
@@ -92,8 +93,8 @@ function Get-HighestNumberFromBranches {
             }
         }
     } catch {
-        # 如果 git 命令失败，返回 0
-        Write-Verbose "无法检查 Git 分支: $_"
+        # If git command fails, return 0
+        Write-Verbose "Could not check Git branches: $_"
     }
     return $highest
 }
@@ -103,34 +104,34 @@ function Get-NextBranchNumber {
         [string]$SpecsDir
     )
 
-    # 获取所有远程的最新分支信息（如果没有远程则抑制错误）
+    # Fetch all remotes to get latest branch info (suppress errors if no remotes)
     try {
         git fetch --all --prune 2>$null | Out-Null
     } catch {
-        # 忽略获取错误
+        # Ignore fetch errors
     }
 
-    # 从所有分支中获取最大编号（不仅仅是匹配短名称的）
+    # Get highest number from ALL branches (not just matching short name)
     $highestBranch = Get-HighestNumberFromBranches
 
-    # 从所有规格中获取最大编号（不仅仅是匹配短名称的）
+    # Get highest number from ALL specs (not just matching short name)
     $highestSpec = Get-HighestNumberFromSpecs -SpecsDir $SpecsDir
 
-    # 取两者的最大值
+    # Take the maximum of both
     $maxNum = [Math]::Max($highestBranch, $highestSpec)
 
-    # 返回下一个编号
+    # Return next number
     return $maxNum + 1
 }
 
 function ConvertTo-CleanBranchName {
     param([string]$Name)
-
+    
     return $Name.ToLower() -replace '[^a-z0-9]', '-' -replace '-{2,}', '-' -replace '^-', '' -replace '-$', ''
 }
 $fallbackRoot = (Find-RepositoryRoot -StartDir $PSScriptRoot)
 if (-not $fallbackRoot) {
-    Write-Error "错误: 无法确定仓库根目录。请从仓库内运行此脚本。"
+    Write-Error "Error: Could not determine repository root. Please run this script from within the repository."
     exit 1
 }
 
@@ -139,7 +140,7 @@ try {
     if ($LASTEXITCODE -eq 0) {
         $hasGit = $true
     } else {
-        throw "Git 不可用"
+        throw "Git not available"
     }
 } catch {
     $repoRoot = $fallbackRoot
@@ -151,11 +152,11 @@ Set-Location $repoRoot
 $specsDir = Join-Path $repoRoot 'specs'
 New-Item -ItemType Directory -Path $specsDir -Force | Out-Null
 
-# 生成分支名称的函数，包含停用词过滤和长度过滤
+# Function to generate branch name with stop word filtering and length filtering
 function Get-BranchName {
     param([string]$Description)
-
-    # 要过滤的常见停用词
+    
+    # Common stop words to filter out
     $stopWords = @(
         'i', 'a', 'an', 'the', 'to', 'for', 'of', 'in', 'on', 'at', 'by', 'with', 'from',
         'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had',
@@ -163,55 +164,55 @@ function Get-BranchName {
         'this', 'that', 'these', 'those', 'my', 'your', 'our', 'their',
         'want', 'need', 'add', 'get', 'set'
     )
-
-    # 转换为小写并提取单词（仅字母数字）
+    
+    # Convert to lowercase and extract words (alphanumeric only)
     $cleanName = $Description.ToLower() -replace '[^a-z0-9\s]', ' '
     $words = $cleanName -split '\s+' | Where-Object { $_ }
-
-    # 过滤单词: 移除停用词和短于3个字符的单词（除非它们在原文中是大写缩写）
+    
+    # Filter words: remove stop words and words shorter than 3 chars (unless they're uppercase acronyms in original)
     $meaningfulWords = @()
     foreach ($word in $words) {
-        # 跳过停用词
+        # Skip stop words
         if ($stopWords -contains $word) { continue }
-
-        # 保留长度 >= 3 的单词，或在原文中为大写的单词（可能是缩写）
+        
+        # Keep words that are length >= 3 OR appear as uppercase in original (likely acronyms)
         if ($word.Length -ge 3) {
             $meaningfulWords += $word
         } elseif ($Description -match "\b$($word.ToUpper())\b") {
-            # 如果短单词在原文中为大写则保留（可能是缩写）
+            # Keep short words if they appear as uppercase in original (likely acronyms)
             $meaningfulWords += $word
         }
     }
-
-    # 如果我们有有意义的单词，使用前 3-4 个
+    
+    # If we have meaningful words, use first 3-4 of them
     if ($meaningfulWords.Count -gt 0) {
         $maxWords = if ($meaningfulWords.Count -eq 4) { 4 } else { 3 }
         $result = ($meaningfulWords | Select-Object -First $maxWords) -join '-'
         return $result
     } else {
-        # 如果未找到有意义的单词，回退到原始逻辑
+        # Fallback to original logic if no meaningful words found
         $result = ConvertTo-CleanBranchName -Name $Description
         $fallbackWords = ($result -split '-') | Where-Object { $_ } | Select-Object -First 3
         return [string]::Join('-', $fallbackWords)
     }
 }
 
-# 生成分支名称
+# Generate branch name
 if ($ShortName) {
-    # 使用提供的短名称，只需清理它
+    # Use provided short name, just clean it up
     $branchSuffix = ConvertTo-CleanBranchName -Name $ShortName
 } else {
-    # 从描述中生成，使用智能过滤
+    # Generate from description with smart filtering
     $branchSuffix = Get-BranchName -Description $featureDesc
 }
 
-# 确定分支编号
+# Determine branch number
 if ($Number -eq 0) {
     if ($hasGit) {
-        # 检查远程上的现有分支
+        # Check existing branches on remotes
         $Number = Get-NextBranchNumber -SpecsDir $specsDir
     } else {
-        # 回退到本地目录检查
+        # Fall back to local directory check
         $Number = (Get-HighestNumberFromSpecs -SpecsDir $specsDir) + 1
     }
 }
@@ -219,35 +220,35 @@ if ($Number -eq 0) {
 $featureNum = ('{0:000}' -f $Number)
 $branchName = "$featureNum-$branchSuffix"
 
-# GitHub 对分支名称强制执行 244 字节的限制
-# 如有必要则验证并截断
+# GitHub enforces a 244-byte limit on branch names
+# Validate and truncate if necessary
 $maxBranchLength = 244
 if ($branchName.Length -gt $maxBranchLength) {
-    # 计算需要从后缀中修剪多少
-    # 考虑: 功能编号（3）+ 连字符（1）= 4 个字符
+    # Calculate how much we need to trim from suffix
+    # Account for: feature number (3) + hyphen (1) = 4 chars
     $maxSuffixLength = $maxBranchLength - 4
-
-    # 截断后缀
+    
+    # Truncate suffix
     $truncatedSuffix = $branchSuffix.Substring(0, [Math]::Min($branchSuffix.Length, $maxSuffixLength))
-    # 如果截断创建了尾部连字符则移除
+    # Remove trailing hyphen if truncation created one
     $truncatedSuffix = $truncatedSuffix -replace '-$', ''
-
+    
     $originalBranchName = $branchName
     $branchName = "$featureNum-$truncatedSuffix"
-
-    Write-Warning "[specify] 分支名称超过了 GitHub 的 244 字节限制"
-    Write-Warning "[specify] 原始: $originalBranchName ($($originalBranchName.Length) 字节)"
-    Write-Warning "[specify] 截断为: $branchName ($($branchName.Length) 字节)"
+    
+    Write-Warning "[specify] Branch name exceeded GitHub's 244-byte limit"
+    Write-Warning "[specify] Original: $originalBranchName ($($originalBranchName.Length) bytes)"
+    Write-Warning "[specify] Truncated to: $branchName ($($branchName.Length) bytes)"
 }
 
 if ($hasGit) {
     try {
         git checkout -b $branchName | Out-Null
     } catch {
-        Write-Warning "创建 git 分支失败: $branchName"
+        Write-Warning "Failed to create git branch: $branchName"
     }
 } else {
-    Write-Warning "[specify] 警告: 未检测到 Git 仓库；已跳过 $branchName 的分支创建"
+    Write-Warning "[specify] Warning: Git repository not detected; skipped branch creation for $branchName"
 }
 
 $featureDir = Join-Path $specsDir $branchName
@@ -255,17 +256,17 @@ New-Item -ItemType Directory -Path $featureDir -Force | Out-Null
 
 $template = Join-Path $repoRoot '.specify/templates/spec-template.md'
 $specFile = Join-Path $featureDir 'spec.md'
-if (Test-Path $template) {
-    Copy-Item $template $specFile -Force
-} else {
-    New-Item -ItemType File -Path $specFile | Out-Null
+if (Test-Path $template) { 
+    Copy-Item $template $specFile -Force 
+} else { 
+    New-Item -ItemType File -Path $specFile | Out-Null 
 }
 
-# 为当前会话设置 SPECIFY_FEATURE 环境变量
+# Set the SPECIFY_FEATURE environment variable for the current session
 $env:SPECIFY_FEATURE = $branchName
 
 if ($Json) {
-    $obj = [PSCustomObject]@{
+    $obj = [PSCustomObject]@{ 
         BRANCH_NAME = $branchName
         SPEC_FILE = $specFile
         FEATURE_NUM = $featureNum
@@ -277,5 +278,6 @@ if ($Json) {
     Write-Output "SPEC_FILE: $specFile"
     Write-Output "FEATURE_NUM: $featureNum"
     Write-Output "HAS_GIT: $hasGit"
-    Write-Output "SPECIFY_FEATURE 环境变量已设置为: $branchName"
+    Write-Output "SPECIFY_FEATURE environment variable set to: $branchName"
 }
+

@@ -12,7 +12,8 @@
       "Bash(move:*)",
       "Bash(test:*)",
       "Bash(git checkout:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Skill(speckit.specify)"
     ]
   }
 }

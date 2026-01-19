@@ -1,146 +1,192 @@
-import { View, Map, Text } from '@tarojs/components'
-import Taro, { useDidShow } from '@tarojs/taro'
-import { useState } from 'react'
-import CommunitySelector from './components/CommunitySelector'
-import { Community } from '@/pages/home/types'
-import { mockCommunities } from '@/pages/home/mockData'
-import './index.scss'
+/**
+ * 社区选择页面主组件
+ * 整合地图视图、列表视图、视图切换、社区选择逻辑
+ */
+import { useState, useEffect } from 'react';
+import { View, Button, Text } from '@tarojs/components';
+import Taro from '@tarojs/taro';
+import { useCommunityStore } from '../../../../store/community-store';
+import MapView from './components/MapView';
+import ListView from './components/ListView';
+import CommunityDetail from './components/CommunityDetail';
+import { MOCK_COMMUNITIES, mockDelay } from './services/mock-data';
+import './index.scss';
 
-const STORAGE_KEY = 'selectedCommunity'
+const CommunitySelect: React.FC = () => {
+  const {
+    selectedCommunity,
+    communities,
+    viewMode,
+    isLoading,
+    error,
+    setSelectedCommunity,
+    setCommunities,
+    setViewMode,
+    setLoading,
+    setError,
+    switchCommunity,
+  } = useCommunityStore();
 
-function CommunitySelect() {
-  const [selectedCommunity, setSelectedCommunity] = useState<Community | null>(null)
-  const [communities] = useState<Community[]>(mockCommunities)
-  const [mapContext, setMapContext] = useState<any>(null)
+  const [currentLocation, setCurrentLocation] = useState({
+    latitude: 39.9042,
+    longitude: 116.4074,
+  });
+  const [selectedCommunityId, setSelectedCommunityId] = useState<string | undefined>();
+  const [showDetail, setShowDetail] = useState(false);
 
-  // 页面显示时检查已选择的社区
-  useDidShow(() => {
+  // 加载社区列表
+  useEffect(() => {
+    const loadCommunities = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        // 模拟网络延迟
+        await mockDelay(500);
+
+        // 使用 Mock 数据
+        setCommunities(MOCK_COMMUNITIES);
+      } catch (e) {
+        setError('加载社区列表失败，请检查网络连接');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadCommunities();
+  }, []);
+
+  // 获取用户位置
+  useEffect(() => {
+    Taro.getLocation({
+      type: 'wgs84',
+      success: (res) => {
+        setCurrentLocation({
+          latitude: res.latitude,
+          longitude: res.longitude,
+        });
+      },
+      fail: () => {
+        console.warn('获取位置失败，使用默认位置');
+      },
+    });
+  }, []);
+
+  // 选择社区
+  const handleSelectCommunity = async (communityId: string) => {
     try {
-      const saved = Taro.getStorageSync(STORAGE_KEY)
-      if (saved) {
-        setSelectedCommunity(saved)
-      } else {
-        // 默认选择第一个
-        setSelectedCommunity(communities[0])
+      await switchCommunity(communityId);
+      const community = communities.find(c => c.id === communityId);
+      if (community) {
+        Taro.showToast({
+          title: `已选择 ${community.name}`,
+          icon: 'success',
+        });
+
+        // 跳转到首页
+        setTimeout(() => {
+          Taro.switchTab({
+            url: '/pages/home/index',
+          });
+        }, 1500);
       }
     } catch (e) {
-      console.error('读取社区信息失败:', e)
-      setSelectedCommunity(communities[0])
-    }
-  })
-
-  // 地图加载完成
-  const handleMapReady = () => {
-    const ctx = Taro.createMapContext('communityMap')
-    setMapContext(ctx)
-  }
-
-  // 地图标记点击
-  const handleMarkerTap = (e: any) => {
-    const markerId = e.markerId
-    const community = communities.find(c => c.id === String(markerId))
-    if (community) {
-      setSelectedCommunity(community)
-      // 移动地图中心到该社区
-      mapContext?.moveToLocation({
-        latitude: community.latitude,
-        longitude: community.longitude
-      })
-    }
-  }
-
-  // 处理社区选择变化
-  const handleCommunityChange = (community: Community) => {
-    setSelectedCommunity(community)
-    // 移动地图中心到选中的社区
-    mapContext?.moveToLocation({
-      latitude: community.latitude,
-      longitude: community.longitude
-    })
-  }
-
-  // 处理确认选择
-  const handleConfirm = () => {
-    if (!selectedCommunity) {
-      Taro.showToast({
-        title: '请先选择社区',
-        icon: 'none'
-      })
-      return
-    }
-
-    try {
-      Taro.setStorageSync(STORAGE_KEY, selectedCommunity)
-
-      Taro.showToast({
-        title: '选择成功',
-        icon: 'success',
-        duration: 1500
-      })
-
-      setTimeout(() => {
-        Taro.navigateBack()
-      }, 1500)
-    } catch (e) {
-      console.error('保存社区信息失败:', e)
       Taro.showToast({
         title: '保存失败，请重试',
-        icon: 'none'
-      })
+        icon: 'none',
+      });
     }
+  };
+
+  // 标记点点击（地图视图）
+  const handleMarkerTap = (communityId: string) => {
+    setSelectedCommunityId(communityId);
+    setShowDetail(true);
+  };
+
+  // 列表项点击（列表视图）
+  const handleCommunityTap = (communityId: string) => {
+    setSelectedCommunityId(communityId);
+    const community = communities.find(c => c.id === communityId);
+    if (community) {
+      // 显示详情并直接选择
+      handleSelectCommunity(communityId);
+    }
+  };
+
+  // 切换视图模式
+  const handleToggleView = () => {
+    setViewMode(viewMode === 'map' ? 'list' : 'map');
+  };
+
+  // 关闭详情
+  const handleCloseDetail = () => {
+    setShowDetail(false);
+  };
+
+  // 加载状态
+  if (isLoading) {
+    return (
+      <View className="community-select loading">
+        <Text>加载中...</Text>
+      </View>
+    );
   }
 
-  // 准备地图标记点
-  const markers = communities.map(community => ({
-    id: parseInt(community.id),
-    latitude: community.latitude,
-    longitude: community.longitude,
-    title: community.name,
-    iconPath: '',
-    width: 30,
-    height: 30,
-    customCallout: {
-      content: community.name,
-      display: 'BYCLICK',
-      textAlign: 'center'
-    }
-  }))
-
-  // 地图中心点（使用选中社区的位置）
-  const mapCenter = selectedCommunity || communities[0]
+  // 错误状态
+  if (error) {
+    return (
+      <View className="community-select error">
+        <Text>{error}</Text>
+        <Button onClick={() => Taro.reLaunch({ url: '/pages/home/data/community-select/index' })}>
+          重试
+        </Button>
+      </View>
+    );
+  }
 
   return (
-    <View className="page-container">
-      {/* 地图 */}
-      <Map
-        id="communityMap"
-        className="community-map"
-        latitude={mapCenter.latitude}
-        longitude={mapCenter.longitude}
-        markers={markers}
-        onMarkerTap={handleMarkerTap}
-        onReady={handleMapReady}
-        scale={14}
-        showLocation
-      />
-
-      {/* 顶部标题 */}
-      <View className="page-header">
-        <Text className="page-title">选择您的社区</Text>
-        <Text className="page-subtitle">在地图上选择您所在的社区</Text>
+    <View className="community-select">
+      {/* 视图切换按钮 */}
+      <View className="view-toggle">
+        <Button onClick={handleToggleView} className="toggle-btn">
+          切换到{viewMode === 'map' ? '列表' : '地图'}视图
+        </Button>
       </View>
 
-      {/* 中心社区选择器 */}
-      <View className="selector-container">
-        <CommunitySelector
+      {/* 地图视图 */}
+      {viewMode === 'map' && (
+        <MapView
           communities={communities}
-          selected={selectedCommunity}
-          onChange={handleCommunityChange}
-          onConfirm={handleConfirm}
+          currentLocation={currentLocation}
+          selectedCommunityId={selectedCommunity?.id}
+          onMarkerTap={handleMarkerTap}
         />
-      </View>
-    </View>
-  )
-}
+      )}
 
-export default CommunitySelect
+      {/* 列表视图 */}
+      {viewMode === 'list' && (
+        <ListView
+          communities={communities}
+          selectedCommunityId={selectedCommunity?.id}
+          onCommunityTap={handleCommunityTap}
+        />
+      )}
+
+      {/* 社区详情浮层 */}
+      {showDetail && selectedCommunityId && (
+        <View className="detail-overlay">
+          <View className="detail-container">
+            <CommunityDetail
+              community={communities.find(c => c.id === selectedCommunityId)!}
+              onClose={handleCloseDetail}
+              onSelect={() => handleSelectCommunity(selectedCommunityId!)}
+            />
+          </View>
+        </View>
+      )}
+    </View>
+  );
+};
+
+export default CommunitySelect;

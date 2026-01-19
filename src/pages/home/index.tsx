@@ -46,7 +46,7 @@ function Home() {
   // 处理社区切换
   const handleCommunityChange = () => {
     Taro.navigateTo({
-      url: "/pages/community-select/index",
+      url: "/pages/home/data/community-select/index",
     });
   };
 
@@ -67,7 +67,7 @@ function Home() {
   const handleGoToSelect = () => {
     setShowGuideModal(false);
     Taro.navigateTo({
-      url: "/pages/community-select/index",
+      url: "/pages/home/data/community-select/index",
     });
   };
 

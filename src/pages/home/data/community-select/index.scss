@@ -1,47 +1,314 @@
-@import '@/assets/styles/variables.scss';
-
-.page-container {
-  position: relative;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-}
-
-.community-map {
+/**
+ * 社区选择页面样式
+ */
+.community-select {
   width: 100%;
-  height: 100%;
+  height: 100vh;
+  position: relative;
+  background-color: #f5f5f5;
+
+  // 视图切换按钮
+  .view-toggle {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+
+    .toggle-btn {
+      background-color: #ff9800;
+      color: #fff;
+      border-radius: 20px;
+      padding: 10px 20px;
+      font-size: 14px;
+    }
+  }
+
+  // 地图视图
+  .map-view {
+    width: 100%;
+    height: 100vh;
+  }
+
+  // 列表视图
+  .list-view {
+    width: 100%;
+    height: 100vh;
+    background-color: #fff;
+
+    .list-scroll {
+      height: 100%;
+      padding: 20px;
+    }
+
+    .community-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      margin-bottom: 15px;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s;
+
+      &.selected {
+        background-color: #fff3e0;
+        border: 2px solid #ff9800;
+      }
+
+      .community-info {
+        flex: 1;
+
+        .community-name {
+          font-size: 18px;
+          font-weight: bold;
+          color: #333;
+          margin-bottom: 8px;
+        }
+
+        .community-address {
+          font-size: 14px;
+          color: #666;
+        }
+
+        .community-distance {
+          font-size: 12px;
+          color: #999;
+          margin-top: 5px;
+        }
+      }
+
+      .selected-icon {
+        width: 30px;
+        height: 30px;
+        background-color: #ff9800;
+        color: #fff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        font-weight: bold;
+      }
+    }
+  }
+
+  // 详情浮层
+  .detail-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .detail-container {
+      width: 80%;
+      max-width: 400px;
+      background-color: #fff;
+      border-radius: 15px;
+      overflow: hidden;
+    }
+  }
+
+  // 加载状态
+  &.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+
+    text {
+      font-size: 16px;
+      color: #666;
+    }
+  }
+
+  // 错误状态
+  &.error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    padding: 20px;
+
+    text {
+      font-size: 16px;
+      color: #f44336;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    button {
+      background-color: #ff9800;
+      color: #fff;
+      border-radius: 20px;
+      padding: 10px 30px;
+    }
+  }
 }
 
-.page-header {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 100%);
-  padding: 48rpx 32rpx 32rpx;
-  z-index: 10;
+// 社区卡片组件样式
+.community-card {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+
+    .community-name {
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .status-badge {
+      padding: 5px 10px;
+      border-radius: 15px;
+
+      &.active {
+        background-color: #4caf50;
+      }
+
+      &.inactive {
+        background-color: #f44336;
+      }
+
+      .status-text {
+        font-size: 12px;
+        color: #fff;
+      }
+    }
+  }
+
+  .card-body {
+    .info-row {
+      display: flex;
+      margin-bottom: 8px;
+
+      .info-label {
+        font-size: 14px;
+        color: #666;
+        min-width: 80px;
+      }
+
+      .info-value {
+        flex: 1;
+        font-size: 14px;
+        color: #333;
+      }
+    }
+  }
 }
 
-.page-title {
-  display: block;
-  font-size: 40rpx;
-  font-weight: 600;
-  color: #fff;
-  margin-bottom: 8rpx;
-  text-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.3);
-}
+// 社区详情组件样式
+.community-detail {
+  background-color: #fff;
+  border-radius: 15px;
+  overflow: hidden;
 
-.page-subtitle {
-  display: block;
-  font-size: 28rpx;
-  color: rgba(255, 255, 255, 0.9);
-  text-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.3);
-}
+  .detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: #ff9800;
+    color: #fff;
 
-.selector-container {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 100;
+    .detail-title {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .close-btn {
+      background-color: transparent;
+      color: #fff;
+      font-size: 24px;
+      padding: 0;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+    }
+  }
+
+  .detail-content {
+    padding: 20px;
+
+    .detail-section {
+      margin-bottom: 20px;
+
+      .section-title {
+        font-size: 16px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 10px;
+      }
+
+      .info-item {
+        display: flex;
+        margin-bottom: 10px;
+
+        .info-label {
+          font-size: 14px;
+          color: #666;
+          min-width: 80px;
+        }
+
+        .info-value {
+          flex: 1;
+          font-size: 14px;
+          color: #333;
+        }
+      }
+
+      .status-badge {
+        display: inline-block;
+        padding: 5px 15px;
+        border-radius: 15px;
+
+        &.active {
+          background-color: #4caf50;
+        }
+
+        &.inactive {
+          background-color: #f44336;
+        }
+
+        .status-text {
+          font-size: 14px;
+          color: #fff;
+        }
+      }
+    }
+  }
+
+  .detail-footer {
+    padding: 15px 20px;
+    border-top: 1px solid #eee;
+
+    .select-btn {
+      width: 100%;
+      background-color: #ff9800;
+      color: #fff;
+      border-radius: 25px;
+      padding: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+    }
+  }
 }

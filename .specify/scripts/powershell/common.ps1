@@ -1,5 +1,5 @@
 #!/usr/bin/env pwsh
-# 类似于 common.sh 的公共 PowerShell 函数
+# Common PowerShell functions analogous to common.sh
 
 function Get-RepoRoot {
     try {
@@ -8,37 +8,37 @@ function Get-RepoRoot {
             return $result
         }
     } catch {
-        # Git 命令失败
+        # Git command failed
     }
-
-    # 对于非 git 仓库，回退到脚本位置
+    
+    # Fall back to script location for non-git repos
     return (Resolve-Path (Join-Path $PSScriptRoot "../../..")).Path
 }
 
 function Get-CurrentBranch {
-    # 首先检查是否设置了 SPECIFY_FEATURE 环境变量
+    # First check if SPECIFY_FEATURE environment variable is set
     if ($env:SPECIFY_FEATURE) {
         return $env:SPECIFY_FEATURE
     }
-
-    # 然后检查 git（如果可用）
+    
+    # Then check git if available
     try {
         $result = git rev-parse --abbrev-ref HEAD 2>$null
         if ($LASTEXITCODE -eq 0) {
             return $result
         }
     } catch {
-        # Git 命令失败
+        # Git command failed
     }
-
-    # 对于非 git 仓库，尝试查找最新的功能目录
+    
+    # For non-git repos, try to find the latest feature directory
     $repoRoot = Get-RepoRoot
-    $specsDir = Join-Path $repoRoot "specs"
-
+    $specsDir = Join-Path $repoRoot ".specify/specs"
+    
     if (Test-Path $specsDir) {
         $latestFeature = ""
         $highest = 0
-
+        
         Get-ChildItem -Path $specsDir -Directory | ForEach-Object {
             if ($_.Name -match '^(\d{3})-') {
                 $num = [int]$matches[1]
@@ -48,13 +48,13 @@ function Get-CurrentBranch {
                 }
             }
         }
-
+        
         if ($latestFeature) {
             return $latestFeature
         }
     }
-
-    # 最终回退
+    
+    # Final fallback
     return "main"
 }
 
@@ -72,16 +72,16 @@ function Test-FeatureBranch {
         [string]$Branch,
         [bool]$HasGit = $true
     )
-
-    # 对于非 git 仓库，我们无法强制分支命名，但仍提供输出
+    
+    # For non-git repos, we can't enforce branch naming but still provide output
     if (-not $HasGit) {
-        Write-Warning "[specify] 警告: 未检测到 Git 仓库；已跳过分支验证"
+        Write-Warning "[specify] Warning: Git repository not detected; skipped branch validation"
         return $true
     }
-
+    
     if ($Branch -notmatch '^[0-9]{3}-') {
-        Write-Output "错误: 不在功能分支上。当前分支: $Branch"
-        Write-Output "功能分支应命名为: 001-feature-name"
+        Write-Output "ERROR: Not on a feature branch. Current branch: $Branch"
+        Write-Output "Feature branches should be named like: 001-feature-name"
         return $false
     }
     return $true
@@ -89,7 +89,7 @@ function Test-FeatureBranch {
 
 function Get-FeatureDir {
     param([string]$RepoRoot, [string]$Branch)
-    Join-Path $RepoRoot "specs/$Branch"
+    Join-Path $RepoRoot ".specify/specs/$Branch"
 }
 
 function Get-FeaturePathsEnv {
@@ -97,7 +97,7 @@ function Get-FeaturePathsEnv {
     $currentBranch = Get-CurrentBranch
     $hasGit = Test-HasGit
     $featureDir = Get-FeatureDir -RepoRoot $repoRoot -Branch $currentBranch
-
+    
     [PSCustomObject]@{
         REPO_ROOT     = $repoRoot
         CURRENT_BRANCH = $currentBranch
@@ -134,3 +134,4 @@ function Test-DirHasFiles {
         return $false
     }
 }
+

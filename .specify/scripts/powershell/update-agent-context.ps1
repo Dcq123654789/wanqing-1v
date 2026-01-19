@@ -1,27 +1,27 @@
 #!/usr/bin/env pwsh
-<#_
+<#!
 .SYNOPSIS
-使用 plan.md 中的信息更新 Agent 上下文文件 (PowerShell 版本)
+Update agent context files with information from plan.md (PowerShell version)
 
 .DESCRIPTION
-镜像 scripts/bash/update-agent-context.sh 的行为:
- 1. 环境验证
- 2. 计划数据提取
- 3. Agent 文件管理（从模板创建或更新现有文件）
- 4. 内容生成（技术栈、最近变更、时间戳）
- 5. 多 Agent 支持（claude、gemini、copilot、cursor-agent、qwen、opencode、codex、windsurf、kilocode、auggie、roo、codebuddy、amp、shai、q、bob、qoder）
+Mirrors the behavior of scripts/bash/update-agent-context.sh:
+ 1. Environment Validation
+ 2. Plan Data Extraction
+ 3. Agent File Management (create from template or update existing)
+ 4. Content Generation (technology stack, recent changes, timestamp)
+ 5. Multi-Agent Support (claude, gemini, copilot, cursor-agent, qwen, opencode, codex, windsurf, kilocode, auggie, roo, codebuddy, amp, shai, q, bob, qoder)
 
 .PARAMETER AgentType
-可选的 Agent 键以更新单个 Agent。如果省略，更新所有现有的 agent 文件（如果不存在则创建默认的 Claude 文件）。
+Optional agent key to update a single agent. If omitted, updates all existing agent files (creating a default Claude file if none exist).
 
 .EXAMPLE
 ./update-agent-context.ps1 -AgentType claude
 
 .EXAMPLE
-./update-agent-context.ps1   # 更新所有现有 agent 文件
+./update-agent-context.ps1   # Updates all existing agent files
 
 .NOTES
-依赖 common.ps1 中的公共辅助函数
+Relies on common helper functions in common.ps1
 #>
 param(
     [Parameter(Position=0)]
@@ -31,11 +31,11 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-# 导入公共辅助函数
+# Import common helpers
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 . (Join-Path $ScriptDir 'common.ps1')
 
-# 获取环境路径
+# Acquire environment paths
 $envData = Get-FeaturePathsEnv
 $REPO_ROOT     = $envData.REPO_ROOT
 $CURRENT_BRANCH = $envData.CURRENT_BRANCH
@@ -43,7 +43,7 @@ $HAS_GIT       = $envData.HAS_GIT
 $IMPL_PLAN     = $envData.IMPL_PLAN
 $NEW_PLAN = $IMPL_PLAN
 
-# Agent 文件路径
+# Agent file paths
 $CLAUDE_FILE   = Join-Path $REPO_ROOT 'CLAUDE.md'
 $GEMINI_FILE   = Join-Path $REPO_ROOT 'GEMINI.md'
 $COPILOT_FILE  = Join-Path $REPO_ROOT '.github/agents/copilot-instructions.md'
@@ -63,59 +63,59 @@ $BOB_FILE      = Join-Path $REPO_ROOT 'AGENTS.md'
 
 $TEMPLATE_FILE = Join-Path $REPO_ROOT '.specify/templates/agent-file-template.md'
 
-# 解析后的计划数据占位符
+# Parsed plan data placeholders
 $script:NEW_LANG = ''
 $script:NEW_FRAMEWORK = ''
 $script:NEW_DB = ''
 $script:NEW_PROJECT_TYPE = ''
 
-function Write-Info {
+function Write-Info { 
     param(
         [Parameter(Mandatory=$true)]
         [string]$Message
     )
-    Write-Host "INFO: $Message"
+    Write-Host "INFO: $Message" 
 }
 
-function Write-Success {
+function Write-Success { 
     param(
         [Parameter(Mandatory=$true)]
         [string]$Message
     )
-    Write-Host "$([char]0x2713) $Message"
+    Write-Host "$([char]0x2713) $Message" 
 }
 
-function Write-WarningMsg {
+function Write-WarningMsg { 
     param(
         [Parameter(Mandatory=$true)]
         [string]$Message
     )
-    Write-Warning $Message
+    Write-Warning $Message 
 }
 
-function Write-Err {
+function Write-Err { 
     param(
         [Parameter(Mandatory=$true)]
         [string]$Message
     )
-    Write-Host "错误: $Message" -ForegroundColor Red
+    Write-Host "ERROR: $Message" -ForegroundColor Red 
 }
 
 function Validate-Environment {
     if (-not $CURRENT_BRANCH) {
-        Write-Err '无法确定当前功能'
-        if ($HAS_GIT) { Write-Info "确保您在功能分支上" } else { Write-Info '设置 SPECIFY_FEATURE 环境变量或先创建功能' }
+        Write-Err 'Unable to determine current feature'
+        if ($HAS_GIT) { Write-Info "Make sure you're on a feature branch" } else { Write-Info 'Set SPECIFY_FEATURE environment variable or create a feature first' }
         exit 1
     }
     if (-not (Test-Path $NEW_PLAN)) {
-        Write-Err "在 $NEW_PLAN 未找到 plan.md"
-        Write-Info '确保您正在处理具有对应规格目录的功能'
-        if (-not $HAS_GIT) { Write-Info '使用: $env:SPECIFY_FEATURE=your-feature-name 或先创建新功能' }
+        Write-Err "No plan.md found at $NEW_PLAN"
+        Write-Info 'Ensure you are working on a feature with a corresponding spec directory'
+        if (-not $HAS_GIT) { Write-Info 'Use: $env:SPECIFY_FEATURE=your-feature-name or create a new feature first' }
         exit 1
     }
     if (-not (Test-Path $TEMPLATE_FILE)) {
-        Write-Err "在 $TEMPLATE_FILE 未找到模板文件"
-        Write-Info '运行 specify init 以搭建 .specify/templates，或在那里添加 agent-file-template.md。'
+        Write-Err "Template file not found at $TEMPLATE_FILE"
+        Write-Info 'Run specify init to scaffold .specify/templates, or add agent-file-template.md there.'
         exit 1
     }
 }
@@ -128,10 +128,10 @@ function Extract-PlanField {
         [string]$PlanFile
     )
     if (-not (Test-Path $PlanFile)) { return '' }
-    # 类似 **Language/Version**: Python 3.12 的行
+    # Lines like **Language/Version**: Python 3.12
     $regex = "^\*\*$([Regex]::Escape($FieldPattern))\*\*: (.+)$"
     Get-Content -LiteralPath $PlanFile -Encoding utf8 | ForEach-Object {
-        if ($_ -match $regex) {
+        if ($_ -match $regex) { 
             $val = $Matches[1].Trim()
             if ($val -notin @('NEEDS CLARIFICATION','N/A')) { return $val }
         }
@@ -143,17 +143,17 @@ function Parse-PlanData {
         [Parameter(Mandatory=$true)]
         [string]$PlanFile
     )
-    if (-not (Test-Path $PlanFile)) { Write-Err "未找到计划文件: $PlanFile"; return $false }
-    Write-Info "正在从 $PlanFile 解析计划数据"
+    if (-not (Test-Path $PlanFile)) { Write-Err "Plan file not found: $PlanFile"; return $false }
+    Write-Info "Parsing plan data from $PlanFile"
     $script:NEW_LANG        = Extract-PlanField -FieldPattern 'Language/Version' -PlanFile $PlanFile
     $script:NEW_FRAMEWORK   = Extract-PlanField -FieldPattern 'Primary Dependencies' -PlanFile $PlanFile
     $script:NEW_DB          = Extract-PlanField -FieldPattern 'Storage' -PlanFile $PlanFile
     $script:NEW_PROJECT_TYPE = Extract-PlanField -FieldPattern 'Project Type' -PlanFile $PlanFile
 
-    if ($NEW_LANG) { Write-Info "找到语言: $NEW_LANG" } else { Write-WarningMsg '计划中未找到语言信息' }
-    if ($NEW_FRAMEWORK) { Write-Info "找到框架: $NEW_FRAMEWORK" }
-    if ($NEW_DB -and $NEW_DB -ne 'N/A') { Write-Info "找到数据库: $NEW_DB" }
-    if ($NEW_PROJECT_TYPE) { Write-Info "找到项目类型: $NEW_PROJECT_TYPE" }
+    if ($NEW_LANG) { Write-Info "Found language: $NEW_LANG" } else { Write-WarningMsg 'No language information found in plan' }
+    if ($NEW_FRAMEWORK) { Write-Info "Found framework: $NEW_FRAMEWORK" }
+    if ($NEW_DB -and $NEW_DB -ne 'N/A') { Write-Info "Found database: $NEW_DB" }
+    if ($NEW_PROJECT_TYPE) { Write-Info "Found project type: $NEW_PROJECT_TYPE" }
     return $true
 }
 
@@ -171,15 +171,15 @@ function Format-TechnologyStack {
     return ($parts -join ' + ')
 }
 
-function Get-ProjectStructure {
+function Get-ProjectStructure { 
     param(
         [Parameter(Mandatory=$false)]
         [string]$ProjectType
     )
-    if ($ProjectType -match 'web') { return "backend/`nfrontend/`ntests/" } else { return "src/`ntests/" }
+    if ($ProjectType -match 'web') { return "backend/`nfrontend/`ntests/" } else { return "src/`ntests/" } 
 }
 
-function Get-CommandsForLanguage {
+function Get-CommandsForLanguage { 
     param(
         [Parameter(Mandatory=$false)]
         [string]$Lang
@@ -188,16 +188,16 @@ function Get-CommandsForLanguage {
         'Python' { return "cd src; pytest; ruff check ." }
         'Rust' { return "cargo test; cargo clippy" }
         'JavaScript|TypeScript' { return "npm test; npm run lint" }
-        default { return "# 为 $Lang 添加命令" }
+        default { return "# Add commands for $Lang" }
     }
 }
 
-function Get-LanguageConventions {
+function Get-LanguageConventions { 
     param(
         [Parameter(Mandatory=$false)]
         [string]$Lang
     )
-    if ($Lang) { "${Lang}: 遵循标准约定" } else { '通用: 遵循标准约定' }
+    if ($Lang) { "${Lang}: Follow standard conventions" } else { 'General: Follow standard conventions' } 
 }
 
 function New-AgentFile {
@@ -209,7 +209,7 @@ function New-AgentFile {
         [Parameter(Mandatory=$true)]
         [datetime]$Date
     )
-    if (-not (Test-Path $TEMPLATE_FILE)) { Write-Err "在 $TEMPLATE_FILE 未找到模板"; return $false }
+    if (-not (Test-Path $TEMPLATE_FILE)) { Write-Err "Template not found at $TEMPLATE_FILE"; return $false }
     $temp = New-TemporaryFile
     Copy-Item -LiteralPath $TEMPLATE_FILE -Destination $temp -Force
 
@@ -224,8 +224,8 @@ function New-AgentFile {
     $content = Get-Content -LiteralPath $temp -Raw -Encoding utf8
     $content = $content -replace '\[PROJECT NAME\]',$ProjectName
     $content = $content -replace '\[DATE\]',$Date.ToString('yyyy-MM-dd')
-
-    # 安全地构建技术栈字符串
+    
+    # Build the technology stack string safely
     $techStackForTemplate = ""
     if ($escaped_lang -and $escaped_framework) {
         $techStackForTemplate = "- $escaped_lang + $escaped_framework ($escaped_branch)"
@@ -234,27 +234,27 @@ function New-AgentFile {
     } elseif ($escaped_framework) {
         $techStackForTemplate = "- $escaped_framework ($escaped_branch)"
     }
-
+    
     $content = $content -replace '\[EXTRACTED FROM ALL PLAN.MD FILES\]',$techStackForTemplate
-    # 对于我们手动嵌入的项目结构（保留换行符）
+    # For project structure we manually embed (keep newlines)
     $escapedStructure = [Regex]::Escape($projectStructure)
     $content = $content -replace '\[ACTUAL STRUCTURE FROM PLANS\]',$escapedStructure
-    # 在所有替换后替换换行符占位符
+    # Replace escaped newlines placeholder after all replacements
     $content = $content -replace '\[ONLY COMMANDS FOR ACTIVE TECHNOLOGIES\]',$commands
     $content = $content -replace '\[LANGUAGE-SPECIFIC, ONLY FOR LANGUAGES IN USE\]',$languageConventions
-
-    # 安全地构建最近变更字符串
+    
+    # Build the recent changes string safely
     $recentChangesForTemplate = ""
     if ($escaped_lang -and $escaped_framework) {
-        $recentChangesForTemplate = "- ${escaped_branch}: 添加了 ${escaped_lang} + ${escaped_framework}"
+        $recentChangesForTemplate = "- ${escaped_branch}: Added ${escaped_lang} + ${escaped_framework}"
     } elseif ($escaped_lang) {
-        $recentChangesForTemplate = "- ${escaped_branch}: 添加了 ${escaped_lang}"
+        $recentChangesForTemplate = "- ${escaped_branch}: Added ${escaped_lang}"
     } elseif ($escaped_framework) {
-        $recentChangesForTemplate = "- ${escaped_branch}: 添加了 ${escaped_framework}"
+        $recentChangesForTemplate = "- ${escaped_branch}: Added ${escaped_framework}"
     }
-
+    
     $content = $content -replace '\[LAST 3 FEATURES AND WHAT THEY ADDED\]',$recentChangesForTemplate
-    # 将 Escape 引入的字面 \n 序列转换为真正的换行符
+    # Convert literal \n sequences introduced by Escape to real newlines
     $content = $content -replace '\\n',[Environment]::NewLine
 
     $parent = Split-Path -Parent $TargetFile
@@ -277,19 +277,19 @@ function Update-ExistingAgentFile {
     $newTechEntries = @()
     if ($techStack) {
         $escapedTechStack = [Regex]::Escape($techStack)
-        if (-not (Select-String -Pattern $escapedTechStack -Path $TargetFile -Quiet)) {
-            $newTechEntries += "- $techStack ($CURRENT_BRANCH)"
+        if (-not (Select-String -Pattern $escapedTechStack -Path $TargetFile -Quiet)) { 
+            $newTechEntries += "- $techStack ($CURRENT_BRANCH)" 
         }
     }
     if ($NEW_DB -and $NEW_DB -notin @('N/A','NEEDS CLARIFICATION')) {
         $escapedDB = [Regex]::Escape($NEW_DB)
-        if (-not (Select-String -Pattern $escapedDB -Path $TargetFile -Quiet)) {
-            $newTechEntries += "- $NEW_DB ($CURRENT_BRANCH)"
+        if (-not (Select-String -Pattern $escapedDB -Path $TargetFile -Quiet)) { 
+            $newTechEntries += "- $NEW_DB ($CURRENT_BRANCH)" 
         }
     }
     $newChangeEntry = ''
-    if ($techStack) { $newChangeEntry = "- ${CURRENT_BRANCH}: 添加了 ${techStack}" }
-    elseif ($NEW_DB -and $NEW_DB -notin @('N/A','NEEDS CLARIFICATION')) { $newChangeEntry = "- ${CURRENT_BRANCH}: 添加了 ${NEW_DB}" }
+    if ($techStack) { $newChangeEntry = "- ${CURRENT_BRANCH}: Added ${techStack}" }
+    elseif ($NEW_DB -and $NEW_DB -notin @('N/A','NEEDS CLARIFICATION')) { $newChangeEntry = "- ${CURRENT_BRANCH}: Added ${NEW_DB}" }
 
     $lines = Get-Content -LiteralPath $TargetFile -Encoding utf8
     $output = New-Object System.Collections.Generic.List[string]
@@ -328,7 +328,7 @@ function Update-ExistingAgentFile {
         $output.Add($line)
     }
 
-    # 循环后检查: 如果我们仍在"使用的技术"部分且尚未添加新条目
+    # Post-loop check: if we're still in the Active Technologies section and haven't added new entries
     if ($inTech -and -not $techAdded -and $newTechEntries.Count -gt 0) {
         $newTechEntries | ForEach-Object { $output.Add($_) }
     }
@@ -344,8 +344,8 @@ function Update-AgentFile {
         [Parameter(Mandatory=$true)]
         [string]$AgentName
     )
-    if (-not $TargetFile -or -not $AgentName) { Write-Err 'Update-AgentFile 需要 TargetFile 和 AgentName'; return $false }
-    Write-Info "正在更新 $AgentName 上下文文件: $TargetFile"
+    if (-not $TargetFile -or -not $AgentName) { Write-Err 'Update-AgentFile requires TargetFile and AgentName'; return $false }
+    Write-Info "Updating $AgentName context file: $TargetFile"
     $projectName = Split-Path $REPO_ROOT -Leaf
     $date = Get-Date
 
@@ -353,12 +353,12 @@ function Update-AgentFile {
     if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir | Out-Null }
 
     if (-not (Test-Path $TargetFile)) {
-        if (New-AgentFile -TargetFile $TargetFile -ProjectName $projectName -Date $date) { Write-Success "已创建新的 $AgentName 上下文文件" } else { Write-Err '创建新 agent 文件失败'; return $false }
+        if (New-AgentFile -TargetFile $TargetFile -ProjectName $projectName -Date $date) { Write-Success "Created new $AgentName context file" } else { Write-Err 'Failed to create new agent file'; return $false }
     } else {
         try {
-            if (Update-ExistingAgentFile -TargetFile $TargetFile -Date $date) { Write-Success "已更新现有 $AgentName 上下文文件" } else { Write-Err '更新 agent 文件失败'; return $false }
+            if (Update-ExistingAgentFile -TargetFile $TargetFile -Date $date) { Write-Success "Updated existing $AgentName context file" } else { Write-Err 'Failed to update agent file'; return $false }
         } catch {
-            Write-Err "无法访问或更新现有文件: $TargetFile. $_"
+            Write-Err "Cannot access or update existing file: $TargetFile. $_"
             return $false
         }
     }
@@ -388,7 +388,7 @@ function Update-SpecificAgent {
         'shai'     { Update-AgentFile -TargetFile $SHAI_FILE     -AgentName 'SHAI' }
         'q'        { Update-AgentFile -TargetFile $Q_FILE        -AgentName 'Amazon Q Developer CLI' }
         'bob'      { Update-AgentFile -TargetFile $BOB_FILE      -AgentName 'IBM Bob' }
-        default { Write-Err "未知的 Agent 类型 '$Type'"; Write-Err '期望: claude|gemini|copilot|cursor-agent|qwen|opencode|codex|windsurf|kilocode|auggie|roo|codebuddy|amp|shai|q|bob|qoder'; return $false }
+        default { Write-Err "Unknown agent type '$Type'"; Write-Err 'Expected: claude|gemini|copilot|cursor-agent|qwen|opencode|codex|windsurf|kilocode|auggie|roo|codebuddy|amp|shai|q|bob|qoder'; return $false }
     }
 }
 
@@ -411,7 +411,7 @@ function Update-AllExistingAgents {
     if (Test-Path $Q_FILE)        { if (-not (Update-AgentFile -TargetFile $Q_FILE        -AgentName 'Amazon Q Developer CLI')) { $ok = $false }; $found = $true }
     if (Test-Path $BOB_FILE)      { if (-not (Update-AgentFile -TargetFile $BOB_FILE      -AgentName 'IBM Bob')) { $ok = $false }; $found = $true }
     if (-not $found) {
-        Write-Info '未找到现有的 agent 文件，正在创建默认的 Claude 文件...'
+        Write-Info 'No existing agent files found, creating default Claude file...'
         if (-not (Update-AgentFile -TargetFile $CLAUDE_FILE -AgentName 'Claude Code')) { $ok = $false }
     }
     return $ok
@@ -419,29 +419,30 @@ function Update-AllExistingAgents {
 
 function Print-Summary {
     Write-Host ''
-    Write-Info '变更摘要:'
-    if ($NEW_LANG) { Write-Host "  - 添加语言: $NEW_LANG" }
-    if ($NEW_FRAMEWORK) { Write-Host "  - 添加框架: $NEW_FRAMEWORK" }
-    if ($NEW_DB -and $NEW_DB -ne 'N/A') { Write-Host "  - 添加数据库: $NEW_DB" }
+    Write-Info 'Summary of changes:'
+    if ($NEW_LANG) { Write-Host "  - Added language: $NEW_LANG" }
+    if ($NEW_FRAMEWORK) { Write-Host "  - Added framework: $NEW_FRAMEWORK" }
+    if ($NEW_DB -and $NEW_DB -ne 'N/A') { Write-Host "  - Added database: $NEW_DB" }
     Write-Host ''
-    Write-Info '用法: ./update-agent-context.ps1 [-AgentType claude|gemini|copilot|cursor-agent|qwen|opencode|codex|windsurf|kilocode|auggie|roo|codebuddy|amp|shai|q|bob|qoder]'
+    Write-Info 'Usage: ./update-agent-context.ps1 [-AgentType claude|gemini|copilot|cursor-agent|qwen|opencode|codex|windsurf|kilocode|auggie|roo|codebuddy|amp|shai|q|bob|qoder]'
 }
 
 function Main {
     Validate-Environment
-    Write-Info "=== 正在为功能 $CURRENT_BRANCH 更新 Agent 上下文文件 ==="
-    if (-not (Parse-PlanData -PlanFile $NEW_PLAN)) { Write-Err '解析计划数据失败'; exit 1 }
+    Write-Info "=== Updating agent context files for feature $CURRENT_BRANCH ==="
+    if (-not (Parse-PlanData -PlanFile $NEW_PLAN)) { Write-Err 'Failed to parse plan data'; exit 1 }
     $success = $true
     if ($AgentType) {
-        Write-Info "正在更新特定 Agent: $AgentType"
+        Write-Info "Updating specific agent: $AgentType"
         if (-not (Update-SpecificAgent -Type $AgentType)) { $success = $false }
     }
     else {
-        Write-Info '未指定 Agent，正在更新所有现有 Agent 文件...'
+        Write-Info 'No agent specified, updating all existing agent files...'
         if (-not (Update-AllExistingAgents)) { $success = $false }
     }
     Print-Summary
-    if ($success) { Write-Success 'Agent 上下文更新成功完成'; exit 0 } else { Write-Err 'Agent 上下文更新完成但存在错误'; exit 1 }
+    if ($success) { Write-Success 'Agent context update completed successfully'; exit 0 } else { Write-Err 'Agent context update completed with errors'; exit 1 }
 }
 
 Main
+
