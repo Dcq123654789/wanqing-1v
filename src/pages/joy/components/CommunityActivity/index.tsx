@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react'
 import { mockActivityList, categoryConfig, statusConfig } from './mockData'
 import type { ActivityListItem } from './types'
 import './index.scss'
-
+import PageTransitionOverlay from "@/components/PageTransitionOverlay";
+import { navigateTo } from "@/utils/navigation";
 function CommunityActivity() {
   const [statusBarHeight, setStatusBarHeight] = useState(0)
   const [activeTab, setActiveTab] = useState<string>('all')
@@ -46,40 +47,23 @@ function CommunityActivity() {
 
   // 活动点击
   const handleActivityClick = (item: ActivityListItem) => {
-    Taro.showToast({
-      title: '查看活动详情',
-      icon: 'none',
-      duration: 2000
+    const params = new URLSearchParams({
+      id: item.id,
+      title: encodeURIComponent(item.title),
+      category: item.category,
+      status: item.status
     })
-    // TODO: 跳转到详情页
-    // Taro.navigateTo({
-    //   url: `/pages/joy/community-activity/detail/index?id=${item.id}`
-    // })
+
+    navigateTo(`/pages/joy/components/CommunityActivity/Detail/index?${params.toString()}`);
   }
 
   // 返回上一页
-  const handleBack = () => {
-    if (getCurrentPages().length > 1) {
-      Taro.navigateBack()
-    } else {
-      Taro.switchTab({ url: '/pages/joy/index' })
-    }
-  }
+ 
 
   return (
     <View className="community-activity-page">
-      {/* 状态栏占位 */}
-      <View className="status-bar" style={{ height: `${statusBarHeight}px` }} />
-
-      {/* 自定义导航栏 */}
-      <View className="custom-navbar">
-        <View className="navbar-back" onClick={handleBack}>
-          <Text className="back-icon">←</Text>
-        </View>
-        <Text className="navbar-title">社区活动</Text>
-        <View className="navbar-placeholder"></View>
-      </View>
-
+      <PageTransitionOverlay />
+      {/* 状态栏占位 */} 
       <ScrollView scrollY className="activity-scroll">
         {/* 分类标签栏 */}
         <View className="tabs-container">

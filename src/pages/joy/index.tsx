@@ -5,7 +5,10 @@ import { mockTravelRoutes, mockProducts } from './mockData'
 import type { TravelRoute, Product } from './mockData'
 import ServiceStrip from './components/ServiceStrip'
 import ProductBanner from './components/ProductBanner'
+import PageTransitionOverlay from '@/components/PageTransitionOverlay'
 import './index.scss'
+
+import { navigateTo } from "@/utils/navigation";
 
 function Joy() {
   const [statusBarHeight, setStatusBarHeight] = useState(0)
@@ -39,6 +42,7 @@ function Joy() {
 
   return (
     <View className="joy-page">
+      <PageTransitionOverlay />
       {/* 状态栏占位 */}
       <View className="status-bar" style={{ height: `${statusBarHeight}px` }} />
 

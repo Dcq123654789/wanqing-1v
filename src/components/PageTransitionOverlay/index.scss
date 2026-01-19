@@ -1,0 +1,36 @@
+@import '@/assets/styles/variables.scss';
+
+.page-transition-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #ffffff;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+.loading-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 4px;
+  background: linear-gradient(90deg, $wanqing-primary, #ffb74d);
+  animation: loading-line 1.2s ease-in-out infinite;
+}
+
+@keyframes loading-line {
+  0% {
+    width: 0%;
+    left: 0;
+  }
+  50% {
+    width: 60%;
+    left: 20%;
+  }
+  100% {
+    width: 100%;
+    left: 100%;
+  }
+}

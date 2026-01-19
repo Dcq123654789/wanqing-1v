@@ -1,4 +1,4 @@
-import { useLaunch } from '@tarojs/taro'
+import { useLaunch } from '@tarojs/taro' 
 import './app.scss'
 
 function App(props: any) {
@@ -6,7 +6,11 @@ function App(props: any) {
     console.log('App launched.')
   })
 
-  return props.children
+  return (
+    <> 
+      {props.children}
+    </>
+  )
 }
 
 export default App

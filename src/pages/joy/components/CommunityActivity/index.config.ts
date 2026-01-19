@@ -1,5 +1,5 @@
 export default {
-  navigationBarTitleText: '社区活动',
-  navigationStyle: 'custom',
-  backgroundColor: '#f6ffed'
+  navigationBarTitleText: '社区活动', 
+   navigationBarBackgroundColor: '#52c41a',
+  navigationBarTextStyle: 'white'
 }

@@ -1,0 +1,400 @@
+@import '@/assets/styles/variables.scss';
+@import '@/assets/styles/mixins.scss';
+
+.activity-detail-page {
+  min-height: 100vh;
+  background: #f6ffed;
+  display: flex;
+  flex-direction: column;
+}
+
+// 加载和错误状态
+.loading-state,
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  gap: 24rpx;
+
+  .error-icon {
+    font-size: 120rpx;
+  }
+
+  .error-text {
+    font-size: 28rpx;
+    color: #999;
+  }
+}
+
+// 滚动区域
+.detail-scroll {
+  flex: 1;
+  height: 100vh;
+}
+
+// 封面图
+.detail-cover {
+  position: relative;
+  width: 100%;
+  height: 500rpx;
+  overflow: hidden;
+}
+
+.cover-image {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.cover-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3) 0%, transparent 30%);
+  padding: 32rpx;
+}
+
+.status-badge {
+  position: absolute;
+  top: 32rpx;
+  right: 32rpx;
+  padding: 12rpx 24rpx;
+  border-radius: 24rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+
+  .status-text {
+    font-size: 24rpx;
+    font-weight: 600;
+  }
+}
+
+// 主要内容区
+.detail-main {
+  padding: 0 32rpx;
+  margin-top: -40rpx;
+  position: relative;
+  z-index: 1;
+}
+
+.detail-title-section {
+  background: #fff;
+  border-radius: 24rpx 24rpx 0 0;
+  padding: 40rpx 32rpx 24rpx;
+  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.04);
+}
+
+.detail-title {
+  font-size: 40rpx;
+  font-weight: 600;
+  color: #333;
+  line-height: 1.4;
+  display: block;
+  margin-bottom: 16rpx;
+}
+
+.detail-category {
+  display: inline-flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 8rpx 20rpx;
+  border-radius: 20rpx;
+  background: rgba(82, 196, 26, 0.1);
+
+  .category-icon {
+    font-size: 28rpx;
+  }
+
+  .category-text {
+    font-size: 24rpx;
+    font-weight: 600;
+  }
+}
+
+// 标签
+.detail-tags {
+  background: #fff;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  padding: 0 32rpx 24rpx;
+}
+
+.tag-item {
+  padding: 8rpx 20rpx;
+  border-radius: 20rpx;
+  background: rgba(82, 196, 26, 0.08);
+
+  .tag-text {
+    font-size: 24rpx;
+  }
+}
+
+// 内容区块
+.detail-section {
+  background: #fff;
+  padding: 32rpx;
+  margin-top: 16rpx;
+  border-radius: 20rpx;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-bottom: 24rpx;
+
+  .title-icon {
+    font-size: 32rpx;
+  }
+
+  .title-text {
+    font-size: 32rpx;
+    font-weight: 600;
+    color: #333;
+  }
+}
+
+// 活动描述
+.description-text {
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.8;
+}
+
+// 信息列表
+.info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+  padding-bottom: 20rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+}
+
+.info-label {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.info-value {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+
+  &.info-value-small {
+    font-size: 26rpx;
+  }
+}
+
+.info-value-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+.info-link {
+  font-size: 26rpx;
+  color: #52c41a;
+  flex-shrink: 0;
+}
+
+// 进度条
+.participants-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.progress-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+  width: 100%;
+}
+
+.progress-bar-wrapper {
+  width: 100%;
+  height: 16rpx;
+  background: #f0f0f0;
+  border-radius: 8rpx;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 8rpx;
+  transition: width 0.3s ease;
+}
+
+// 组织者卡片
+.organizer-card {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 24rpx;
+  background: linear-gradient(135deg, #f6ffed 0%, #ffffff 100%);
+  border-radius: 16rpx;
+}
+
+.organizer-avatar {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.organizer-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.organizer-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.organizer-phone {
+  font-size: 26rpx;
+  color: #52c41a;
+}
+
+// 参与者列表
+.participants-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.participant-item {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 20rpx;
+  background: #fafafa;
+  border-radius: 16rpx;
+}
+
+.participant-avatar {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.participant-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.participant-name {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333;
+}
+
+.participant-time {
+  font-size: 24rpx;
+  color: #999;
+}
+
+// 图片网格
+.images-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12rpx;
+}
+
+.grid-image {
+  width: 100%;
+  height: 200rpx;
+  border-radius: 12rpx;
+  display: block;
+}
+
+// 底部留白
+.bottom-spacer {
+  height: 180rpx;
+}
+
+// 底部操作栏
+.detail-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.08);
+  z-index: 100;
+}
+
+.footer-actions {
+  display: flex;
+  gap: 16rpx;
+  padding: 20rpx 32rpx;
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+}
+
+.action-btn {
+  flex: 1;
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 44rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  transition: all 0.3s ease;
+
+  &.action-btn--secondary {
+    flex: 0 0 160rpx;
+    background: #f5f5f5;
+    color: #666;
+    flex-direction: column;
+    gap: 4rpx;
+
+    .action-icon {
+      font-size: 32rpx;
+    }
+
+    .action-text {
+      font-size: 22rpx;
+    }
+  }
+
+  &.action-btn--primary {
+    flex: 1;
+    background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%);
+    color: #fff;
+    box-shadow: 0 4rpx 12rpx rgba(82, 196, 26, 0.3);
+
+    &.action-btn--disabled {
+      background: linear-gradient(135deg, #d9d9d9 0%, #bfbfbf 100%);
+      box-shadow: none;
+    }
+  }
+
+  &:active:not(.action-btn--disabled) {
+    transform: scale(0.98);
+    opacity: 0.9;
+  }
+}

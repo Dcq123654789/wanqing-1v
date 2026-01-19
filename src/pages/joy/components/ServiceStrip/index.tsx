@@ -2,6 +2,7 @@ import { View, Text } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import './index.scss'
 
+import { navigateTo } from "@/utils/navigation";
 interface ServiceItem {
   id: string
   icon: string
@@ -27,14 +28,14 @@ const defaultServiceData: ServiceItem[] = [
     id: '2',
     title: '老年商城',
     icon: '🛒',
-    route: '',
+    route: '/pages/joy/components/ElderlyMall/index',
     color: '#4ECDC4'
   },
   {
     id: '3',
-    title: '上门服务',
+    title: '上门服务1',
     icon: '🔧',
-    route: '',
+    route: '/pages/joy/components/HomeService/index',
     color: '#45B7D1'
   },
   {
@@ -63,8 +64,7 @@ function ServiceStrip({ data = defaultServiceData }: ServiceStripProps) {
       })
       return
     }
-
-    Taro.navigateTo({ url: item.route })
+   navigateTo( item.route); 
   }
 
   return (
