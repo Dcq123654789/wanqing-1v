@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { View, Text, ScrollView, Input, Button } from "@tarojs/components";
 import Taro from "@tarojs/taro";
 import "./index.scss";
+import { healthConsultation, getConversationHistory } from "@/services/qwen";
 
 // 消息类型
 interface Message {
@@ -43,7 +44,7 @@ function Consultation() {
   };
 
   // 发送消息
-  const handleSend = () => {
+  const handleSend = async () => {
     const text = inputText.trim();
     if (!text) {
       Taro.showToast({
@@ -66,18 +67,49 @@ function Consultation() {
     setInputText("");
     setIsLoading(true);
 
-    // 模拟AI响应（暂时不接入AI）
-    setTimeout(() => {
+    try {
+      // 获取对话历史（排除欢迎消息）
+      const conversationHistory = messages
+        .filter((msg) => msg.id !== "1")
+        .map((msg) => ({
+          type: msg.type,
+          content: msg.content,
+        }));
+
+      // 调用通义千问API
+      const response = await healthConsultation(text, conversationHistory);
+
+      // 添加AI回复
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: "assistant",
-        content: "收到您的问题，AI接入功能正在开发中，敬请期待...",
+        content: response,
         timestamp: new Date(),
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
+    } catch (error: any) {
+      console.error("AI问诊失败:", error);
+
+      // 显示错误提示
+      Taro.showToast({
+        title: error.message || "服务暂时不可用",
+        icon: "none",
+        duration: 3000,
+      });
+
+      // 添加错误消息
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        type: "assistant",
+        content: "抱歉，我现在无法回答您的问题。请稍后再试，或直接咨询专业医生。",
+        timestamp: new Date(),
+      };
+
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   // 处理输入框变化
