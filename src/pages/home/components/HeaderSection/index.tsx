@@ -48,10 +48,7 @@ function HeaderSection({
       />
 
       {/* 橙色透明覆盖层 */}
-      <View className="header-overlay">
-        {/* 状态栏占位 */}
-        <StatusBar />
-
+      <View className="header-overlay"> 
         {/* 导航栏和欢迎区 */}
         <View className="header-content">
           {/* 顶部导航栏 */}

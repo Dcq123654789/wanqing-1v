@@ -4,16 +4,28 @@ import Taro from "@tarojs/taro";
 import "./index.scss";
 import {
   mockHealthData,
-  mockHealthServices,
-  mockHealthTips,
+  mockHealthServices, 
   HealthService,
 } from "./mockData";
 import werunService from "@/services/werun";
+
+// 步数转卡路里消耗（老年人按每步0.04卡路里计算）
+const calculateCalories = (steps: number): number => {
+  return Math.round(steps * 0.04);
+};
+
+// 步数目标（每日目标）
+const STEP_TARGET = 8000;
 
 function Care() {
   const [statusBarHeight, setStatusBarHeight] = useState(0);
   const [todaySteps, setTodaySteps] = useState<number>(mockHealthData.steps);
   const [isLoadingSteps, setIsLoadingSteps] = useState(false);
+
+  // 计算卡路里消耗
+  const calories = calculateCalories(todaySteps);
+  // 计算步数目标完成百分比
+  const stepProgress = Math.min((todaySteps / STEP_TARGET) * 100, 100);
 
   useEffect(() => {
     const systemInfo = Taro.getSystemInfoSync();
@@ -109,6 +121,9 @@ function Care() {
           </View>
           <View className="welcome-decoration">
             <Text className="decoration-icon">💚</Text>
+            <Text className="decoration-circle decoration-circle-1"></Text>
+            <Text className="decoration-circle decoration-circle-2"></Text>
+            <Text className="decoration-circle decoration-circle-3"></Text>
           </View>
         </View>
 
@@ -124,6 +139,24 @@ function Care() {
               <Text className="trend-text">{isLoadingSteps ? '加载中' : '刷新'}</Text>
             </View>
           </View>
+
+          {/* 步数进度条 */}
+          <View className="step-progress-section">
+            <View className="progress-header">
+              <Text className="progress-label">今日目标</Text>
+              <Text className="progress-value">{Math.round(stepProgress)}%</Text>
+            </View>
+            <View className="progress-bar-bg">
+              <View
+                className="progress-bar-fill"
+                style={{ width: `${stepProgress}%` }}
+              />
+            </View>
+            <Text className="progress-detail">
+              {todaySteps.toLocaleString()} / {STEP_TARGET.toLocaleString()} 步
+            </Text>
+          </View>
+
           <View className="health-hero-stats">
             <View className="hero-stat-item">
               <View className="stat-icon-wrapper blue">👟</View>
@@ -134,6 +167,15 @@ function Care() {
                 <Text className="hero-stat-label">步数</Text>
               </View>
               <Text className="stat-trend up">↑</Text>
+            </View>
+            <View className="hero-stat-divider" />
+            <View className="hero-stat-item">
+              <View className="stat-icon-wrapper orange">🔥</View>
+              <View className="stat-content">
+                <Text className="hero-stat-value">{calories}</Text>
+                <Text className="hero-stat-label">千卡</Text>
+              </View>
+              <Text className="stat-badge burn">消耗</Text>
             </View>
             <View className="hero-stat-divider" />
             <View className="hero-stat-item">
@@ -162,43 +204,23 @@ function Care() {
         <View className="service-grid-section">
           <Text className="section-title">健康服务</Text>
           <View className="service-grid">
-            {mockHealthServices.map((service) => (
+            {mockHealthServices.map((service, index) => (
               <View
                 key={service.id}
                 className="service-card"
-                style={{ background: service.gradient }}
+                style={{
+                  background: service.gradient,
+                  '--delay': `${index * 0.2}s`
+                } as any}
                 onClick={() => handleServiceClick(service)}
               >
                 <View className="service-icon">{service.icon}</View>
                 <Text className="service-title">{service.title}</Text>
-                <Text className="service-desc">{service.description}</Text>
-                <View className="service-arrow">→</View>
+                <Text className="service-desc">{service.description}</Text> 
               </View>
             ))}
           </View>
-        </View>
-
-        {/* 健康小贴士 */}
-        <View className="health-tips-section">
-          {mockHealthTips.map((tip) => (
-            <View
-              key={tip.id}
-              className={`health-tip-card importance-${tip.importance}`}
-            >
-              <View className="tip-header">
-                <Text className="tip-big-icon">{tip.icon}</Text>
-                <Text className="tip-head-title">{tip.title}</Text>
-                {tip.importance === "high" && (
-                  <View className="urgent-badge">重要</View>
-                )}
-              </View>
-              <Text className="tip-body-text">{tip.content}</Text>
-            </View>
-          ))}
-        </View>
-
-        {/* 底部间距 */}
-        <View className="bottom-spacer" />
+        </View> 
       </ScrollView>
     </View>
   );

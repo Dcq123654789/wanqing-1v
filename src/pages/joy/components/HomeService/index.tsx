@@ -44,14 +44,9 @@ function HomeService() {
 
   // 服务卡片点击
   const handleServiceClick = (item: HomeService) => {
-    Taro.showToast({
-      title: `查看${item.name}`,
-      icon: 'none'
+    Taro.navigateTo({
+      url: `/pages/joy/components/HomeService/Detail/index?id=${item.id}`
     })
-    // TODO: 跳转到服务详情页
-    // Taro.navigateTo({
-    //   url: `/pages/joy/components/HomeService/Detail/index?id=${item.id}`
-    // })
   }
 
   // 图片加载错误处理

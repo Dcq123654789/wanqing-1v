@@ -30,9 +30,12 @@ $home-bg-end: #fffef8;
 
 // 通知栏包裹层 - 添加上边距
 .notification-wrapper {
-  padding: 40rpx 32rpx 0;
+  padding: 40rpx 32rpx 0; 
 }
-
+.status-bar {
+  background: linear-gradient(135deg, $home-primary 0%, $home-secondary 100%);
+  flex-shrink: 0;
+}
 // 区域容器
 .section {
   margin-bottom: 32rpx;

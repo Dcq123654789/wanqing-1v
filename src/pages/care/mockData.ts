@@ -122,16 +122,17 @@ export const mockHealthServices: HealthService[] = [
     icon: '🩺',
     title: '在线问诊',
     description: '专业医生在线咨询',
-    route: '/pages/consult/index',
+    route: '/pages/care/data/consultation/index',
     type: 'consult',
     color: '#1890ff',
     gradient: 'linear-gradient(135deg, #1890ff 0%, #40a9ff 100%)'
   },
   {
     id: '2',
-    icon: '💊',
-    title: '用药提醒',
-    description: '定时提醒，关爱健康',
+    icon: '📋',
+    title: '健康档案',
+    description: '记录健康，守护平安',
+    route: '/pages/health-record/index',
     type: 'medication',
     color: '#52c41a',
     gradient: 'linear-gradient(135deg, #52c41a 0%, #73d13d 100%)'
@@ -207,7 +208,29 @@ export const mockWellnessTips: WellnessTip[] = [
 ]
 
 // 健康小贴士
-export const mockHealthTips: HealthTip[] = []
+export const mockHealthTips: HealthTip[] = [
+  {
+    id: '1',
+    icon: '💧',
+    title: '水分补充',
+    content: '建议每天饮用 1.5-2 升水，保持良好的水合状态有助于维持身体正常代谢，促进血液循环，预防便秘和肾结石。',
+    importance: 'high'
+  },
+  {
+    id: '2',
+    icon: '🚶',
+    title: '适量运动',
+    content: '建议每天进行 30 分钟的中等强度运动，如快走、太极拳等，有助于增强心肺功能，提高身体免疫力。',
+    importance: 'medium'
+  },
+  {
+    id: '3',
+    icon: '🥗',
+    title: '均衡饮食',
+    content: '注意饮食均衡，多摄入蔬菜水果，适量补充优质蛋白质，减少高油高盐食物的摄入。',
+    importance: 'medium'
+  }
+]
 
 // 旧版兼容导出
 export const mockHealthDataOld = {
@@ -223,14 +246,15 @@ export const mockHealthServicesOld = [
     icon: '🩺',
     title: '在线问诊',
     description: '专业医生在线咨询',
-    route: '/pages/consult/index',
+    route: '/pages/care/data/consultation/index',
     type: 'consult' as const
   },
   {
     id: '2',
-    icon: '💊',
-    title: '用药提醒',
-    description: '定时提醒，关爱健康',
+    icon: '📋',
+    title: '健康档案',
+    description: '记录健康，守护平安',
+    route: '/pages/health-record/index',
     type: 'medication' as const
   },
   {

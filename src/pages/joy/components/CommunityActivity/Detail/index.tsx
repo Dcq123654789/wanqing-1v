@@ -1,14 +1,28 @@
 import { View, Text, Image, ScrollView } from '@tarojs/components'
-import Taro, { useRouter } from '@tarojs/taro'
+import Taro, { useRouter, useDidShow } from '@tarojs/taro'
 import { useState, useEffect } from 'react'
 import { getActivityById, categoryConfig, statusConfig } from '../mockData'
 import type { CommunityActivity } from '../types'
 import './index.scss'
+import PageTransitionOverlay from '@/components/PageTransitionOverlay'
+import { navigateTo } from '@/utils/navigation'
 
 function ActivityDetail() {
   const router = useRouter()
   const [activity, setActivity] = useState<CommunityActivity | null>(null)
   const [loading, setLoading] = useState(true)
+
+  // 页面显示时隐藏遮罩
+  useDidShow(() => {
+    console.log('活动详情页面显示，开始隐藏遮罩流程')
+    console.log('当前页面参数:', router.params)
+
+    // 延迟一小段时间，确保页面完全渲染
+    setTimeout(() => {
+      console.log('活动详情页面触发隐藏遮罩事件')
+      Taro.eventCenter.trigger('hidePageTransition')
+    }, 100)
+  })
 
   useEffect(() => {
     const activityId = router.params.id
@@ -55,26 +69,19 @@ function ActivityDetail() {
   const handleViewMap = () => {
     if (!activity) return
     if (activity.location.latitude && activity.location.longitude) {
-      Taro.openLocation({
-        latitude: activity.location.latitude,
-        longitude: activity.location.longitude,
+      const params = new URLSearchParams({
+        lat: activity.location.latitude.toString(),
+        lng: activity.location.longitude.toString(),
         name: activity.location.name,
         address: activity.location.address
       })
+      navigateTo(`/pages/joy/components/CommunityActivity/MapView/index?${params.toString()}`)
     } else {
       Taro.showToast({
         title: '暂无位置信息',
         icon: 'none'
       })
     }
-  }
-
-  // 预览图片
-  const handlePreviewImage = (urls: string[], current: string) => {
-    Taro.previewImage({
-      current,
-      urls
-    })
   }
 
   // 报名活动
@@ -97,33 +104,15 @@ function ActivityDetail() {
       return
     }
 
-    Taro.showModal({
-      title: '确认报名',
-      content: `确定要报名参加「${activity.title}」吗？`,
-      success: (res) => {
-        if (res.confirm) {
-          // TODO: 调用报名接口
-          Taro.showToast({
-            title: '报名成功',
-            icon: 'success'
-          })
-        }
-      }
-    })
+    // 跳转到报名页面，只传递 activityId
+    navigateTo(`/pages/joy/components/CommunityActivity/Registration/index?activityId=${activity.id}`)
   }
 
-  // 分享活动
-  const handleShare = () => {
-    Taro.showShareMenu({
-      withShareTicket: true
-    })
-  }
-
- 
 
   if (!activity) {
     return (
       <View className="activity-detail-page">
+        <PageTransitionOverlay />
         <View className="error-state">
           <Text className="error-icon">😕</Text>
           <Text className="error-text">活动不存在</Text>
@@ -138,6 +127,7 @@ function ActivityDetail() {
 
   return (
     <View className="activity-detail-page">
+      <PageTransitionOverlay />
       <ScrollView scrollY className="detail-scroll">
         {/* 封面图 */}
         <View className="detail-cover">
@@ -145,7 +135,6 @@ function ActivityDetail() {
             src={activity.coverImage}
             className="cover-image"
             mode="aspectFill"
-            onClick={() => handlePreviewImage([activity.coverImage], activity.coverImage)}
           />
           <View className="cover-overlay">
             <View
@@ -260,51 +249,6 @@ function ActivityDetail() {
             </View>
           </View>
 
-          {/* 参与者列表 */}
-          {activity.participants.length > 0 && (
-            <View className="detail-section">
-              <View className="section-title">
-                <Text className="title-icon">👥</Text>
-                <Text className="title-text">已报名 ({activity.participants.length})</Text>
-              </View>
-              <View className="participants-list">
-                {activity.participants.map((participant) => (
-                  <View key={participant.id} className="participant-item">
-                    <Image
-                      src={participant.avatar}
-                      className="participant-avatar"
-                    />
-                    <View className="participant-info">
-                      <Text className="participant-name">{participant.name}</Text>
-                      <Text className="participant-time">报名时间: {participant.joinTime}</Text>
-                    </View>
-                  </View>
-                ))}
-              </View>
-            </View>
-          )}
-
-          {/* 活动相册 */}
-          {activity.images.length > 1 && (
-            <View className="detail-section">
-              <View className="section-title">
-                <Text className="title-icon">🖼️</Text>
-                <Text className="title-text">活动相册</Text>
-              </View>
-              <View className="images-grid">
-                {activity.images.map((image, index) => (
-                  <Image
-                    key={index}
-                    src={image}
-                    className="grid-image"
-                    mode="aspectFill"
-                    onClick={() => handlePreviewImage(activity.images, image)}
-                  />
-                ))}
-              </View>
-            </View>
-          )}
-
           {/* 底部留白 */}
           <View className="bottom-spacer"></View>
         </View>
@@ -313,10 +257,6 @@ function ActivityDetail() {
       {/* 底部操作栏 */}
       <View className="detail-footer">
         <View className="footer-actions">
-          <View className="action-btn action-btn--secondary" onClick={handleShare}>
-            <Text className="action-icon">📤</Text>
-            <Text className="action-text">分享</Text>
-          </View>
           <View
             className={`action-btn action-btn--primary ${activity.status === 'full' || activity.status === 'ended' ? 'action-btn--disabled' : ''}`}
             onClick={handleRegister}

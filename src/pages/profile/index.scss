@@ -1,11 +1,15 @@
 @import '@/assets/styles/variables.scss';
 @import '@/assets/styles/mixins.scss';
 
-// 个人中心专属颜色
-$profile-primary: #722ed1;
-$profile-secondary: #9254de;
-$profile-gradient: linear-gradient(135deg, #722ed1 0%, #9254de 100%);
-$profile-bg: #f9f0ff;
+// 个人中心专属颜色 - 紫色主题
+$profile-primary: #9c27b0;
+$profile-secondary: #ba68c8;
+$profile-light: #e1bee7;
+$profile-bg: #faf5ff;
+$profile-card-bg: #ffffff;
+$profile-text-primary: #333333;
+$profile-text-secondary: #666666;
+$profile-gradient: linear-gradient(135deg, #9c27b0 0%, #ba68c8 100%);
 
 .profile-page {
   min-height: 100vh;
@@ -26,10 +30,8 @@ $profile-bg: #f9f0ff;
 
 .profile-header {
   position: relative;
-  height: 240px;
+  height: 204rpx;
   overflow: hidden;
-  margin-bottom: 60px;
-  margin-top: $spacing-md;
 
   .header-bg {
     width: 100%;
@@ -78,7 +80,7 @@ $profile-bg: #f9f0ff;
 }
 
 .content-container {
-  padding: $spacing-md;
+  padding: $spacing-sm;
   padding-bottom: $spacing-xxl;
 }
 
@@ -174,17 +176,244 @@ $profile-bg: #f9f0ff;
   }
 }
 
+/* ========== 订单列表 ========== */
+.orders-section {
+  margin-top: $spacing-xl;
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 $spacing-md;
+    margin-bottom: $spacing-md;
+
+    .section-title {
+      display: block;
+      font-size: 36rpx;
+      font-weight: 600;
+      color: $profile-text-primary;
+    }
+
+    .view-all {
+      font-size: 26rpx;
+      color: $profile-text-secondary;
+      display: flex;
+      align-items: center;
+      gap: 4rpx;
+
+      &::after {
+        content: '›';
+        font-size: 32rpx;
+        line-height: 1;
+      }
+    }
+  }
+
+  .orders-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    padding: 0 $spacing-md;
+    background: $profile-card-bg;
+    border-radius: $border-radius-lg;
+    overflow: hidden;
+  }
+
+  .order-card {
+    padding: $spacing-lg $spacing-sm;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: background 0.3s ease;
+
+    &:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 1px;
+      height: 60rpx;
+      background: linear-gradient(to bottom, transparent, $border-color, transparent);
+    }
+
+    &:active {
+      background: #fafafa;
+    }
+
+    .order-icon-wrapper {
+      position: relative;
+      margin-bottom: $spacing-sm;
+
+      .order-icon {
+        width: 72rpx;
+        height: 72rpx;
+        border-radius: $border-radius-circle;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 36rpx;
+        background: linear-gradient(135deg, #f3e5f5, #e1bee7);
+        transition: all 0.3s ease;
+        position: relative;
+
+        &::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border-radius: $border-radius-circle;
+          padding: 2rpx;
+          background: linear-gradient(135deg, #9c27b0, #ba68c8);
+          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          -webkit-mask-composite: xor;
+          mask-composite: exclude;
+          opacity: 0.3;
+        }
+      }
+
+      .order-badge {
+        position: absolute;
+        top: -6rpx;
+        right: -6rpx;
+        background: linear-gradient(135deg, #ff6b6b, #ff4757);
+        color: #fff;
+        font-size: 20rpx;
+        min-width: 32rpx;
+        height: 32rpx;
+        border-radius: 16rpx;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 8rpx;
+        border: 3rpx solid $profile-card-bg;
+        font-weight: 600;
+        box-shadow: 0 2rpx 8rpx rgba(255, 71, 87, 0.3);
+        animation: pulse 2s infinite;
+      }
+    }
+
+    .order-title {
+      font-size: 26rpx;
+      font-weight: 500;
+      color: $profile-text-primary;
+      text-align: center;
+    }
+  }
+}
+
+/* ========== 设置菜单 ========== */
+.settings-section {
+  margin-top: $spacing-xl;
+
+  .section-title {
+    display: block;
+    font-size: 36rpx;
+    font-weight: 600;
+    color: $profile-text-primary;
+    margin-bottom: $spacing-md;
+    padding: 0 $spacing-md;
+  }
+
+  .settings-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    padding: 0 $spacing-md;
+    background: $profile-card-bg;
+    border-radius: $border-radius-lg;
+    overflow: hidden;
+  }
+
+  .setting-item {
+    padding: $spacing-lg;
+    display: flex;
+    align-items: center;
+    transition: background 0.3s ease;
+    position: relative;
+
+    &:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: $spacing-lg;
+      right: 0;
+      bottom: 0;
+      height: 1px;
+      background: linear-gradient(to right, $border-color, transparent);
+    }
+
+    &:active {
+      background: #fafafa;
+    }
+
+    .setting-icon {
+      font-size: 36rpx;
+      margin-right: $spacing-lg;
+      width: 60rpx;
+      height: 60rpx;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      background: $profile-bg;
+      border-radius: $border-radius-circle;
+    }
+
+    .setting-content {
+      flex: 1;
+
+      .setting-title {
+        display: block;
+        font-size: 32rpx;
+        font-weight: 600;
+        color: $profile-text-primary;
+        margin-bottom: 4rpx;
+      }
+
+      .setting-desc {
+        display: block;
+        font-size: 26rpx;
+        color: $profile-text-secondary;
+      }
+    }
+
+    .setting-arrow {
+      font-size: 32rpx;
+      color: $profile-text-secondary;
+      margin-left: $spacing-sm;
+    }
+  }
+}
+
 .logout-section {
-  margin-top: $spacing-lg;
+  margin-top: $spacing-xl;
 
   .logout-button {
     display: block;
     text-align: center;
-    padding: $spacing-md;
+    padding: $spacing-lg;
     background: #fff;
-    border-radius: $border-radius-md;
+    border-radius: $border-radius-lg;
     color: $error-color;
-    font-size: $font-size-md;
-    box-shadow: $shadow-sm;
+    font-size: 32rpx;
+    font-weight: 500;
+    box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+    margin: 0 $spacing-md;
+    transition: all 0.3s ease;
+
+    &:active {
+      background: #fff5f5;
+      transform: scale(0.98);
+    }
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
   }
 }

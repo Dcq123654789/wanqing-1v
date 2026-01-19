@@ -37,6 +37,7 @@ $color-red: #ff4d4f;
   padding: $spacing-lg;
   padding-top: $spacing-xl;
   padding-bottom: 48px;
+  height: 204rpx;
   position: relative;
   overflow: hidden;
 
@@ -92,7 +93,61 @@ $color-red: #ff4d4f;
     .decoration-icon {
       font-size: 64px;
       opacity: 0.3;
+      animation: float 3s ease-in-out infinite;
     }
+
+    .decoration-circle {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.15);
+      animation: pulse 2s ease-in-out infinite;
+
+      &.decoration-circle-1 {
+        width: 20px;
+        height: 20px;
+        top: -10px;
+        right: 60px;
+        animation-delay: 0s;
+      }
+
+      &.decoration-circle-2 {
+        width: 14px;
+        height: 14px;
+        top: 20px;
+        right: -5px;
+        animation-delay: 0.5s;
+      }
+
+      &.decoration-circle-3 {
+        width: 10px;
+        height: 10px;
+        top: 50px;
+        right: 40px;
+        animation-delay: 1s;
+      }
+    }
+  }
+}
+
+// 悬浮动画
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+// 脉冲动画
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.15;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.3;
   }
 }
 
@@ -155,6 +210,68 @@ $color-red: #ff4d4f;
     }
   }
 
+  // 步数进度条
+  .step-progress-section {
+    margin-bottom: $spacing-lg;
+    padding: $spacing-md;
+    background: linear-gradient(135deg, #f0f5ff 0%, #e6f7ff 100%);
+    border-radius: 16px;
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: $spacing-sm;
+
+      .progress-label {
+        font-size: $font-size-md;
+        font-weight: $font-weight-medium;
+        color: #1890ff;
+      }
+
+      .progress-value {
+        font-size: $font-size-lg;
+        font-weight: $font-weight-bold;
+        color: #1890ff;
+      }
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 12px;
+      background: #fff;
+      border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: $spacing-xs;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #1890ff 0%, #52c41a 100%);
+      border-radius: 6px;
+      transition: width 0.6s ease;
+      position: relative;
+
+      &::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        animation: shimmer 2s infinite;
+      }
+    }
+
+    .progress-detail {
+      font-size: $font-size-sm;
+      color: $text-color-secondary;
+      text-align: center;
+    }
+  }
+
   .health-hero-stats {
     display: flex;
     justify-content: space-around;
@@ -188,6 +305,10 @@ $color-red: #ff4d4f;
 
         &.red {
           background: linear-gradient(135deg, #fff1f0 0%, #ffccc7 100%);
+        }
+
+        &.orange {
+          background: linear-gradient(135deg, #fff7e6 0%, #ffd591 100%);
         }
       }
 
@@ -247,6 +368,22 @@ $color-red: #ff4d4f;
           background: #e6f7ff;
           color: #1890ff;
           border: 1px solid #91d5ff;
+        }
+      }
+
+      .stat-badge {
+        position: absolute;
+        top: 0;
+        right: 8px;
+        font-size: $font-size-xs;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-weight: $font-weight-medium;
+
+        &.burn {
+          background: #fff7e6;
+          color: #fa8c16;
+          border: 1px solid #ffd591;
         }
       }
     }
@@ -396,6 +533,18 @@ $color-red: #ff4d4f;
   position: relative;
   overflow: hidden;
 
+  // 装饰性背景图案
+  &::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
   &:active {
     transform: scale(0.95);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
@@ -405,6 +554,10 @@ $color-red: #ff4d4f;
     font-size: 64px;
     margin-bottom: $spacing-md;
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    animation: iconFloat 3s ease-in-out infinite;
+    animation-delay: var(--delay, 0s);
+    position: relative;
+    z-index: 1;
   }
 
   .service-title {
@@ -413,6 +566,8 @@ $color-red: #ff4d4f;
     color: #fff;
     margin-bottom: $spacing-xs;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 1;
   }
 
   .service-desc {
@@ -420,6 +575,8 @@ $color-red: #ff4d4f;
     color: rgba(255, 255, 255, 0.95);
     line-height: 1.5;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 1;
   }
 
   .service-arrow {
@@ -429,6 +586,17 @@ $color-red: #ff4d4f;
     font-size: 32px;
     color: rgba(255, 255, 255, 0.8);
     font-weight: bold;
+    z-index: 1;
+  }
+}
+
+// 图标悬浮动画
+@keyframes iconFloat {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-5px) rotate(3deg);
   }
 }
 
@@ -446,6 +614,20 @@ $color-red: #ff4d4f;
   padding: $spacing-md;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
   transition: all $transition-duration $transition-timing;
+  position: relative;
+  overflow: hidden;
+
+  // 装饰性背景图案
+  &::before {
+    content: "";
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    opacity: 0.1;
+  }
 
   &:active {
     transform: scale(0.98);
@@ -454,16 +636,28 @@ $color-red: #ff4d4f;
   &.importance-high {
     background: linear-gradient(135deg, #fff7e6 0%, #ffe7ba 100%);
     border-left: 4px solid #fa8c16;
+
+    &::before {
+      background: radial-gradient(circle, #fa8c16 0%, transparent 70%);
+    }
   }
 
   &.importance-medium {
     background: linear-gradient(135deg, #f6ffed 0%, #d9f7be 100%);
     border-left: 4px solid #52c41a;
+
+    &::before {
+      background: radial-gradient(circle, #52c41a 0%, transparent 70%);
+    }
   }
 
   &.importance-low {
     background: linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%);
     border-left: 4px solid #1890ff;
+
+    &::before {
+      background: radial-gradient(circle, #1890ff 0%, transparent 70%);
+    }
   }
 
   .tip-header {
@@ -471,6 +665,8 @@ $color-red: #ff4d4f;
     align-items: center;
     gap: $spacing-sm;
     margin-bottom: $spacing-sm;
+    position: relative;
+    z-index: 1;
 
     .tip-big-icon {
       font-size: 40px;
@@ -490,6 +686,7 @@ $color-red: #ff4d4f;
       padding: 4px 12px;
       border-radius: 12px;
       font-weight: $font-weight-medium;
+      box-shadow: 0 2px 4px rgba(255, 77, 79, 0.3);
     }
   }
 
@@ -497,10 +694,22 @@ $color-red: #ff4d4f;
     font-size: $font-size-md;
     color: $text-color;
     line-height: 1.8;
+    position: relative;
+    z-index: 1;
   }
 }
 
 // ========== 底部间距 ==========
 .bottom-spacer {
   height: 120px;
+}
+
+// ========== 进度条动画 ==========
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }

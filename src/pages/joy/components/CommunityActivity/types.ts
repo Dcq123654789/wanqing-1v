@@ -40,6 +40,7 @@ export interface CommunityActivity {
   tags: string[]
   status: ActivityStatus
   category: 'culture' | 'sports' | 'entertainment' | 'volunteer' | 'learning'
+  price?: number // 活动费用（元），undefined或0表示免费
 }
 
 // 活动列表项（简化版）

@@ -6,8 +6,6 @@ import Taro from '@tarojs/taro'
 export interface NavigationOptions {
   /** 跳转延迟（毫秒），默认 50ms */
   delay?: number
-  /** 遮罩显示时长（毫秒），默认 1200ms */
-  duration?: number
   /** 跳转类型 */
   navigateType?: 'navigateTo' | 'redirectTo' | 'switchTab' | 'reLaunch'
 }
@@ -23,7 +21,6 @@ export const navigateWithTransition = (
 ) => {
   const {
     delay = 50,
-    duration = 1200,
     navigateType = 'navigateTo'
   } = options
 
@@ -47,10 +44,7 @@ export const navigateWithTransition = (
         break
     }
 
-    // 页面跳转完成后延迟隐藏遮罩
-    setTimeout(() => {
-      Taro.eventCenter.trigger('hidePageTransition')
-    }, duration)
+    // 注意：这里不再自动隐藏遮罩，而是让目标页面在加载完成后手动触发隐藏
   }, delay)
 }
 

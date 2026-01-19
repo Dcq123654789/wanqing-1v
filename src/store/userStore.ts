@@ -1,10 +1,20 @@
 import { create } from 'zustand'
 
+interface Address {
+  province: string
+  city: string
+  district: string
+  detail: string
+}
+
 interface UserInfo {
   id: string
   username: string
   avatar?: string
   phone?: string
+  name?: string
+  address?: Address
+  balance?: number
 }
 
 interface UserState {

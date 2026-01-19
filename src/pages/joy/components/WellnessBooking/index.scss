@@ -1,0 +1,245 @@
+/* 康养预订页面样式 */
+.wellness-booking-page {
+  width: 100%;
+  height: 100vh;
+  background: linear-gradient(180deg, #FFF9F0 0%, #F5F5F5 100%);
+  overflow: hidden;
+}
+
+.wellness-scroll {
+  height: 100%;
+  width: 100%;
+}
+
+/* 分类标签栏 */
+.tabs-container {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #fff;
+  padding: 24rpx 0;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+}
+
+.tabs-scroll {
+  white-space: nowrap;
+}
+
+.tabs-wrapper {
+  display: inline-flex;
+  padding: 0 32rpx;
+}
+
+.tab-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16rpx 32rpx;
+  margin-right: 16rpx;
+  background: #F5F5F5;
+  border-radius: 40rpx;
+  transition: all 0.3s ease;
+
+  &--active {
+    background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+    box-shadow: 0 4rpx 12rpx rgba(255, 107, 107, 0.3);
+
+    .tab-text {
+      color: #fff;
+      font-weight: 600;
+    }
+  }
+}
+
+.tab-text {
+  font-size: 28rpx;
+  color: #666;
+  white-space: nowrap;
+}
+
+/* 服务列表 */
+.wellness-list {
+  padding: 32rpx;
+}
+
+.wellness-card {
+  background: #fff;
+  border-radius: 24rpx;
+  margin-bottom: 32rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s ease;
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.card-header {
+  position: relative;
+  width: 100%;
+  height: 360rpx;
+}
+
+.card-image {
+  width: 100%;
+  height: 100%;
+}
+
+.card-status-badge {
+  position: absolute;
+  top: 24rpx;
+  right: 24rpx;
+  padding: 8rpx 20rpx;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+  font-weight: 500;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+}
+
+.status-text {
+  font-size: 24rpx;
+}
+
+.card-content {
+  padding: 32rpx;
+}
+
+.card-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 24rpx;
+  line-height: 1.4;
+}
+
+/* 服务类型标签 */
+.card-service-types {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  margin-bottom: 24rpx;
+}
+
+.service-type-tag {
+  display: flex;
+  align-items: center;
+  padding: 8rpx 16rpx;
+  border-radius: 8rpx;
+}
+
+.service-type-icon {
+  font-size: 28rpx;
+  margin-right: 8rpx;
+}
+
+.service-type-text {
+  font-size: 24rpx;
+  font-weight: 500;
+}
+
+/* 亮点特色 */
+.card-highlights {
+  margin-bottom: 24rpx;
+}
+
+.highlight-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12rpx;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.highlight-icon {
+  width: 32rpx;
+  height: 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 20rpx;
+  font-weight: 600;
+  margin-right: 12rpx;
+  flex-shrink: 0;
+}
+
+.highlight-text {
+  flex: 1;
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.5;
+}
+
+/* 位置信息 */
+.card-info {
+  border-top: 1rpx solid #F0F0F0;
+  padding-top: 20rpx;
+  margin-bottom: 20rpx;
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12rpx;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.info-icon {
+  font-size: 28rpx;
+  margin-right: 12rpx;
+}
+
+.info-text {
+  flex: 1;
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.5;
+}
+
+/* 卡片底部 */
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1rpx solid #F0F0F0;
+  padding-top: 20rpx;
+}
+
+.card-detail-hint {
+  font-size: 28rpx;
+  color: #FF6B6B;
+  font-weight: 500;
+}
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 0;
+}
+
+.empty-icon {
+  font-size: 120rpx;
+  margin-bottom: 24rpx;
+  opacity: 0.5;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: #999;
+}
+
+/* 底部留白 */
+.bottom-spacer {
+  height: 120rpx;
+}

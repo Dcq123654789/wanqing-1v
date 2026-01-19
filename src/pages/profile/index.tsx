@@ -28,12 +28,43 @@ function Profile() {
     })
   }
 
-  const menuItems = [
-    { id: 1, icon: '👤', title: '个人信息', desc: '编辑个人资料' },
-    { id: 2, icon: '⚙️', title: '设置', desc: '应用设置' },
-    { id: 3, icon: '❓', title: '帮助与反馈', desc: '常见问题' },
-    { id: 4, icon: '📞', title: '联系我们', desc: '客服热线' },
+  // 订单类型
+  const orderTypes = [
+    { id: 1, icon: '🛒', title: '商品订单', count: 3 },
+    { id: 2, icon: '🛍️', title: '服务订单', count: 2 },
+    { id: 3, icon: '🎭', title: '我的活动', count: 5 },
+    { id: 4, icon: '✈️', title: '旅游订单', count: 1 },
   ]
+
+  // 设置菜单
+  const settingItems = [
+    { id: 1, icon: '🛡️', title: '隐私政策', desc: '查看隐私条款', route: '/pages/login/privacy/index' },
+    { id: 2, icon: '📄', title: '用户协议', desc: '服务使用条款', route: '/pages/login/agreement/index' },
+    { id: 3, icon: '📞', title: '联系客服', desc: '在线客服', route: '/pages/profile/support' },
+  ]
+
+  const handleOrderClick = (orderType: typeof orderTypes[0]) => {
+    Taro.showToast({
+      title: `${orderType.title}功能开发中`,
+      icon: 'none',
+      duration: 2000
+    })
+  }
+
+  const handleSettingClick = (item: typeof settingItems[0]) => {
+    if (item.route) {
+      Taro.navigateTo({
+        url: item.route,
+        fail: () => {
+          Taro.showToast({
+            title: '功能开发中',
+            icon: 'none',
+            duration: 2000
+          })
+        }
+      })
+    }
+  }
 
   return (
     <View className="profile-page">
@@ -63,36 +94,42 @@ function Profile() {
 
         {/* 内容区域 */}
         <View className="content-container">
-          {/* 数据统计 */}
-          <View className="stats-card">
-            <View className="stat-item">
-              <Text className="stat-value">128</Text>
-              <Text className="stat-label">活动</Text>
+          {/* 订单列表 */}
+          <View className="orders-section">
+            <View className="section-header">
+              <Text className="section-title">我的订单</Text> 
             </View>
-            <View className="stat-divider" />
-            <View className="stat-item">
-              <Text className="stat-value">56</Text>
-              <Text className="stat-label">关注</Text>
-            </View>
-            <View className="stat-divider" />
-            <View className="stat-item">
-              <Text className="stat-value">32</Text>
-              <Text className="stat-label">收藏</Text>
+            <View className="orders-grid">
+              {orderTypes.map(order => (
+                <View
+                  key={order.id}
+                  className="order-card"
+                  onClick={() => handleOrderClick(order)}
+                >
+                  <View className="order-icon-wrapper">
+                    <View className="order-icon">{order.icon}</View> 
+                  </View>
+                  <Text className="order-title">{order.title}</Text>
+                </View>
+              ))}
             </View>
           </View>
 
-          {/* 菜单列表 */}
-          <View className="menu-section">
-            {menuItems.map(item => (
-              <View key={item.id} className="menu-item">
-                <View className="menu-icon">{item.icon}</View>
-                <View className="menu-content">
-                  <Text className="menu-title">{item.title}</Text>
-                  <Text className="menu-desc">{item.desc}</Text>
+          {/* 设置菜单 */}
+          <View className="settings-section">
+            <Text className="section-title">设置与帮助</Text>
+            <View className="settings-list">
+              {settingItems.map(item => (
+                <View key={item.id} className="setting-item" onClick={() => handleSettingClick(item)}>
+                  <View className="setting-icon">{item.icon}</View>
+                  <View className="setting-content">
+                    <Text className="setting-title">{item.title}</Text>
+                    <Text className="setting-desc">{item.desc}</Text>
+                  </View>
+                  <View className="setting-arrow">›</View>
                 </View>
-                <View className="menu-arrow">›</View>
-              </View>
-            ))}
+              ))}
+            </View>
           </View>
 
           {/* 退出登录按钮 */}

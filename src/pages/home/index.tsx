@@ -14,6 +14,7 @@ import "./index.scss";
 const STORAGE_KEY = "selectedCommunity";
 
 function Home() {
+  const [statusBarHeight, setStatusBarHeight] = useState(0);
   const [currentCommunity, setCurrentCommunity] = useState<Community | null>(
     null
   );
@@ -21,6 +22,9 @@ function Home() {
 
   // 初始化：检查是否有选择的社区
   useEffect(() => {
+    const systemInfo = Taro.getSystemInfoSync();
+    setStatusBarHeight(systemInfo.statusBarHeight || 0);
+
     checkSelectedCommunity();
   }, []);
 
@@ -71,8 +75,12 @@ function Home() {
 
   return (
     <View className="home-page">
-      {/* 全局页面过渡遮罩 */}
+      
       <PageTransitionOverlay />
+      {/* 状态栏占位 */}
+      <View className="status-bar" style={{ height: `${statusBarHeight}px` }} />
+
+      {/* 全局页面过渡遮罩 */}
 
       {/* 顶部区域（包含状态栏、导航栏和欢迎区） */}
       <View className="home-header">

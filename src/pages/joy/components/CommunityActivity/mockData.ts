@@ -40,7 +40,8 @@ export const mockActivities: CommunityActivity[] = [
     registrationDeadline: '2024-01-19 18:00',
     tags: ['书法', '文化交流', '免费'],
     status: 'upcoming',
-    category: 'culture'
+    category: 'culture',
+    price: 0 // 免费
   },
   {
     id: '2',
@@ -70,7 +71,8 @@ export const mockActivities: CommunityActivity[] = [
     registrationDeadline: '长期有效',
     tags: ['健身', '太极拳', '户外'],
     status: 'ongoing',
-    category: 'sports'
+    category: 'sports',
+    price: 50 // 收费 50元
   },
   {
     id: '3',

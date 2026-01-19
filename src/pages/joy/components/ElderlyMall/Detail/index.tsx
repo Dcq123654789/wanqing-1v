@@ -1,14 +1,27 @@
 import { View, Text, Image, ScrollView } from '@tarojs/components'
-import Taro from '@tarojs/taro'
+import Taro, { useDidShow } from '@tarojs/taro'
 import { useState, useEffect } from 'react'
 import { getProductDetailById, categoryConfig } from '../mockData'
 import type { ProductDetail } from '../types'
 import './index.scss'
+import PageTransitionOverlay from '@/components/PageTransitionOverlay'
 
 function ProductDetail() {
   const [productDetail, setProductDetail] = useState<ProductDetail | null>(null)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [quantity, setQuantity] = useState(1)
+
+  // 页面显示时隐藏遮罩
+  useDidShow(() => {
+    console.log('商品详情页面显示，开始隐藏遮罩流程')
+    console.log('当前页面参数:', Taro.getCurrentInstance().router?.params)
+
+    // 延迟一小段时间，确保页面完全渲染
+    setTimeout(() => {
+      console.log('商品详情页面触发隐藏遮罩事件')
+      Taro.eventCenter.trigger('hidePageTransition')
+    }, 100)
+  })
 
   useEffect(() => {
     // 获取页面参数
@@ -78,6 +91,7 @@ function ProductDetail() {
 
   return (
     <View className="product-detail-page">
+      <PageTransitionOverlay />
       <ScrollView scrollY className="detail-scroll">
        
 

@@ -1,7 +1,7 @@
 .home-service-page {
   width: 100%;
   height: 100vh;
-  background: #f6ffed;
+  background: #f0f9eb;
 }
 
 .service-scroll {
@@ -34,8 +34,8 @@
 }
 
 .sort-button--active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  box-shadow: 0 4rpx 12rpx rgba(102, 126, 234, 0.3);
+  background: linear-gradient(135deg, #67c23a 0%, #85ce61 100%);
+  box-shadow: 0 4rpx 12rpx rgba(103, 194, 58, 0.3);
 }
 
 .sort-text {
@@ -50,9 +50,9 @@
 
 /* 分类标签栏 */
 .categories-container {
-  position: sticky; 
+  position: sticky;
   z-index: 10;
-  background-color:#f6ffed;
+  background-color: #f0f9eb;
   padding: 20rpx 0;
   box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
 }
@@ -70,14 +70,16 @@
 .category-item {
   display: inline-block;
   padding: 16rpx 32rpx;
-  background-color: #f0f0f0;
+  background-color: #fff;
   border-radius: 50rpx;
   transition: all 0.3s ease;
+  border: 2rpx solid #e0e0e0;
 }
 
 .category-item--active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  box-shadow: 0 4rpx 12rpx rgba(102, 126, 234, 0.3);
+  background: linear-gradient(135deg, #67c23a 0%, #85ce61 100%);
+  border-color: #67c23a;
+  box-shadow: 0 4rpx 12rpx rgba(103, 194, 58, 0.3);
 }
 
 .category-text {
@@ -117,14 +119,14 @@
 
 .service-card--press {
   transform: scale(0.98);
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4rpx 16rpx rgba(103, 194, 58, 0.2);
 }
 
 /* 服务图片 */
 .service-poster {
   width: 100%;
   height: 320rpx;
-  background-color: #f0f0f0;
+  background-color: #f0f9eb;
 }
 
 /* 服务信息 */
@@ -161,13 +163,13 @@
 .price-symbol {
   font-size: 28rpx;
   font-weight: 600;
-  color: #ff4d4f;
+  color: #67c23a;
 }
 
 .price-value {
   font-size: 40rpx;
   font-weight: 700;
-  color: #ff4d4f;
+  color: #67c23a;
   line-height: 1;
 }
 

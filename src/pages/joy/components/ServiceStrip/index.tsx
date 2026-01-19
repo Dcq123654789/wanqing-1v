@@ -37,19 +37,12 @@ const defaultServiceData: ServiceItem[] = [
     icon: '🔧',
     route: '/pages/joy/components/HomeService/index',
     color: '#45B7D1'
-  },
+  }, 
   {
     id: '4',
-    title: '健康咨询',
-    icon: '👨‍⚕️',
-    route: '',
-    color: '#FF6B9D'
-  },
-  {
-    id: '5',
     title: '康养预订',
     icon: '🏥',
-    route: '',
+    route: '/pages/joy/components/WellnessBooking/index',
     color: '#9B59B6'
   }
 ]

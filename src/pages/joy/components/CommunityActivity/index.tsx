@@ -1,5 +1,5 @@
 import { View, Text, Image, ScrollView } from '@tarojs/components'
-import Taro from '@tarojs/taro'
+import Taro, { useDidShow } from '@tarojs/taro'
 import { useState, useEffect } from 'react'
 import { mockActivityList, categoryConfig, statusConfig } from './mockData'
 import type { ActivityListItem } from './types'
@@ -28,6 +28,15 @@ function CommunityActivity() {
     // 初始化加载所有活动
     filterActivities('all')
   }, [])
+
+  // 页面显示时隐藏遮罩（从详情页返回时）
+  useDidShow(() => {
+    console.log('社区活动页面显示，开始隐藏遮罩流程')
+    setTimeout(() => {
+      console.log('社区活动页面触发隐藏遮罩事件')
+      Taro.eventCenter.trigger('hidePageTransition')
+    }, 100)
+  })
 
   // 筛选活动
   const filterActivities = (category: string) => {
