@@ -2,12 +2,11 @@ import { View, Text, Image, ScrollView } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { useState, useEffect } from 'react'
 import { mockServiceList, categoryConfig } from './mockData'
-import type { HomeService, SortType } from './types'
+import type { HomeService } from './types'
 import './index.scss'
 
 function HomeService() {
-  const [activeCategory, setActiveCategory] = useState<string>('all')
-  const [sortType, setSortType] = useState<SortType>('none')
+  const [activeCategory, setActiveCategory] = useState<string>('all') 
   const [serviceList, setServiceList] = useState<HomeService[]>([])
 
   // 分类列表
@@ -26,14 +25,7 @@ function HomeService() {
     if (activeCategory !== 'all') {
       filtered = filtered.filter(item => item.category === activeCategory)
     }
-
-    // 2. 按价格排序
-    if (sortType === 'asc') {
-      filtered.sort((a, b) => a.price - b.price)
-    } else if (sortType === 'desc') {
-      filtered.sort((a, b) => b.price - a.price)
-    }
-
+ 
     setServiceList(filtered)
   }
 
@@ -43,33 +35,7 @@ function HomeService() {
     // 延迟执行以确保状态更新完成
     setTimeout(() => applyFilters(), 0)
   }
-
-  // 切换价格排序
-  const handleSortToggle = () => {
-    const newSortType: SortType = sortType === 'none' ? 'asc' : sortType === 'asc' ? 'desc' : 'none'
-    setSortType(newSortType)
-    setTimeout(() => applyFilters(), 0)
-
-    // 显示提示
-    const sortText = newSortType === 'asc' ? '价格从低到高' : newSortType === 'desc' ? '价格从高到低' : '取消排序'
-    Taro.showToast({
-      title: sortText,
-      icon: 'none',
-      duration: 1500
-    })
-  }
-
-  // 获取排序按钮文本
-  const getSortButtonText = () => {
-    if (sortType === 'asc') return '价格↑'
-    if (sortType === 'desc') return '价格↓'
-    return '价格排序'
-  }
-
-  // 获取价格显示文本
-  const getPriceText = (price: number) => {
-    return price === 0 ? '免费' : `¥${price}`
-  }
+ 
 
   // 获取销量显示文本
   const getSalesText = (sales: number) => {
@@ -97,15 +63,7 @@ function HomeService() {
   return (
     <View className="home-service-page">
       <ScrollView scrollY className="service-scroll">
-        {/* 排序按钮栏 */}
-        <View className="sort-container">
-          <View
-            className={`sort-button ${sortType !== 'none' ? 'sort-button--active' : ''}`}
-            onClick={handleSortToggle}
-          >
-            <Text className="sort-text">{getSortButtonText()}</Text>
-          </View>
-        </View>
+      
 
         {/* 分类标签栏 */}
         <View className="categories-container">

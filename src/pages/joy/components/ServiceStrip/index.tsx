@@ -33,7 +33,7 @@ const defaultServiceData: ServiceItem[] = [
   },
   {
     id: '3',
-    title: '上门服务1',
+    title: '上门服务',
     icon: '🔧',
     route: '/pages/joy/components/HomeService/index',
     color: '#45B7D1'

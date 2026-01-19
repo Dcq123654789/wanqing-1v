@@ -34,7 +34,4 @@ export interface ServiceCategory {
   icon?: string
 }
 
-/**
- * 排序类型
- */
-export type SortType = 'none' | 'asc' | 'desc'
+ 

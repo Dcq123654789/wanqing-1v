@@ -50,10 +50,9 @@
 
 /* 分类标签栏 */
 .categories-container {
-  position: sticky;
-  top: 88rpx; /* 排序栏高度 */
+  position: sticky; 
   z-index: 10;
-  background-color: #fff;
+  background-color:#f6ffed;
   padding: 20rpx 0;
   box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
 }
