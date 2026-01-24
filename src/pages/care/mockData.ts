@@ -64,6 +64,18 @@ export interface HealthTip {
   importance: 'high' | 'medium' | 'low'
 }
 
+// 养生指导内容
+export interface WellnessGuide {
+  id: string
+  title: string
+  description: string
+  image: string
+  videoUrl: string
+  tags: string[]
+  duration: string
+  category: 'diet' | 'exercise' | 'mind' | 'sleep'
+}
+
 // 今日健康数据
 export const mockHealthData: HealthData = {
   date: '2026年1月15日 周四',
@@ -142,7 +154,7 @@ export const mockHealthServices: HealthService[] = [
     icon: '🏥',
     title: '康复理疗',
     description: '专业康复，恢复健康',
-    route: '/pages/rehab/index',
+    route: '/pages/care/data/WellnessBooking/index',
     type: 'rehab',
     color: '#fa8c16',
     gradient: 'linear-gradient(135deg, #fa8c16 0%, #ffa940 100%)'
@@ -152,6 +164,7 @@ export const mockHealthServices: HealthService[] = [
     icon: '🧘',
     title: '养生指导',
     description: '中医养生，调理身心',
+    route: '/pages/care/data/wellness/index',
     type: 'wellness',
     color: '#722ed1',
     gradient: 'linear-gradient(135deg, #722ed1 0%, #9254de 100%)'
@@ -281,5 +294,69 @@ export const mockWellnessTipsOld = [
     title: '亲近自然，放松心情',
     description: '户外活动有益身心健康',
     link: '/pages/wellness/index'
+  }
+]
+
+// 养生指导列表数据
+export const mockWellnessGuides: WellnessGuide[] = [
+  {
+    id: '1',
+    title: '春季养生：养肝护胃',
+    description: '春季养肝正当时，专家教您如何通过饮食和作息调理肝胃健康',
+    image: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800',
+    videoUrl: 'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4',
+    tags: ['饮食调理', '春季养生'],
+    duration: '5:30',
+    category: 'diet'
+  },
+  {
+    id: '2',
+    title: '八段锦养生操',
+    description: '传统八段锦养生操，简单易学，适合老年人日常锻炼',
+    image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800',
+    videoUrl: 'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4',
+    tags: ['传统运动', '强身健体'],
+    duration: '8:15',
+    category: 'exercise'
+  },
+  {
+    id: '3',
+    title: '冥想放松：减压助眠',
+    description: '学习简单冥想技巧，缓解压力，改善睡眠质量',
+    image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800',
+    videoUrl: 'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4',
+    tags: ['冥想', '助眠'],
+    duration: '12:00',
+    category: 'mind'
+  },
+  {
+    id: '4',
+    title: '太极拳入门',
+    description: '太极拳基础动作教学，增强体质，提高平衡能力',
+    image: 'https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=800',
+    videoUrl: 'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4',
+    tags: ['太极', '入门教学'],
+    duration: '15:45',
+    category: 'exercise'
+  },
+  {
+    id: '5',
+    title: '健康饮食：少盐少油',
+    description: '科学饮食指南，如何做到少盐少油又美味',
+    image: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800',
+    videoUrl: 'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4',
+    tags: ['健康饮食', '营养搭配'],
+    duration: '6:20',
+    category: 'diet'
+  },
+  {
+    id: '6',
+    title: '睡眠质量提升技巧',
+    description: '改善睡眠环境，培养良好作息习惯，提升睡眠质量',
+    image: 'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=800',
+    videoUrl: 'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4',
+    tags: ['睡眠', '作息调整'],
+    duration: '7:50',
+    category: 'sleep'
   }
 ]

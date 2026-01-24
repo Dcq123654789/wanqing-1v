@@ -1,0 +1,348 @@
+@import "@/assets/styles/variables.scss";
+@import "@/assets/styles/mixins.scss";
+
+// 养生指导页面颜色系统
+$wellness-primary: #722ed1;
+$wellness-secondary: #9254de;
+$wellness-gradient: linear-gradient(135deg, #722ed1 0%, #9254de 100%);
+$wellness-bg: #f5f0ff;
+
+.wellness-guide-page {
+  min-height: 100vh;
+  background-color: $wellness-bg;
+  display: flex;
+  flex-direction: column;
+}
+
+.wellness-scroll {
+  flex: 1;
+  height: 100vh;
+}
+
+// 养生指导列表
+.wellness-list {
+  padding: $spacing-lg $spacing-md;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.wellness-card {
+  background: #fff;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(114, 46, 209, 0.1);
+  transition: all $transition-duration $transition-timing;
+  cursor: pointer;
+  // GPU 加速优化动画性能
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+
+  &:active {
+    transform: scale(0.98);
+    box-shadow: 0 2px 12px rgba(114, 46, 209, 0.15);
+  }
+
+  // 视频封面区
+  .card-cover {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 56.25%; // 16:9 比例，响应式适配
+    overflow: hidden;
+
+    .cover-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    // 播放按钮遮罩
+    .play-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background $transition-duration $transition-timing;
+
+      .wellness-card:active & {
+        background: rgba(0, 0, 0, 0.3);
+      }
+
+      .play-button {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.95);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+        transition: all $transition-duration $transition-timing;
+
+        .play-icon {
+          color: $wellness-primary;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-left: 6px;
+
+          svg {
+            width: 44px;
+            height: 44px;
+            display: block;
+          }
+        }
+
+        .wellness-card:active & {
+          transform: scale(0.9);
+        }
+      }
+    }
+
+    // 视频时长标签
+    .duration-badge {
+      position: absolute;
+      bottom: $spacing-md;
+      right: $spacing-md;
+      background: rgba(0, 0, 0, 0.75);
+      padding: 8px 20px;
+      border-radius: 24px;
+      backdrop-filter: blur(10px);
+
+      .duration-text {
+        font-size: $font-size-md;
+        color: #fff;
+        font-weight: $font-weight-medium;
+      }
+    }
+  }
+
+  // 内容信息区
+  .card-content {
+    padding: $spacing-lg;
+
+    .card-title {
+      font-size: 32px;
+      font-weight: $font-weight-bold;
+      color: $text-color;
+      margin-bottom: $spacing-sm;
+      display: block;
+      line-height: 1.4;
+    }
+
+    .card-description {
+      font-size: $font-size-md;
+      color: $text-color-secondary;
+      line-height: 1.6;
+      margin-bottom: $spacing-md;
+      display: block;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    // 标签
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: $spacing-xs;
+
+      .tag-item {
+        background: linear-gradient(135deg, #f9f0ff 0%, #efdbff 100%);
+        padding: 8px 24px;
+        border-radius: 24px;
+        border: 1px solid #d3adf7;
+
+        .tag-text {
+          font-size: $font-size-sm;
+          color: $wellness-primary;
+          font-weight: $font-weight-medium;
+        }
+      }
+    }
+  }
+}
+
+// 底部留白
+.bottom-spacer {
+  height: $spacing-xxl;
+}
+
+// ========== 加载状态优化 ==========
+
+// 骨架屏动画
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+// 骨架屏卡片
+.skeleton-card {
+  background: #fff;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(114, 46, 209, 0.1);
+  animation: pulse 1.5s ease-in-out infinite;
+
+  .skeleton-cover {
+    width: 100%;
+    height: 0;
+    padding-bottom: 56.25%;
+    background: linear-gradient(
+      90deg,
+      #f0f0f0 25%,
+      #e0e0e0 50%,
+      #f0f0f0 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  .skeleton-content {
+    padding: $spacing-lg;
+
+    .skeleton-title {
+      height: 32px;
+      background: linear-gradient(
+        90deg,
+        #f0f0f0 25%,
+        #e0e0e0 50%,
+        #f0f0f0 75%
+      );
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 8px;
+      margin-bottom: $spacing-sm;
+    }
+
+    .skeleton-description {
+      height: 44px;
+      background: linear-gradient(
+        90deg,
+        #f0f0f0 25%,
+        #e0e0e0 50%,
+        #f0f0f0 75%
+      );
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 8px;
+      margin-bottom: $spacing-md;
+    }
+
+    .skeleton-tags {
+      display: flex;
+      gap: $spacing-xs;
+
+      .skeleton-tag {
+        width: 80px;
+        height: 32px;
+        background: linear-gradient(
+          90deg,
+          #f0f0f0 25%,
+          #e0e0e0 50%,
+          #f0f0f0 75%
+        );
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+        border-radius: 24px;
+      }
+    }
+  }
+}
+
+// 空状态
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-xxl $spacing-lg;
+  min-height: 400px;
+
+  .empty-icon {
+    font-size: 120px;
+    margin-bottom: $spacing-lg;
+    opacity: 0.5;
+  }
+
+  .empty-title {
+    font-size: $font-size-lg;
+    color: $text-color-secondary;
+    margin-bottom: $spacing-sm;
+  }
+
+  .empty-description {
+    font-size: $font-size-md;
+    color: rgba(0, 0, 0, 0.45);
+    text-align: center;
+  }
+
+  .empty-button {
+    margin-top: $spacing-lg;
+    padding: $spacing-sm $spacing-lg;
+    background: $wellness-gradient;
+    color: #fff;
+    border-radius: 48px;
+    font-size: $font-size-md;
+  }
+}
+
+// 错误状态
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-xxl $spacing-lg;
+  min-height: 400px;
+
+  .error-icon {
+    font-size: 120px;
+    margin-bottom: $spacing-lg;
+  }
+
+  .error-title {
+    font-size: $font-size-lg;
+    color: $text-color;
+    margin-bottom: $spacing-sm;
+  }
+
+  .error-message {
+    font-size: $font-size-md;
+    color: $text-color-secondary;
+    text-align: center;
+    margin-bottom: $spacing-lg;
+  }
+
+  .retry-button {
+    padding: $spacing-sm $spacing-lg;
+    background: $wellness-gradient;
+    color: #fff;
+    border-radius: 48px;
+    font-size: $font-size-md;
+  }
+}

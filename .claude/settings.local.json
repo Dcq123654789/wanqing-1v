@@ -13,7 +13,10 @@
       "Bash(test:*)",
       "Bash(git checkout:*)",
       "Bash(find:*)",
-      "Skill(speckit.specify)"
+      "Skill(speckit.specify)",
+      "Skill(ui-design)",
+      "Bash(npm run lint:*)",
+      "Bash(npx tsc:*)"
     ]
   }
 }

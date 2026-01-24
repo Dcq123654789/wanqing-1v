@@ -4,7 +4,7 @@ import Taro from "@tarojs/taro";
 import "./index.scss";
 import {
   mockHealthData,
-  mockHealthServices, 
+  mockHealthServices,
   HealthService,
 } from "./mockData";
 import werunService from "@/services/werun";
@@ -216,7 +216,7 @@ function Care() {
               >
                 <View className="service-icon">{service.icon}</View>
                 <Text className="service-title">{service.title}</Text>
-                <Text className="service-desc">{service.description}</Text> 
+                <Text className="service-desc">{service.description}</Text>
               </View>
             ))}
           </View>

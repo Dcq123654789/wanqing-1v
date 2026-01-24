@@ -9,6 +9,7 @@ import PageTransitionOverlay from "@/components/PageTransitionOverlay";
 import { navigateTo } from "@/utils/navigation";
 import { mockBanners, mockNotifications } from "./mockData";
 import { Banner, Community } from "./types";
+import { useUserStore } from "@/store/userStore";
 import "./index.scss";
 
 const STORAGE_KEY = "selectedCommunity";
@@ -20,26 +21,70 @@ function Home() {
   );
   const [showGuideModal, setShowGuideModal] = useState(false);
 
+  // 获取用户状态
+  const { isLoggedIn, userInfo } = useUserStore();
+
   // 初始化：检查是否有选择的社区
   useEffect(() => {
     const systemInfo = Taro.getSystemInfoSync();
     setStatusBarHeight(systemInfo.statusBarHeight || 0);
 
     checkSelectedCommunity();
-  }, []);
+  }, [userInfo]); // 监听用户信息变化
 
   // 页面显示时重新检查社区（从社区选择页返回时刷新）
   useDidShow(() => {
+    console.log('home 页面显示，隐藏遮罩')
+    Taro.eventCenter.trigger('hidePageTransition')
     checkSelectedCommunity();
   });
+
+  // 监听社区选择事件
+  useEffect(() => {
+    const handleCommunitySelected = (data: any) => {
+      console.log('接收到社区选择事件:', data)
+      // 延迟一点时间确保数据已保存
+      setTimeout(() => {
+        checkSelectedCommunity();
+      }, 500)
+    }
+
+    // 监听社区选择完成事件
+    Taro.eventCenter.on('communitySelected', handleCommunitySelected)
+
+    return () => {
+      Taro.eventCenter.off('communitySelected', handleCommunitySelected)
+    }
+  }, [])
 
   // 检查本地存储的社区
   const checkSelectedCommunity = () => {
     try {
-      const saved = Taro.getStorageSync(STORAGE_KEY);
-      if (saved) {
-        setCurrentCommunity(saved);
+      console.log('检查已选择的社区，用户信息:', userInfo)
+      let community = null;
+
+      // 优先从用户信息中获取社区（已登录用户）
+      if (userInfo?.communityId && userInfo?.communityName) {
+        community = {
+          id: userInfo.communityId,
+          name: userInfo.communityName
+        };
+        console.log('从用户信息中获取社区:', community)
       } else {
+        // 用户没有绑定社区，尝试从本地存储读取（未登录用户）
+        const saved = Taro.getStorageSync(STORAGE_KEY);
+        if (saved) {
+          community = saved;
+          console.log('从本地存储中获取社区:', community)
+        }
+      }
+
+      if (community) {
+        console.log('设置当前社区:', community)
+        setCurrentCommunity(community);
+        setShowGuideModal(false); // 隐藏引导弹窗
+      } else {
+        console.log('没有找到已选择的社区，显示引导弹窗')
         // 没有选择过社区，显示引导弹窗
         setShowGuideModal(true);
       }
@@ -75,7 +120,6 @@ function Home() {
 
   return (
     <View className="home-page">
-      
       <PageTransitionOverlay />
       {/* 状态栏占位 */}
       <View className="status-bar" style={{ height: `${statusBarHeight}px` }} />

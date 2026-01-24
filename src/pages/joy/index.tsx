@@ -1,5 +1,5 @@
 import { View, Text, Image, ScrollView, Swiper, SwiperItem } from '@tarojs/components'
-import Taro from '@tarojs/taro'
+import Taro, { useDidShow } from '@tarojs/taro'
 import { useState, useEffect } from 'react'
 import { mockTravelRoutes, mockProducts } from './mockData'
 import type { TravelRoute, Product } from './mockData'
@@ -12,6 +12,12 @@ import { navigateTo } from "@/utils/navigation";
 
 function Joy() {
   const [statusBarHeight, setStatusBarHeight] = useState(0)
+
+  // 页面显示时隐藏遮罩（处理从子页面返回的情况）
+  useDidShow(() => {
+    console.log('joy 页面显示，隐藏遮罩')
+    Taro.eventCenter.trigger('hidePageTransition')
+  })
 
   useEffect(() => {
     const systemInfo = Taro.getSystemInfoSync()

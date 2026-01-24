@@ -1,6 +1,10 @@
+/**
+ * 登录页面
+ * 支持微信小程序一键登录
+ */
 import React, { useState } from "react";
 import { View, Image, Button, Text } from "@tarojs/components";
-import Taro, { useDidShow } from "@tarojs/taro";
+import Taro, { useDidShow, useLoad } from "@tarojs/taro";
 import { useUserStore } from "@/store/userStore";
 import "./index.scss";
 
@@ -10,73 +14,124 @@ interface LoginState {
   pageTransition: boolean;
 }
 
+interface WechatUserInfo {
+  nickName: string;
+  avatarUrl: string;
+  gender: number;
+}
+
 function Login() {
   const [state, setState] = useState<LoginState>({
     loading: false,
-    agreed: true,
+    agreed: false,
     pageTransition: false,
   });
 
-  const { login } = useUserStore();
+  const { login, isLoggedIn, initializeAuth } = useUserStore();
 
-  // 监听页面跳转完成事件
+  /**
+   * 页面加载时检查登录状态
+   */
+  useLoad(() => {
+    console.log('登录页面加载');
+    // 初始化认证状态
+    initializeAuth();
+
+    // 如果已经登录，直接跳转到首页
+    if (isLoggedIn) {
+      console.log('用户已登录，跳转到首页');
+      setTimeout(() => {
+        Taro.switchTab({
+          url: "/pages/home/index",
+        });
+      }, 100);
+    }
+  });
+
+  /**
+   * 页面显示时再次检查
+   */
   useDidShow(() => {
     // 如果是从其他页面返回，隐藏跳转遮罩
     if (state.pageTransition) {
       setState((prev) => ({ ...prev, pageTransition: false }));
     }
+
+    // 再次检查登录状态
+    if (isLoggedIn) {
+      console.log('用户已登录，跳转到首页');
+      setTimeout(() => {
+        Taro.switchTab({
+          url: "/pages/home/index",
+        });
+      }, 100);
+    }
   });
 
-  // 监听目标页面加载完成事件
-  React.useEffect(() => {
-    const handleHideTransition = () => {
-      console.log("收到隐藏遮罩事件");
-      setState((prev) => ({ ...prev, pageTransition: false }));
-    };
-
-    Taro.eventCenter.on("hidePageTransition", handleHideTransition);
-
-    return () => {
-      Taro.eventCenter.off("hidePageTransition", handleHideTransition);
-    };
-  }, []);
-
-  // 跳转到用户协议
+  /**
+   * 跳转到用户协议
+   */
   const handleGoToAgreement = () => {
     setState((prev) => ({ ...prev, pageTransition: true }));
 
-    // 延迟跳转，让loading遮罩先显示
     setTimeout(() => {
       Taro.navigateTo({
         url: "/pages/login/agreement/index",
       });
 
-      // 页面跳转完成后延迟隐藏遮罩，确保新页面完全加载
       setTimeout(() => {
         setState((prev) => ({ ...prev, pageTransition: false }));
       }, 1200);
     }, 50);
   };
 
-  // 跳转到隐私政策
+  /**
+   * 跳转到隐私政策
+   */
   const handleGoToPrivacy = () => {
     setState((prev) => ({ ...prev, pageTransition: true }));
 
-    // 延迟跳转，让loading遮罩先显示
     setTimeout(() => {
       Taro.navigateTo({
         url: "/pages/login/privacy/index",
       });
 
-      // 页面跳转完成后延迟隐藏遮罩，确保新页面完全加载
       setTimeout(() => {
         setState((prev) => ({ ...prev, pageTransition: false }));
       }, 1200);
     }, 50);
   };
 
-  // 微信一键登录
+  /**
+   * 获取微信用户信息
+   * 注意：新版小程序需要用户主动授权才能获取头像和昵称
+   */
+  const getWechatUserInfo = async (): Promise<WechatUserInfo | null> => {
+    return new Promise((resolve) => {
+      // 尝试获取用户信息
+      Taro.getUserInfo({
+        success: (res) => {
+          console.log('获取用户信息成功:', res);
+          resolve({
+            nickName: res.userInfo.nickName,
+            avatarUrl: res.userInfo.avatarUrl,
+            gender: res.userInfo.gender,
+          });
+        },
+        fail: (err) => {
+          console.log('获取用户信息失败（用户拒绝或未授权）:', err);
+          // 用户拒绝授权，返回null，使用默认信息
+          resolve(null);
+        },
+      });
+    });
+  };
+
+  /**
+   * 微信一键登录
+   */
   const handleWechatLogin = async () => {
+    // 检查是否同意协议
     if (!state.agreed) {
       Taro.showToast({
         title: "请先阅读并同意用户协议和隐私政策",
@@ -89,44 +144,80 @@ function Login() {
     setState((prev) => ({ ...prev, loading: true }));
 
     try {
-      // 调用微信登录
-      const res = await Taro.login({
+      // 第一步：获取微信登录code
+      console.log('开始微信登录...');
+      const loginRes = await Taro.login({
         provider: "weixin",
       });
 
-      if (res.code) {
-        // TODO: 将 res.code 发送到后端服务器，换取用户信息
-        // 这里暂时使用本地登录模拟
-        const success = await login("wechat_user", res.code);
+      if (!loginRes.code) {
+        throw new Error('获取微信授权码失败');
+      }
 
-        if (success) {
-          Taro.showToast({
-            title: "登录成功",
-            icon: "success",
-          });
+      console.log('获取微信code成功:', loginRes.code);
 
-          setTimeout(() => {
-            Taro.switchTab({
-              url: "/pages/home/index",
-            });
-          }, 1000);
-        } else {
-          Taro.showToast({
-            title: "登录失败",
-            icon: "error",
-          });
-        }
-      } else {
+      // 第二步：尝试获取用户信息（可选）
+      let userInfo: WechatUserInfo | null = null;
+      try {
+        userInfo = await getWechatUserInfo();
+      } catch (err) {
+        console.log('获取用户信息失败，将使用默认信息');
+      }
+
+      // 第三步：调用后端登录接口
+      const success = await login({
+        type: 'wechat',
+        code: loginRes.code,
+        nickname: userInfo?.nickName,
+        avatar: userInfo?.avatarUrl,
+        gender: userInfo?.gender,
+      });
+
+      if (success) {
+        // 登录成功
+        console.log('登录成功，准备跳转');
+
         Taro.showToast({
-          title: "微信授权失败",
+          title: "登录成功",
+          icon: "success",
+          duration: 1500,
+        });
+
+        // 延迟跳转，让用户看到成功提示
+        setTimeout(() => {
+          Taro.switchTab({
+            url: "/pages/home/index",
+          });
+        }, 1500);
+      } else {
+        // 登录失败
+        console.error('登录失败');
+        Taro.showToast({
+          title: "登录失败，请重试",
           icon: "none",
+          duration: 2000,
         });
       }
-    } catch (error) {
-      console.error("微信登录失败:", error);
+    } catch (error: any) {
+      console.error("微信登录异常:", error);
+
+      // 根据错误类型显示不同的提示
+      let errorMessage = "登录失败，请重试";
+
+      if (error.errMsg) {
+        if (error.errMsg.includes('auth deny')) {
+          errorMessage = "您拒绝了授权";
+        } else if (error.errMsg.includes('network')) {
+          errorMessage = "网络连接失败";
+        } else if (error.errMsg.includes('timeout')) {
+          errorMessage = "请求超时";
+        }
+      }
+
       Taro.showToast({
-        title: "登录失败",
-        icon: "error",
+        title: errorMessage,
+        icon: "none",
+        duration: 2000,
       });
     } finally {
       setState((prev) => ({ ...prev, loading: false }));
@@ -137,6 +228,8 @@ function Login() {
     <View className="login-page">
       {/* 页面跳转时的全屏loading遮罩 */}
       {state.pageTransition && <View className="page-transition-overlay" />}
+
+      {/* 背景图片 */}
       <View className="login-background">
         <Image
           src={require("../../assets/images/backgrounds/login-bg.png")}
@@ -146,13 +239,17 @@ function Login() {
         <View className="bg-overlay" />
       </View>
 
+      {/* 登录内容 */}
       <View className="login-container">
         <View className="login-content">
           <View className="login-footer">
+            {/* 欢迎文案 */}
             <View className="welcome-section">
               <Text className="app-slogan">温暖相伴，幸福晚年</Text>
               <Text className="welcome-desc">智能养老服务平台</Text>
             </View>
+
+            {/* 微信登录按钮 */}
             <Button
               className={`wechat-login-button ${
                 state.loading ? "loading" : ""
@@ -169,6 +266,7 @@ function Login() {
               </Text>
             </Button>
 
+            {/* 协议勾选 */}
             <View className="agreement-section">
               <View
                 className={`checkbox ${state.agreed ? "checked" : ""}`}

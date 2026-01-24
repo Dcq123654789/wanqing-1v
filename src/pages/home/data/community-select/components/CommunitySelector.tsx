@@ -41,12 +41,12 @@ function CommunitySelector({
           <ScrollView scrollY className="dropdown-list">
             {communities.map((community) => (
               <View
-                key={community.id}
-                className={`dropdown-item ${selected?.id === community.id ? 'active' : ''}`}
+                key={community._id}
+                className={`dropdown-item ${selected?._id === community._id ? 'active' : ''}`}
                 onClick={() => handleSelectCommunity(community)}
               >
                 <Text className="item-name">{community.name}</Text>
-                {selected?.id === community.id && (
+                {selected?._id === community._id && (
                   <Text className="item-check">✓</Text>
                 )}
               </View>

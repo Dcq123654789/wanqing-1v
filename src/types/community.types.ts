@@ -4,31 +4,41 @@
  */
 
 /**
- * 社区实体
+ * 社区实体（与后端Community实体对应）
  */
 export interface Community {
   /** 社区唯一标识符 */
-  id: string;
+  _id: string;
+  /** 社区编码 */
+  code?: string;
   /** 社区名称 */
   name: string;
-  /** 完整地址 */
-  fullAddress: string;
-  /** 简短地址（用于列表显示） */
-  shortAddress: string;
+  /** 省份 */
+  province?: string;
+  /** 城市 */
+  city?: string;
+  /** 区/县 */
+  district?: string;
+  /** 详细地址 */
+  detailAddress?: string;
   /** 纬度 */
-  latitude: number;
+  latitude?: number;
   /** 经度 */
-  longitude: number;
-  /** 服务范围描述 */
-  serviceRange: string;
-  /** 运营状态 */
-  status: 'active' | 'inactive';
-  /** 创建时间戳（毫秒） */
-  createdAt: number;
-  /** 更新时间戳（毫秒） */
-  updatedAt: number;
-  /** 距离用户的距离（单位：公里，可选） */
+  longitude?: number;
+  /** 联系人 */
+  contactPerson?: string;
+  /** 联系电话 */
+  contactPhone?: string;
+  /** 社区描述 */
+  description?: string;
+  /** 逻辑删除标记 */
+  deleted?: number;
+  /** 距离用户的距离（单位：公里，可选，由前端计算） */
   distance?: number;
+  /** 创建时间戳 */
+  createTime?: string;
+  /** 更新时间戳 */
+  updateTime?: string;
 }
 
 /**

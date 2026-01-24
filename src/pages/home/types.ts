@@ -40,10 +40,20 @@ export interface Activity {
 
 // 社区
 export interface Community {
-  id: string
+  _id: string
+  code?: string
   name: string
-  address: string
-  latitude: number
-  longitude: number
-  coverImage?: string
+  province?: string
+  city?: string
+  district?: string
+  detailAddress?: string
+  latitude?: number
+  longitude?: number
+  contactPerson?: string
+  contactPhone?: string
+  description?: string
+  deleted?: number
+  // 兼容性字段
+  address?: string // 组合地址
+  coverImage?: string // 封面图片（可能需要另外处理）
 }

@@ -12,8 +12,13 @@ export default {
     'pages/joy/components/ElderlyMall/Detail/index',
     'pages/joy/components/HomeService/index',
     'pages/joy/components/HomeService/Detail/index',
+    'pages/joy/components/WellnessBooking/index',
+    'pages/joy/components/WellnessBooking/Detail/index',
     'pages/care/index',
     'pages/care/data/consultation/index',
+    'pages/care/data/WellnessBooking/index',
+    'pages/care/data/WellnessBooking/Detail/index',
+    'pages/care/data/wellness/index',
     'pages/profile/index',
     'pages/login/agreement/index',
     'pages/login/privacy/index'
