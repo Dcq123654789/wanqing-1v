@@ -20,6 +20,10 @@ const config = {
   },
   copy: {
     patterns: [
+      {
+        from: 'node_modules/@vant/weapp/dist',
+        to: 'dist/miniprogram_npm/@vant/weapp'
+      }
     ],
     options: {
     }
@@ -35,6 +39,9 @@ const config = {
     enable: false
   },
   mini: {
+    usingComponents: {
+      'van-icon': '@vant/weapp/icon/index'
+    },
     webpackChain(chain) {
       chain.resolve.alias.set('@', path.resolve(__dirname, '..', 'src'))
     },

@@ -18,10 +18,18 @@ function NotificationBar({ data, autoplay = true, interval = 4000, onClick }: No
     if (!autoplay || data.length <= 1) return
 
     const timer = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % data.length)
+      try {
+        if (!data || data.length === 0) return
+        setCurrentIndex((prev) => (prev + 1) % data.length)
+      } catch (err) {
+        // 捕获回调内的任何异常，避免未捕获异常冒泡到宿主运行时
+        console.error('NotificationBar interval error:', err)
+      }
     }, interval)
 
-    return () => clearInterval(timer)
+    return () => {
+      clearInterval(timer)
+    }
   }, [autoplay, interval, data.length])
 
   if (data.length === 0) return null

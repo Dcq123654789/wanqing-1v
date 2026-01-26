@@ -1,0 +1,524 @@
+/**
+ * 晚晴养老 - 完善信息页面样式
+ * 基于 UI/UX Pro Max 专业设计系统
+ * 配色方案: 医疗健康专用配色（可信赖蓝色 + 安全绿色）
+ */
+
+.complete-info-page {
+  width: 100vw;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.complete-info-page .scroll-container {
+  position: relative;
+  z-index: 1;
+  height: 100vh;
+  padding: 0 32rpx;
+  box-sizing: border-box;
+}
+
+/* ========== 顶部标题区 ========== */
+.complete-info-page .header-section {
+  text-align: center;
+  padding: 60rpx 0 40rpx;
+  position: relative;
+}
+
+.complete-info-page .header-section .welcome-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24rpx;
+  animation: fadeInDown 0.6s ease-out;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.complete-info-page .header-section .welcome-icon .custom-icon {
+  filter: drop-shadow(0 4rpx 12rpx rgba(34, 197, 94, 0.3));
+}
+
+.complete-info-page .header-section .page-title {
+  display: block;
+  font-size: 56rpx;
+  font-weight: 700;
+  color: #0C4A6E;
+  margin-bottom: 16rpx;
+  letter-spacing: 1rpx;
+  line-height: 1.3;
+}
+
+.complete-info-page .header-section .page-desc {
+  display: block;
+  font-size: 32rpx;
+  color: #0E7490;
+  margin-bottom: 40rpx;
+  line-height: 1.5;
+}
+
+/* 进度条 */
+.complete-info-page .header-section .progress-bar {
+  width: 80%;
+  height: 12rpx;
+  background: rgba(14, 116, 144, 0.2);
+  border-radius: 6rpx;
+  margin: 0 auto 20rpx;
+  overflow: hidden;
+}
+
+.complete-info-page .header-section .progress-bar .progress-fill {
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, #22C55E 0%, #0369A1 100%);
+  border-radius: 6rpx;
+  animation: progress 1.5s ease-out;
+}
+
+@keyframes progress {
+  from {
+    width: 0;
+  }
+  to {
+    width: 50%;
+  }
+}
+
+.complete-info-page .header-section .progress-text {
+  display: block;
+  font-size: 28rpx;
+  color: #0E7490;
+  font-weight: 500;
+}
+
+/* ========== 表单区域 ========== */
+.complete-info-page .form-section {
+  background: #FFFFFF;
+  border-radius: 32rpx;
+  padding: 48rpx 32rpx;
+  box-shadow: 0 8rpx 32rpx rgba(3, 105, 161, 0.12);
+  margin-bottom: 32rpx;
+}
+
+.complete-info-page .form-section .form-item {
+  margin-bottom: 48rpx;
+}
+
+.complete-info-page .form-section .form-item:last-child {
+  margin-bottom: 0;
+}
+
+/* ========== 头像上传 ========== */
+.complete-info-page .form-item.avatar-item {
+  text-align: center;
+  margin-bottom: 56rpx;
+}
+
+.complete-info-page .form-item.avatar-item .avatar-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24rpx;
+}
+
+.complete-info-page .form-item.avatar-item .avatar-label .label-text {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #0C4A6E;
+}
+
+.complete-info-page .form-item.avatar-item .avatar-label .required {
+  margin-left: 8rpx;
+  font-size: 36rpx;
+  color: #DC2626;
+}
+
+.complete-info-page .form-item.avatar-item .avatar-upload {
+  width: 220rpx;
+  height: 220rpx;
+  margin: 0 auto;
+  border-radius: 50%;
+  overflow: hidden;
+  position: relative;
+  background: linear-gradient(135deg, #0369A1 0%, #0EA5E9 100%);
+  box-shadow: 0 12rpx 32rpx rgba(3, 105, 161, 0.25);
+  transition: all 0.3s ease;
+}
+
+.complete-info-page .form-item.avatar-item .avatar-upload:active {
+  transform: scale(0.96);
+}
+
+.complete-info-page .form-item.avatar-item .avatar-upload:focus-visible {
+  outline: none;
+  box-shadow: 0 16rpx 40rpx rgba(3, 105, 161, 0.35),
+              0 0 0 6rpx rgba(3, 105, 161, 0.3);
+}
+
+.complete-info-page .form-item.avatar-item .avatar-upload.error {
+  box-shadow: 0 12rpx 32rpx rgba(220, 38, 38, 0.3);
+}
+
+.complete-info-page .form-item.avatar-item .avatar-upload.error:focus-visible {
+  box-shadow: 0 12rpx 32rpx rgba(220, 38, 38, 0.3),
+              0 0 0 6rpx rgba(220, 38, 38, 0.3);
+}
+
+.complete-info-page .form-item.avatar-item .avatar-upload .avatar-image {
+  width: 100%;
+  height: 100%;
+}
+
+.complete-info-page .form-item.avatar-item .avatar-upload .avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0369A1 0%, #0EA5E9 100%);
+}
+
+.complete-info-page .form-item.avatar-item .avatar-placeholder .custom-icon {
+  margin-bottom: 12rpx;
+}
+
+.complete-info-page .form-item.avatar-item .avatar-upload .avatar-placeholder .avatar-text {
+  font-size: 26rpx;
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 500;
+}
+
+.complete-info-page .form-item.avatar-item .avatar-upload .avatar-mask {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 72rpx;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.complete-info-page .form-item.avatar-item .avatar-upload .avatar-mask .mask-text {
+  font-size: 26rpx;
+  color: #FFFFFF;
+  font-weight: 500;
+}
+
+.complete-info-page .form-item.avatar-item .avatar-upload:active .avatar-mask {
+  opacity: 1;
+}
+
+.complete-info-page .form-item.avatar-item .error-text-center {
+  display: block;
+  margin-top: 20rpx;
+  font-size: 28rpx;
+  color: #DC2626;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* ========== 表单标签 ========== */
+.complete-info-page .form-item .form-label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.complete-info-page .form-item .form-label .custom-icon.label-icon {
+  margin-right: 12rpx;
+  flex-shrink: 0;
+}
+
+.complete-info-page .form-item .form-label .label-text {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #0C4A6E;
+}
+
+.complete-info-page .form-item .form-label .required {
+  margin-left: 8rpx;
+  font-size: 34rpx;
+  color: #DC2626;
+}
+
+.complete-info-page .form-item .form-label .optional {
+  margin-left: 8rpx;
+  font-size: 28rpx;
+  color: #64748B;
+  font-weight: 400;
+}
+
+/* ========== 表单输入框 ========== */
+.complete-info-page .form-item .form-input {
+  width: 100%;
+  height: 96rpx;
+  background: #F8FAFC;
+  border: 3rpx solid #E2E8F0;
+  border-radius: 16rpx;
+  padding: 0 28rpx;
+  font-size: 32rpx;
+  color: #0C4A6E;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.complete-info-page .form-item .form-input:-moz-placeholder {
+  color: #94A3B8;
+}
+
+.complete-info-page .form-item .form-input::-webkit-input-placeholder {
+  color: #94A3B8;
+}
+
+.complete-info-page .form-item .form-input:hover {
+  border-color: #BAE6FD;
+  background: #F0F9FF;
+}
+
+.complete-info-page .form-item .form-input:focus {
+  background: #FFFFFF;
+  border-color: #0369A1;
+  box-shadow: 0 0 0 6rpx rgba(3, 105, 161, 0.15);
+  outline: none;
+}
+
+.complete-info-page .form-item .form-input.textarea {
+  height: 140rpx;
+  padding: 24rpx 28rpx;
+  line-height: 1.6;
+}
+
+/* inline picker shown like an input */
+.complete-info-page .form-item .picker-value {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 96rpx;
+  padding: 0 28rpx;
+  background: #F8FAFC;
+  border: 3rpx solid #E2E8F0;
+  border-radius: 16rpx;
+  font-size: 32rpx;
+  color: #0C4A6E;
+  box-sizing: border-box;
+}
+.complete-info-page .form-item .picker-value .value-text {
+  color: #0C4A6E;
+}
+.complete-info-page .form-item .picker-value .picker-arrow {
+  color: #94A3B8;
+  font-size: 30rpx;
+}
+
+.complete-info-page .form-item .error-text {
+  display: block;
+  margin-top: 16rpx;
+  font-size: 28rpx;
+  color: #DC2626;
+  padding-left: 8rpx;
+  font-weight: 500;
+}
+
+/* ========== 性别选择 - 单选框样式 ========== */
+.complete-info-page .form-item .gender-radio-group {
+  display: flex;
+  gap: 48rpx;
+  padding: 20rpx 0;
+}
+
+.complete-info-page .form-item .gender-radio-group .gender-radio-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.complete-info-page .form-item .gender-radio-group .gender-radio-label:active {
+  transform: scale(0.96);
+}
+
+.complete-info-page .form-item .gender-radio-group .gender-radio-label .gender-radio {
+  margin-right: 16rpx;
+  transform: scale(1.2);
+}
+
+.complete-info-page .form-item .gender-radio-group .gender-radio-label .radio-text {
+  font-size: 32rpx;
+  color: #475569;
+  font-weight: 500;
+}
+
+/* ========== 温馨提示卡片 ========== */
+.complete-info-page .tips-card {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 36rpx;
+  margin-bottom: 32rpx;
+  box-shadow: 0 4rpx 20rpx rgba(3, 105, 161, 0.08);
+  border-left: 6rpx solid #22C55E;
+}
+
+.complete-info-page .tips-card .tips-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.complete-info-page .tips-card .tips-header .custom-icon.tips-icon {
+  margin-right: 12rpx;
+}
+
+.complete-info-page .tips-card .tips-header .tips-title {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #0C4A6E;
+}
+
+.complete-info-page .tips-card .tips-list .tip-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 20rpx;
+}
+
+.complete-info-page .tips-card .tips-list .tip-item:last-child {
+  margin-bottom: 0;
+}
+
+.complete-info-page .tips-card .tips-list .tip-item .tip-bullet {
+  width: 10rpx;
+  height: 10rpx;
+  border-radius: 50%;
+  background: #22C55E;
+  margin-top: 18rpx;
+  margin-right: 16rpx;
+  flex-shrink: 0;
+}
+
+.complete-info-page .tips-card .tips-list .tip-item .tips-text {
+  flex: 1;
+  font-size: 30rpx;
+  color: #475569;
+  line-height: 1.7;
+}
+
+/* ========== 提交按钮 ========== */
+.complete-info-page .submit-section {
+  padding: 32rpx 0 80rpx;
+}
+
+.complete-info-page .submit-section .submit-button {
+  width: 100%;
+  height: 112rpx;
+  background: linear-gradient(135deg, #22C55E 0%, #16A34A 100%);
+  border-radius: 56rpx;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12rpx 32rpx rgba(34, 197, 94, 0.35);
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.complete-info-page .submit-section .submit-button:hover {
+  transform: translateY(-4rpx);
+  box-shadow: 0 16rpx 40rpx rgba(34, 197, 94, 0.45);
+}
+
+.complete-info-page .submit-section .submit-button:focus-visible {
+  outline: none;
+  box-shadow: 0 16rpx 40rpx rgba(34, 197, 94, 0.45),
+              0 0 0 6rpx rgba(34, 197, 94, 0.4);
+}
+
+.complete-info-page .submit-section .submit-button:active {
+  transform: scale(0.98);
+  box-shadow: 0 8rpx 24rpx rgba(34, 197, 94, 0.35);
+}
+
+.complete-info-page .submit-section .submit-button::after {
+  border: none;
+}
+
+.complete-info-page .submit-section .submit-button.submitting {
+  opacity: 0.7;
+  background: linear-gradient(135deg, #94A3B8 0%, #64748B 100%);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.complete-info-page .submit-section .submit-button .button-text {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: 1rpx;
+  margin-right: 12rpx;
+}
+
+.complete-info-page .submit-section .submit-button .button-icon {
+  font-size: 40rpx;
+  color: #FFFFFF;
+  font-weight: bold;
+  transition: transform 0.2s ease;
+}
+
+.complete-info-page .submit-section .submit-button:hover .button-icon {
+  transform: translateX(8rpx);
+}
+
+.complete-info-page .submit-section .submit-tips {
+  display: block;
+  text-align: center;
+  font-size: 26rpx;
+  color: #64748B;
+  margin-top: 24rpx;
+  line-height: 1.5;
+}
+
+/* ========== 可访问性增强 ========== */
+/* 注意：WXSS 不支持通配符选择器，已移除 prefers-reduced-motion */
+
+/* ========== 响应式优化 ========== */
+@media (max-width: 375px) {
+  .complete-info-page .header-section {
+    padding: 40rpx 0 32rpx;
+  }
+
+  .complete-info-page .header-section .page-title {
+    font-size: 48rpx;
+  }
+
+  .complete-info-page .header-section .page-desc {
+    font-size: 28rpx;
+  }
+
+  .complete-info-page .form-section {
+    padding: 40rpx 24rpx;
+  }
+
+  .complete-info-page .form-section .form-item {
+    margin-bottom: 40rpx;
+  }
+}
+
+/* 增加详细地址标题与上方的间距 */
+.complete-info-page .form-item .form-label--spaced {
+  margin-top: 24rpx;
+}

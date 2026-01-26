@@ -1,51 +1,39 @@
 @import "@/assets/styles/variables.scss";
 
-.address-picker {
-  .picker-row {
-    display: flex;
-    align-items: center;
-    padding: 28rpx 0;
-    border-bottom: 1rpx solid #f0f0f0;
+.address-picker-inline {
+  width: 100%;
 
-    &:last-child {
-      border-bottom: none;
-    }
-  }
-
-  .picker-label {
-    width: 180rpx;
-    font-size: 28rpx;
-    color: #333;
-    font-weight: 500;
-  }
-
-  .picker-value {
-    flex: 1;
+  .picker-value-inline {
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16rpx 24rpx;
-    background: #f5f5f5;
-    border-radius: 8rpx;
-    transition: all 0.3s;
+    padding: 20rpx 24rpx;
+    background: #F8FAFC;
+    border: 3rpx solid #E2E8F0;
+    border-radius: 16rpx;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    min-height: 96rpx;
+
+    &:active {
+      transform: scale(0.98);
+      background: #F0F9FF;
+    }
 
     &--selected {
-      background: #fff;
-      border: 1rpx solid $wanqing-primary;
+      background: #F0F9FF;
+      border-color: #0369A1;
     }
   }
 
   .value-text {
-    font-size: 28rpx;
-    color: #999;
+    font-size: 32rpx;
+    color: #94A3B8;
+    font-weight: 500;
 
     .picker-value--selected & {
-      color: #333;
+      color: #0C4A6E;
     }
-  }
-
-  .picker-arrow {
-    font-size: 20rpx;
-    color: #999;
   }
 }

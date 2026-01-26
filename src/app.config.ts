@@ -1,6 +1,7 @@
 export default {
   pages: [
     'pages/login/index',
+    'pages/login/complete-info/index',
     'pages/home/index',
     'pages/home/data/community-select/index',
     'pages/joy/index',

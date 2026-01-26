@@ -23,7 +23,7 @@ interface WechatUserInfo {
 function Login() {
   const [state, setState] = useState<LoginState>({
     loading: false,
-    agreed: false,
+    agreed: true,
     pageTransition: false,
   });
 
@@ -177,18 +177,43 @@ function Login() {
         // 登录成功
         console.log('登录成功，准备跳转');
 
-        Taro.showToast({
-          title: "登录成功",
-          icon: "success",
-          duration: 1500,
-        });
+        // 重新获取最新的用户信息
+        const currentUserInfo = useUserStore.getState().userInfo;
+        const isNewUser = currentUserInfo?.isNewUser || false;
 
-        // 延迟跳转，让用户看到成功提示
-        setTimeout(() => {
-          Taro.switchTab({
-            url: "/pages/home/index",
+        console.log('用户信息:', currentUserInfo, '是否新用户:', isNewUser);
+
+        if (isNewUser) {
+          // 新用户：跳转到完善信息页面
+          Taro.showToast({
+            title: "欢迎加入晚晴",
+            icon: "success",
+            duration: 1500,
           });
-        }, 1500);
+
+          setTimeout(() => {
+            Taro.redirectTo({
+              url: "/pages/login/complete-info/index",
+            });
+          }, 1500);
+        } else {
+          // 老用户：直接进入首页
+          Taro.showToast({
+            title: "登录成功",
+            icon: "success",
+            duration: 1500,
+          });
+
+          setTimeout(() => {
+            Taro.redirectTo({
+              url: "/pages/login/complete-info/index",
+            });
+            // Taro.switchTab({
+            //   url: "/pages/home/index",
+              
+            // });
+          }, 1500);
+        }
       } else {
         // 登录失败
         console.error('登录失败');

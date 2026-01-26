@@ -20,6 +20,7 @@ interface UserInfo {
   phone?: string
   name?: string
   gender?: number
+  address?: string  // 详细地址
   balance?: number
   isNewUser?: boolean
   communityId?: string  // 绑定的社区ID
@@ -44,6 +45,7 @@ interface UserState {
   logout: () => void
   initializeAuth: () => void
   getCurrentUser: () => Promise<UserInfo | null>
+  updateUserInfo: (data: Partial<UserInfo>) => Promise<boolean>
   // 社区相关方法
   setCommunity: (communityId: string, communityName: string) => Promise<void>
   clearCommunity: () => void
@@ -280,19 +282,19 @@ export const useUserStore = create<UserState>((set, get) => ({
         return
       }
 
-      // 使用通用接口更新用户的社区信息
-      await request({
-        url: '/api/batch',
-        method: 'POST',
-        data: {
-          entity: 'wquser', // 用户实体
-          action: 'update', // 更新操作
-          id: userInfo._id, // 用户ID
+        // 使用通用接口更新用户的社区信息
+        await request({
+          url: '/api/batch',
+          method: 'POST',
           data: {
-            communityId: communityId // 更新社区ID字段
+            entity: 'wquser', // 用户实体
+            action: 'update', // 更新操作
+            id: userInfo._id, // 用户ID
+            data: {
+              communityId: communityId // 更新社区ID字段
+            }
           }
-        }
-      })
+        })
 
       // 更新本地用户信息
       const updatedUserInfo: UserInfo = {
@@ -361,6 +363,49 @@ export const useUserStore = create<UserState>((set, get) => ({
     } catch (error) {
       console.error('获取用户信息失败:', error)
       return null
+    }
+  },
+
+  /**
+   * 更新用户信息
+   * @param data 要更新的用户数据
+   * @returns Promise<boolean> 是否更新成功
+   */
+  updateUserInfo: async (data: Partial<UserInfo>): Promise<boolean> => {
+    try {
+      const { userInfo } = get()
+
+      if (!userInfo || !userInfo._id) {
+        console.error('用户未登录或用户ID不存在')
+        return false
+      }
+
+      // 调用更新接口
+      await request({
+        url: '/api/batch',
+        method: 'POST',
+        data: {
+          entity: 'wquser',
+          action: 'update',
+          id: userInfo._id,
+          data
+        }
+      })
+
+      // 更新本地用户信息
+      const updatedUserInfo: UserInfo = {
+        ...userInfo,
+        ...data
+      }
+
+      set({ userInfo: updatedUserInfo })
+      saveUserInfo(updatedUserInfo)
+
+      console.log('用户信息更新成功:', updatedUserInfo)
+      return true
+    } catch (error) {
+      console.error('更新用户信息失败:', error)
+      return false
     }
   }
 }))

@@ -37,15 +37,26 @@ export const usePageTransition = () => {
         Taro.eventCenter.off('hidePageTransition', handleHide)
       }
 
-      // 将清理函数存储在 window 上，以便后续清理
-      ;(window as any).__pageTransitionCleanup = cleanup
+      // 将清理函数存储在 window 上，以便后续清理（仅在 window 可用时）
+      try {
+        if (typeof window !== 'undefined' && window) {
+          ;(window as any).__pageTransitionCleanup = cleanup
+        }
+      } catch (err) {
+        // 在非浏览器或小程序 appservice 环境下访问 window 可能抛错，吞掉以免影响主流程
+        console.warn('usePageTransition: cannot attach cleanup to window:', err)
+      }
     }, 500) // 延迟 500ms 注册，避免初始化干扰
 
     return () => {
       clearTimeout(timer)
-      // 执行清理函数
-      if ((window as any).__pageTransitionCleanup) {
-        ;(window as any).__pageTransitionCleanup()
+      // 执行清理函数（仅在 window 可用且已存储时）
+      try {
+        if (typeof window !== 'undefined' && (window as any).__pageTransitionCleanup) {
+          ;(window as any).__pageTransitionCleanup()
+        }
+      } catch (err) {
+        console.warn('usePageTransition: cannot run cleanup from window:', err)
       }
     }
   }, [])
