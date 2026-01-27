@@ -115,6 +115,12 @@ function Care() {
       <ScrollView scrollY className="care-scroll">
         {/* 顶部欢迎区 */}
         <View className="welcome-header">
+          <Image
+            src={require('../../assets/images/backgrounds/care-bg.jpg')}
+            className="welcome-bg"
+            mode="aspectFill"
+          />
+          <View className="welcome-overlay" />
           <View className="welcome-content">
             <Text className="welcome-title">颐养身心</Text>
             <Text className="welcome-subtitle">专业健康管理，守护您的健康</Text>

@@ -33,13 +33,31 @@ $color-red: #ff4d4f;
 
 // ========== 顶部欢迎区 ==========
 .welcome-header {
-  background: $care-gradient;
   padding: $spacing-lg;
   padding-top: $spacing-xl;
   padding-bottom: 48px;
   height: 204rpx;
   position: relative;
   overflow: hidden;
+
+  .welcome-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+  }
+
+  .welcome-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(24, 144, 255, 0.85) 0%, rgba(64, 169, 255, 0.75) 100%);
+    z-index: 1;
+  }
 
   &::before {
     content: "";
@@ -50,6 +68,7 @@ $color-red: #ff4d4f;
     height: 300px;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 50%;
+    z-index: 1;
   }
 
   &::after {
@@ -61,11 +80,12 @@ $color-red: #ff4d4f;
     height: 200px;
     background: rgba(255, 255, 255, 0.08);
     border-radius: 50%;
+    z-index: 1;
   }
 
   .welcome-content {
     position: relative;
-    z-index: 1;
+    z-index: 2;
 
     .welcome-title {
       font-size: 48px;
@@ -74,13 +94,15 @@ $color-red: #ff4d4f;
       display: block;
       margin-bottom: $spacing-xs;
       letter-spacing: 2px;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     }
 
     .welcome-subtitle {
       font-size: 28px;
-      color: rgba(255, 255, 255, 0.9);
+      color: rgba(255, 255, 255, 0.95);
       display: block;
       letter-spacing: 1px;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
     }
   }
 
@@ -88,18 +110,19 @@ $color-red: #ff4d4f;
     position: absolute;
     top: $spacing-lg;
     right: $spacing-lg;
-    z-index: 1;
+    z-index: 2;
 
     .decoration-icon {
       font-size: 64px;
-      opacity: 0.3;
+      opacity: 0.4;
       animation: float 3s ease-in-out infinite;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
     }
 
     .decoration-circle {
       position: absolute;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.2);
       animation: pulse 2s ease-in-out infinite;
 
       &.decoration-circle-1 {

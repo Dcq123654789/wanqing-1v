@@ -129,7 +129,7 @@ function Home() {
       {/* 顶部区域（包含状态栏、导航栏和欢迎区） */}
       <View className="home-header">
         <HeaderSection
-          communityName={currentCommunity?.name || "晚晴社区"}
+          communityName={currentCommunity?.name || "请选择社区"}
           onCommunityChange={handleCommunityChange}
         />
       </View>

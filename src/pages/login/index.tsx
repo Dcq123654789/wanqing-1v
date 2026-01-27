@@ -27,7 +27,7 @@ function Login() {
     pageTransition: false,
   });
 
-  const { login, isLoggedIn, initializeAuth } = useUserStore();
+  const { login, isLoggedIn, initializeAuth, getCurrentUser } = useUserStore();
 
   /**
    * 页面加载时检查登录状态
@@ -197,18 +197,24 @@ function Login() {
             });
           }, 1500);
         } else {
-          // 老用户：直接进入首页
+          // 老用户：先获取完整的用户信息，再进入首页
           Taro.showToast({
             title: "登录成功",
             icon: "success",
             duration: 1500,
           });
 
+          // 获取完整的用户信息
+          try {
+            await getCurrentUser();
+            console.log('已获取老用户的完整信息');
+          } catch (err) {
+            console.error('获取用户信息失败:', err);
+          }
+
           setTimeout(() => {
-           
             Taro.switchTab({
               url: "/pages/home/index",
-              
             });
           }, 1500);
         }

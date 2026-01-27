@@ -2,9 +2,9 @@
  * 完善信息页面
  * 新用户首次登录后需要填写基本信息
  */
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, Input, Button, ScrollView, Image, Picker, RadioGroup, Radio, Label } from "@tarojs/components";
-import Taro from "@tarojs/taro";
+import Taro, { useRouter } from "@tarojs/taro";
 import { useUserStore } from "@/store/userStore";
 import { API_BASE_URL, API_ROUTES } from "@/config";
 import AddressPicker from "@/pages/joy/components/CommunityActivity/Registration/components/AddressPicker";
@@ -32,20 +32,9 @@ interface FormErrors {
 }
 
 function CompleteInfo() {
+  const router = useRouter();
   const { userInfo, updateUserInfo } = useUserStore();
-  const [formData, setFormData] = useState<FormData>({
-    avatar: userInfo?.avatar || "",
-    name: "",
-    nickname: "",
-    phone: "",
-    gender: 0,
-    birthdate: "",
-    address: "",
-    detailAddress: "",
-  });
-  const [errors, setErrors] = useState<FormErrors>({});
-  const [submitting, setSubmitting] = useState(false);
-  const [addressValue, setAddressValue] = useState<{ province: string; city: string; district: string } | undefined>(undefined);
+  const [mode, setMode] = useState<'new' | 'edit'>('new');
 
   // 生成日期选择器数据（多列选择，优化年份滑动）
   const currentYear = new Date().getFullYear();
@@ -66,6 +55,64 @@ function CompleteInfo() {
     return [yearIndex, monthIndex, dayIndex];
   });
   const todayStr = new Date().toISOString().slice(0, 10);
+
+  const [formData, setFormData] = useState<FormData>({
+    avatar: userInfo?.avatar || "",
+    name: "",
+    nickname: "",
+    phone: "",
+    gender: 0,
+    birthdate: "",
+    address: "",
+    detailAddress: "",
+  });
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [submitting, setSubmitting] = useState(false);
+  const [addressValue, setAddressValue] = useState<{ province: string; city: string; district: string } | undefined>(undefined);
+
+  // 初始化表单数据
+  useEffect(() => {
+    // 检查是否是编辑模式
+    const isEditMode = router.params.mode === 'edit';
+    setMode(isEditMode ? 'edit' : 'new');
+
+    if (isEditMode && userInfo) {
+      // 编辑模式：从 userInfo 中加载数据
+      const newFormData: FormData = {
+        avatar: userInfo.avatar || "",
+        name: userInfo.realName || "",
+        nickname: userInfo.nickname || "",
+        phone: userInfo.phone || "",
+        gender: userInfo.gender || 0,
+        birthdate: userInfo.birthDate || "",
+        address: userInfo.address || "",
+        detailAddress: userInfo.detailAddress || "",
+      };
+
+      setFormData(newFormData);
+
+      // 设置地址选择器的值
+      if (userInfo.province || userInfo.city || userInfo.district) {
+        setAddressValue({
+          province: userInfo.province || "",
+          city: userInfo.city || "",
+          district: userInfo.district || "",
+        });
+      }
+
+      // 设置出生日期选择器的值
+      if (userInfo.birthDate) {
+        const [year, month, day] = userInfo.birthDate.split('-').map(Number);
+        const yearIndex = years.findIndex(y => y === year);
+        const monthIndex = (month || 1) - 1;
+        const dayIndex = (day || 1) - 1;
+
+        if (yearIndex >= 0) {
+          setDatePickerValue([yearIndex, monthIndex, dayIndex]);
+        }
+      }
+    }
+  }, []);
 
   /**
    * 选择头像
@@ -319,16 +366,22 @@ function CompleteInfo() {
 
       if (success) {
         Taro.showToast({
-          title: "信息完善成功",
+          title: mode === 'edit' ? "保存成功" : "信息完善成功",
           icon: "success",
           duration: 1500,
         });
 
-        //延迟跳转到首页
+        // 延迟跳转
         setTimeout(() => {
-          Taro.switchTab({
-            url: "/pages/home/index",
-          });
+          if (mode === 'edit') {
+            // 编辑模式：返回上一页
+            Taro.navigateBack();
+          } else {
+            // 新用户模式：跳转到首页
+            Taro.switchTab({
+              url: "/pages/home/index",
+            });
+          }
         }, 1500);
       } else {
         throw new Error("更新失败");
@@ -554,12 +607,12 @@ function CompleteInfo() {
             aria-busy={submitting}
           >
             <Text className="button-text">
-              {submitting ? "提交中..." : "完成，开启晚晴生活"}
+              {submitting ? "提交中..." : (mode === 'edit' ? "保存修改" : "完成，开启晚晴生活")}
             </Text>
             {!submitting && (
               <Text className="button-icon">→</Text>
             )}
-          </Button> 
+          </Button>
         </View>
       </ScrollView>
     </View>

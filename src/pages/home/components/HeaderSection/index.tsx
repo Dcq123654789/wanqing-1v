@@ -15,7 +15,7 @@ function HeaderSection({
   onCommunityChange
 }: HeaderSectionProps) {
   const { userInfo } = useUserStore()
-  const username = userInfo?.username || '访客'
+  const username = userInfo?.realName || userInfo?.nickname || userInfo?.username || '访客'
   const [greeting, setGreeting] = useState('早上好')
 
   useEffect(() => {
