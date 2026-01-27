@@ -55,6 +55,12 @@ $profile-gradient: linear-gradient(135deg, #9c27b0 0%, #ba68c8 100%);
     display: flex;
     flex-direction: column;
     align-items: center;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+
+    &:active {
+      transform: translateX(-50%) scale(0.98);
+    }
 
     .user-avatar {
       width: 112px;
@@ -75,6 +81,27 @@ $profile-gradient: linear-gradient(135deg, #9c27b0 0%, #ba68c8 100%);
     .user-desc {
       font-size: $font-size-sm;
       color: rgba(255, 255, 255, 0.9);
+    }
+
+    .edit-hint {
+      display: flex;
+      align-items: center;
+      gap: 6rpx;
+      margin-top: 8rpx;
+      padding: 4rpx 16rpx;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 20rpx;
+      backdrop-filter: blur(10rpx);
+
+      .edit-icon {
+        font-size: 24rpx;
+      }
+
+      .edit-text {
+        font-size: 22rpx;
+        color: rgba(255, 255, 255, 0.95);
+        font-weight: 500;
+      }
     }
   }
 }

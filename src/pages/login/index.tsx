@@ -205,13 +205,11 @@ function Login() {
           });
 
           setTimeout(() => {
-            Taro.redirectTo({
-              url: "/pages/login/complete-info/index",
-            });
-            // Taro.switchTab({
-            //   url: "/pages/home/index",
+           
+            Taro.switchTab({
+              url: "/pages/home/index",
               
-            // });
+            });
           }, 1500);
         }
       } else {

@@ -19,8 +19,14 @@ interface UserInfo {
   avatar?: string
   phone?: string
   name?: string
+  realName?: string  // 真实姓名
   gender?: number
   address?: string  // 详细地址
+  birthDate?: string  // 出生日期
+  province?: string  // 省份
+  city?: string  // 城市
+  district?: string  // 区县
+  detailAddress?: string  // 详细地址（门牌等）
   balance?: number
   isNewUser?: boolean
   communityId?: string  // 绑定的社区ID

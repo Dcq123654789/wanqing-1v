@@ -280,17 +280,36 @@ function CompleteInfo() {
         avatar: formData.avatar,
         // map to backend entity fields
         realName: formData.name.trim(),
-        nickname: formData.nickname && formData.nickname.trim() !== "" ? formData.nickname.trim() : undefined,
         phone: formData.phone.trim(),
         gender: formData.gender,
-        birthDate: formData.birthdate && formData.birthdate.trim() !== "" ? formData.birthdate.trim() : undefined,
-        province: addressValue?.province,
-        city: addressValue?.city,
-        district: addressValue?.district,
-        detailAddress: formData.detailAddress && formData.detailAddress.trim() !== "" ? formData.detailAddress.trim() : undefined,
         // 更新后不再是新用户
         isNewUser: false,
       };
+
+      // 昵称（选填，有值时才添加）
+      if (formData.nickname && formData.nickname.trim() !== "") {
+        payload.nickname = formData.nickname.trim();
+      }
+
+      // 出生日期（选填，有值时才添加，避免 LocalDate 类型转换问题）
+      if (formData.birthdate && formData.birthdate.trim() !== "") {
+        payload.birthDate = formData.birthdate.trim();
+      }
+
+      // 地址信息（选填，有值时才添加）
+      if (addressValue?.province) {
+        payload.province = addressValue.province;
+      }
+      if (addressValue?.city) {
+        payload.city = addressValue.city;
+      }
+      if (addressValue?.district) {
+        payload.district = addressValue.district;
+      }
+      if (formData.detailAddress && formData.detailAddress.trim() !== "") {
+        payload.detailAddress = formData.detailAddress.trim();
+      }
+
       // include communityId if available from store
       if (userInfo?.communityId) {
         payload.communityId = userInfo.communityId;
@@ -305,12 +324,12 @@ function CompleteInfo() {
           duration: 1500,
         });
 
-        // 延迟跳转到首页
-        // setTimeout(() => {
-        //   Taro.switchTab({
-        //     url: "/pages/home/index",
-        //   });
-        // }, 1500);
+        //延迟跳转到首页
+        setTimeout(() => {
+          Taro.switchTab({
+            url: "/pages/home/index",
+          });
+        }, 1500);
       } else {
         throw new Error("更新失败");
       }

@@ -19,12 +19,7 @@ const config = {
   defineConstants: {
   },
   copy: {
-    patterns: [
-      {
-        from: 'node_modules/@vant/weapp/dist',
-        to: 'dist/miniprogram_npm/@vant/weapp'
-      }
-    ],
+    patterns: [],
     options: {
     }
   },
@@ -40,7 +35,6 @@ const config = {
   },
   mini: {
     usingComponents: {
-      'van-icon': '@vant/weapp/icon/index'
     },
     webpackChain(chain) {
       chain.resolve.alias.set('@', path.resolve(__dirname, '..', 'src'))

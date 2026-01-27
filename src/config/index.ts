@@ -85,8 +85,8 @@ export const API_ROUTES = {
 
   // ========== 上传相关 ==========
   UPLOAD: {
-    IMAGE: '/upload/image', // 上传图片
-    FILE: '/upload/file', // 上传文件
+    IMAGE: '/api/upload', // 上传图片（OSS）
+    FILE: '/api/upload', // 上传文件（OSS）
   },
 }
 

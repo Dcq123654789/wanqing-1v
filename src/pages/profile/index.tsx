@@ -66,6 +66,13 @@ function Profile() {
     }
   }
 
+  // 点击用户信息区域，跳转到编辑页面
+  const handleEditProfile = () => {
+    Taro.navigateTo({
+      url: '/pages/login/complete-info/index?mode=edit'
+    })
+  }
+
   return (
     <View className="profile-page">
       {/* 状态栏占位 */}
@@ -81,14 +88,18 @@ function Profile() {
           />
           <View className="header-overlay" />
 
-          {/* 用户信息 */}
-          <View className="user-info">
+          {/* 用户信息 - 点击可编辑 */}
+          <View className="user-info" onClick={handleEditProfile}>
             <Image
               src={userInfo?.avatar || require('../../assets/images/icons/icon-login-user.png')}
               className="user-avatar"
             />
-            <Text className="user-name">{userInfo?.username || '未登录'}</Text>
+            <Text className="user-name">{userInfo?.realName || userInfo?.nickname || userInfo?.username || '未登录'}</Text>
             <Text className="user-desc">享受美好晚年生活</Text>
+            <View className="edit-hint">
+              <Text className="edit-icon">✏️</Text>
+              <Text className="edit-text">点击编辑</Text>
+            </View>
           </View>
         </View>
 
