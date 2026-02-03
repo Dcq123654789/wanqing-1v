@@ -6,7 +6,7 @@
 export interface RegistrationFormData {
   name: string
   phone: string
-  detailAddress: string
+  remarks: string
 }
 
 // 支付方式
@@ -19,4 +19,25 @@ export interface ActivityInfo {
   coverImage?: string
   price?: number
   isFree: boolean
+  maxParticipants?: number
+  currentParticipants?: number
+}
+
+// 报名响应数据
+export interface JoinActivityResult {
+  code: number
+  message: string
+  data: {
+    orderNo: string
+    activity?: {
+      _id: string
+      title?: string
+    }
+    isFree?: boolean
+    needPayment?: boolean
+    registration?: {
+      paymentAmount?: number
+    }
+    paymentAmount?: number
+  }
 }

@@ -36,26 +36,7 @@ function PaymentSelector({ price, balance = 0, value, onChange }: PaymentSelecto
           <View className={`option-radio ${value === 'wechat' ? 'option-radio--checked' : ''}`}>
             {value === 'wechat' && <Text className="radio-check">✓</Text>}
           </View>
-        </View>
-
-        {/* 余额支付 */}
-        <View
-          className={`payment-option ${value === 'balance' ? 'payment-option--active' : ''}`}
-          onClick={() => onChange('balance')}
-        >
-          <View className="option-left">
-            <View className="option-icon option-icon--balance">
-              <Text className="icon-text">余</Text>
-            </View>
-            <View className="option-info">
-              <Text className="option-name">余额支付</Text>
-              <Text className="option-balance">当前余额：¥{balance.toFixed(2)}</Text>
-            </View>
-          </View>
-          <View className={`option-radio ${value === 'balance' ? 'option-radio--checked' : ''}`}>
-            {value === 'balance' && <Text className="radio-check">✓</Text>}
-          </View>
-        </View>
+        </View> 
       </View>
 
       {value === 'balance' && balance < price && (

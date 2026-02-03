@@ -1,6 +1,6 @@
 import { View, Map, Text } from '@tarojs/components'
 import Taro, { useDidShow } from '@tarojs/taro'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import CommunitySelector from './components/CommunitySelector'
 import { Community } from '@/pages/home/types'
 import PageTransitionOverlay from '@/components/PageTransitionOverlay'
@@ -9,6 +9,8 @@ import { fetchCommunities } from './services/community.service'
 import './index.scss'
 
 const STORAGE_KEY = 'selectedCommunity'
+const COMMUNITIES_CACHE_KEY = 'communities_cache'
+const CACHE_DURATION = 10 * 60 * 1000 // 10分钟缓存
 
 function CommunitySelect() {
   const [selectedCommunity, setSelectedCommunity] = useState<Community | null>(null)
@@ -17,47 +19,79 @@ function CommunitySelect() {
   const [isReady, setIsReady] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [retryCount, setRetryCount] = useState(0) // 重试次数
 
   // 获取用户状态
-  const { isLoggedIn, setCommunity, userInfo, initializeAuth } = useUserStore()
+  const { isLoggedIn, setCommunity, userInfo } = useUserStore()
 
-  // 加载社区列表
+  // 使用 ref 跟踪是否已加载
+  const hasLoaded = useRef(false)
+
+  // 加载社区列表（添加缓存机制和重试支持）
   useEffect(() => {
-    // 初始化用户认证状态
-    initializeAuth()
+    // 防止重复加载（除非重试）
+    if (hasLoaded.current && retryCount === 0) return;
+    hasLoaded.current = true;
 
     const loadCommunities = async () => {
       setIsLoading(true)
       setError(null)
 
       try {
-        // 获取用户位置（用于按距离排序）
-        const location = await Taro.getLocation()
+        // 1. 尝试从缓存读取（重试时不使用缓存）
+        const cacheData = retryCount === 0 ? Taro.getStorageSync(COMMUNITIES_CACHE_KEY) : null
+        if (cacheData && cacheData.timestamp) {
+          const cacheAge = Date.now() - cacheData.timestamp
+          if (cacheAge < CACHE_DURATION) {
+            console.log('使用缓存的社区列表，缓存时间:', Math.floor(cacheAge / 1000), '秒')
+            setCommunities(cacheData.communities || [])
+            await initSelectedCommunity(cacheData.communities || [])
+            setIsLoading(false)
+            setTimeout(() => setIsReady(true), 100)
+            return
+          }
+        }
 
-        // 调用真实接口获取社区列表
-        const data = await fetchCommunities({
-          lat: location.latitude,
-          lng: location.longitude,
-          deleted: 0 // 只查询未删除的社区
+        // 2. 获取用户位置（用于按距离排序）
+        let location
+        try {
+          location = await Taro.getLocation()
+        } catch (err) {
+          console.log('获取位置失败，将不带位置信息加载社区列表')
+        }
+
+        // 3. 调用真实接口获取社区列表
+        const params: any = { deleted: 0 }
+        if (location) {
+          params.lat = location.latitude
+          params.lng = location.longitude
+        }
+
+        const data = await fetchCommunities(params)
+        const communityList = data.communities || []
+        setCommunities(communityList)
+
+        // 4. 保存到缓存
+        Taro.setStorageSync(COMMUNITIES_CACHE_KEY, {
+          communities: communityList,
+          timestamp: Date.now()
         })
 
-        setCommunities(data.communities || [])
-
         // 初始化选中的社区
-        await initSelectedCommunity(data.communities || [])
+        await initSelectedCommunity(communityList)
+
+        // 重置重试次数
+        setRetryCount(0)
       } catch (err: any) {
         console.error('加载社区列表失败:', err)
         setError(err?.message || '加载社区列表失败')
 
-        // 如果获取位置失败，尝试不带位置获取社区列表
-        try {
-          const data = await fetchCommunities({
-            deleted: 0 // 只查询未删除的社区
-          })
-          setCommunities(data.communities || [])
-          await initSelectedCommunity(data.communities || [])
-        } catch (retryErr) {
-          console.error('重试加载社区列表失败:', retryErr)
+        // 如果有缓存数据，即使过期也先显示
+        const cacheData = Taro.getStorageSync(COMMUNITIES_CACHE_KEY)
+        if (cacheData?.communities) {
+          console.log('网络请求失败，使用过期缓存数据')
+          setCommunities(cacheData.communities)
+          await initSelectedCommunity(cacheData.communities)
         }
       } finally {
         setIsLoading(false)
@@ -67,7 +101,7 @@ function CommunitySelect() {
     }
 
     loadCommunities()
-  }, [])
+  }, [retryCount]) // 监听 retryCount，支持重试
 
   // 初始化选中的社区
   const initSelectedCommunity = async (communityList: Community[]) => {
@@ -112,14 +146,14 @@ function CommunitySelect() {
     }
   })
 
-  // 地图加载完成
-  const handleMapReady = () => {
+  // 地图加载完成 - 使用 useCallback 优化
+  const handleMapReady = useCallback(() => {
     const ctx = Taro.createMapContext('communityMap')
     setMapContext(ctx)
-  }
+  }, [])
 
-  // 地图标记点击
-  const handleMarkerTap = (e: any) => {
+  // 地图标记点击 - 使用 useCallback 优化
+  const handleMarkerTap = useCallback((e: any) => {
     const markerId = e.markerId
     // markerId从1开始，对应数组索引（从0开始）
     const communityIndex = markerId - 1
@@ -136,17 +170,17 @@ function CommunitySelect() {
     } else {
       console.error('未找到对应的社区:', markerId, communities.length)
     }
-  }
+  }, [communities, mapContext])
 
-  // 处理社区选择变化
-  const handleCommunityChange = (community: Community) => {
+  // 处理社区选择变化 - 使用 useCallback 优化
+  const handleCommunityChange = useCallback((community: Community) => {
     setSelectedCommunity(community)
     // 移动地图中心到选中的社区
     mapContext?.moveToLocation({
       latitude: community.latitude,
       longitude: community.longitude
     })
-  }
+  }, [mapContext])
 
   // 处理确认选择
   const handleConfirm = async () => {
@@ -242,8 +276,13 @@ function CommunitySelect() {
           <Text className="error-icon">⚠️</Text>
           <Text className="error-title">加载失败</Text>
           <Text className="error-message">{error}</Text>
-          <View className="retry-btn" onClick={() => Taro.reLaunch({ url: '/pages/home/data/community-select/index' })}>
-            <Text>重试</Text>
+          <View className="retry-btn" onClick={() => {
+            // 清除缓存并重试
+            Taro.removeStorageSync(COMMUNITIES_CACHE_KEY)
+            hasLoaded.current = false
+            setRetryCount(retryCount + 1)
+          }}>
+            <Text>重试 {retryCount > 0 ? `(${retryCount})` : ''}</Text>
           </View>
         </View>
       </View>

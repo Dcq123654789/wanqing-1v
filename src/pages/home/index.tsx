@@ -1,6 +1,6 @@
 import { View, Text, ScrollView } from "@tarojs/components";
 import Taro, { useDidShow } from "@tarojs/taro";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import HeaderSection from "./components/HeaderSection";
 import NotificationBar from "./components/NotificationBar";
 import QuickNav from "./components/QuickNav";
@@ -16,10 +16,12 @@ const STORAGE_KEY = "selectedCommunity";
 
 function Home() {
   const [statusBarHeight, setStatusBarHeight] = useState(0);
-  const [currentCommunity, setCurrentCommunity] = useState<Community | null>(
-    null
-  );
+  const [currentCommunity, setCurrentCommunity] = useState<Community | null>(null);
   const [showGuideModal, setShowGuideModal] = useState(false);
+
+  // 使用 ref 跟踪是否已经检查过社区，防止重复调用
+  const hasCheckedCommunity = useRef(false);
+  const lastCheckTime = useRef(0);
 
   // 获取用户状态
   const { isLoggedIn, userInfo } = useUserStore();
@@ -36,17 +38,18 @@ function Home() {
   useDidShow(() => {
     console.log('home 页面显示，隐藏遮罩')
     Taro.eventCenter.trigger('hidePageTransition')
-    checkSelectedCommunity();
+    // 只有在用户信息变化或首次加载时才检查
+    if (!hasCheckedCommunity.current || userInfo) {
+      checkSelectedCommunity();
+    }
   });
 
   // 监听社区选择事件
   useEffect(() => {
     const handleCommunitySelected = (data: any) => {
       console.log('接收到社区选择事件:', data)
-      // 延迟一点时间确保数据已保存
-      setTimeout(() => {
-        checkSelectedCommunity();
-      }, 500)
+      // 立即检查社区信息（useDidShow 也会触发，确保数据同步）
+      checkSelectedCommunity();
     }
 
     // 监听社区选择完成事件
@@ -57,66 +60,84 @@ function Home() {
     }
   }, [])
 
-  // 检查本地存储的社区
-  const checkSelectedCommunity = () => {
+  // 检查本地存储的社区（优化：添加防抖，防止1秒内重复调用）
+  const checkSelectedCommunity = useCallback(() => {
+    // 防抖：1秒内不允许重复调用
+    const now = Date.now();
+    if (now - lastCheckTime.current < 1000) {
+      console.log('checkSelectedCommunity 调用过于频繁，已忽略');
+      return;
+    }
+    lastCheckTime.current = now;
+
     try {
-      console.log('检查已选择的社区，用户信息:', userInfo)
+      console.log('========== 检查社区信息 ==========')
+      console.log('登录状态:', isLoggedIn)
+      console.log('用户信息:', userInfo)
+      console.log('communityId:', userInfo?.communityId)
+      console.log('communityName:', userInfo?.communityName)
+
       let community = null;
 
       // 优先从用户信息中获取社区（已登录用户）
       if (userInfo?.communityId && userInfo?.communityName) {
         community = {
-          id: userInfo.communityId,
+          _id: userInfo.communityId,
           name: userInfo.communityName
         };
-        console.log('从用户信息中获取社区:', community)
+        console.log('✅ 从用户信息中获取社区:', community)
       } else {
+        console.log('⚠️ 用户信息中没有社区信息，尝试从本地存储读取')
         // 用户没有绑定社区，尝试从本地存储读取（未登录用户）
         const saved = Taro.getStorageSync(STORAGE_KEY);
         if (saved) {
           community = saved;
-          console.log('从本地存储中获取社区:', community)
+          console.log('✅ 从本地存储中获取社区:', community)
+        } else {
+          console.log('❌ 本地存储中也没有社区信息')
         }
       }
 
       if (community) {
-        console.log('设置当前社区:', community)
+        console.log('✅ 设置当前社区:', community)
         setCurrentCommunity(community);
         setShowGuideModal(false); // 隐藏引导弹窗
+        hasCheckedCommunity.current = true;
       } else {
-        console.log('没有找到已选择的社区，显示引导弹窗')
+        console.log('❌ 没有找到已选择的社区，显示引导弹窗')
         // 没有选择过社区，显示引导弹窗
         setShowGuideModal(true);
       }
+      console.log('===================================')
     } catch (e) {
       console.error("读取社区信息失败:", e);
       setShowGuideModal(true);
     }
-  };
+  }, [userInfo, isLoggedIn]); // 添加 isLoggedIn 依赖
 
-  // 处理社区切换 - 使用新的跳转方法
-  const handleCommunityChange = () => {
+  // 处理社区切换 - 使用 useCallback 优化
+  const handleCommunityChange = useCallback(() => {
     navigateTo("/pages/home/data/community-select/index");
-  }; 
+  }, []);
 
-  // 处理活动点击
-  const handleBannerClick = (banner: Banner) => {
+  // 处理活动点击 - 使用 useCallback 优化
+  const handleBannerClick = useCallback((banner: Banner) => {
     console.log("点击活动:", banner);
-  };
+  }, []);
 
-  // 处理通知点击
-  const handleNotificationClick = () => {
+  // 处理通知点击 - 使用 useCallback 优化
+  const handleNotificationClick = useCallback(() => {
     Taro.showToast({
       title: "查看通知详情",
       icon: "none",
     });
-  };
+  }, []);
 
-  // 跳转到社区选择页面 - 使用新的跳转方法
-  const handleGoToSelect = () => {
+  // 跳转到社区选择页面 - 使用 useCallback 优化
+  const handleGoToSelect = useCallback(() => {
     setShowGuideModal(false);
     navigateTo("/pages/home/data/community-select/index");
-  };
+  }, []);
 
   return (
     <View className="home-page">

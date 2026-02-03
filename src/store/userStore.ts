@@ -4,7 +4,7 @@
  */
 import { create } from 'zustand'
 import Taro from '@tarojs/taro'
-import { setTokens, clearTokens, getAccessToken, getRefreshToken, request } from '@/utils/request'
+import { setTokens, clearTokens, getAccessToken, getRefreshToken, request, query } from '@/utils/request'
 import { API_ROUTES } from '@/config'
 
 const USER_INFO_KEY = 'user_info'
@@ -45,12 +45,14 @@ interface UserState {
   isLoggedIn: boolean
   token: string
   userInfo: UserInfo | null
+  isRefreshing: boolean  // 是否正在刷新用户信息
+  lastFetchTime: number  // 上次获取用户信息的时间戳
   setToken: (token: string) => void
   setUserInfo: (info: UserInfo) => void
   login: (params: LoginParams) => Promise<boolean>
   logout: () => void
-  initializeAuth: () => void
-  getCurrentUser: () => Promise<UserInfo | null>
+  initializeAuth: (forceRefresh?: boolean) => void  // 添加forceRefresh参数
+  getCurrentUser: (forceRefresh?: boolean) => Promise<UserInfo | null>  // 添加forceRefresh参数
   updateUserInfo: (data: Partial<UserInfo>) => Promise<boolean>
   // 社区相关方法
   setCommunity: (communityId: string, communityName: string) => Promise<void>
@@ -100,24 +102,45 @@ interface LoginResponseData {
   refreshToken: string
   tokenType: string
   expiresIn: number
-  userId: string
-  nickname: string
-  avatar: string
-  isNewUser: boolean
-  communityId?: string  // 用户绑定的社区ID
-  communityName?: string  // 用户绑定的社区名称
+  // user: 用户完整信息对象
+  user?: {
+    _id: string
+    openid?: string
+    nickname?: string
+    avatar?: string
+    realName?: string
+    phone?: string
+    gender?: number
+    birthDate?: string
+    province?: string
+    city?: string
+    district?: string
+    detailAddress?: string
+    communityId?: string
+    community?: {
+      _id: string
+      name?: string
+    }
+    createTime?: string
+    updateTime?: string
+    status?: number
+    deleted?: number
+  }
 }
 
 export const useUserStore = create<UserState>((set, get) => ({
   isLoggedIn: false,
   token: '',
   userInfo: null,
+  isRefreshing: false,  // 初始化刷新状态
+  lastFetchTime: 0,     // 初始化最后获取时间
 
   /**
     * 初始化认证状态
-    * 从本地存储恢复登录信息
+    * 从本地存储恢复登录信息，根据需要获取最新用户数据
+    * @param forceRefresh 是否强制刷新用户信息（默认false）
     */
-  initializeAuth: () => {
+  initializeAuth: async (forceRefresh = false) => {
     const accessToken = getAccessToken()
     const refreshToken = getRefreshToken()
     const userInfo = loadUserInfo()
@@ -130,7 +153,26 @@ export const useUserStore = create<UserState>((set, get) => ({
         userInfo,
         isLoggedIn: true
       })
-      console.log('已恢复登录状态')
+
+      // 缓存策略：5分钟内不重复请求
+      const CACHE_DURATION = 5 * 60 * 1000 // 5分钟
+      const now = Date.now()
+      const lastFetch = get().lastFetchTime
+      const shouldFetch = forceRefresh || !lastFetch || (now - lastFetch > CACHE_DURATION)
+
+      if (shouldFetch) {
+        console.log('正在获取最新用户数据...')
+        // 自动获取最新的用户信息，确保数据是最新的
+        try {
+          await get().getCurrentUser(true)  // 强制刷新
+          console.log('已获取最新用户数据')
+        } catch (error) {
+          console.error('获取最新用户数据失败，使用本地缓存数据:', error)
+          // 获取失败时继续使用本地缓存的数据
+        }
+      } else {
+        console.log('使用缓存用户数据，距离上次获取:', Math.floor((now - lastFetch) / 1000), '秒')
+      }
     } else {
       console.log('未找到登录信息')
       set({
@@ -182,24 +224,51 @@ export const useUserStore = create<UserState>((set, get) => ({
 
       // 处理登录成功响应
       if (response && response.data) {
-        const { accessToken, refreshToken, userId, nickname, avatar, isNewUser, communityId, communityName } = response.data
+        console.log('登录接口返回的完整数据:', response.data)
+
+        // 从 response.data 中获取 token 信息
+        const { accessToken, refreshToken, tokenType, expiresIn } = response.data
+
+        // 从 response.data.user 中获取用户信息
+        const userData = (response.data as any).user
 
         if (!accessToken || !refreshToken) {
-          console.error('登录响应数据不完整')
+          console.error('登录响应数据不完整，缺少 token')
           return false
         }
 
-        // 构建用户信息（包含社区信息）
-        const userInfo: UserInfo = {
-          _id: userId,  // 主键ID，用于更新操作
-          id: userId,   // 兼容性字段
-          userId,
-          nickname,
-          avatar,
-          isNewUser,
-          communityId,
-          communityName
+        if (!userData || !userData._id) {
+          console.error('登录响应中缺少用户信息或用户ID')
+          console.error('用户数据:', userData)
+          return false
         }
+
+        // 判断是否为新用户（根据是否有真实姓名和手机号判断）
+        const isNewUser = !userData.realName || !userData.phone
+
+        // 构建用户信息
+        const userInfo: UserInfo = {
+          _id: userData._id,
+          id: userData._id,
+          userId: userData._id,
+          openid: userData.openid,
+          nickname: userData.nickname,
+          avatar: userData.avatar,
+          realName: userData.realName,
+          phone: userData.phone,
+          gender: userData.gender,
+          birthDate: userData.birthDate,
+          province: userData.province,
+          city: userData.city,
+          district: userData.district,
+          detailAddress: userData.detailAddress,
+          isNewUser: isNewUser,
+          communityId: userData.communityId,
+          // 兼容两种情况：1. community.name 2. 直接的 communityName 字段
+          communityName: userData.community?.name || userData.communityName || ''
+        }
+
+        console.log('构建的用户信息:', userInfo)
 
         // 同时保存两种Token
         setTokens(accessToken, refreshToken)
@@ -221,7 +290,7 @@ export const useUserStore = create<UserState>((set, get) => ({
           duration: 2000
         })
 
-        console.log('登录成功:', nickname)
+         
         return true
       } else {
         console.error('登录响应格式错误')
@@ -297,7 +366,8 @@ export const useUserStore = create<UserState>((set, get) => ({
             action: 'update', // 更新操作
             id: userInfo._id, // 用户ID
             data: {
-              communityId: communityId // 更新社区ID字段
+              communityId: communityId ,// 更新社区ID字段
+              communityName: communityName
             }
           }
         })
@@ -332,42 +402,87 @@ export const useUserStore = create<UserState>((set, get) => ({
   },
 
   /**
-   * 获取当前用户信息
+   * 获取当前用户信息（使用通用接口查询用户实体）
+   * @param forceRefresh 是否强制刷新（默认false，增加防重复请求）
    * @returns Promise<UserInfo | null>
    */
-  getCurrentUser: async (): Promise<UserInfo | null> => {
+  getCurrentUser: async (forceRefresh = false): Promise<UserInfo | null> => {
     try {
-      const response = await request<UserInfo>({
-        url: API_ROUTES.AUTH.USER_INFO,
-        method: 'GET'
+      // 防重复请求：如果正在刷新且不强制刷新，等待完成
+      const { isRefreshing } = get()
+      if (isRefreshing && !forceRefresh) {
+        console.log('正在刷新用户信息，等待完成...')
+        // 等待最多5秒
+        let attempts = 0
+        while (get().isRefreshing && attempts < 50) {
+          await new Promise(resolve => setTimeout(resolve, 100))
+          attempts++
+        }
+        return get().userInfo
+      }
+
+      // 优先从 store 获取，如果没有则从 localStorage 加载
+      let currentUserInfo = get().userInfo || loadUserInfo()
+
+      if (!currentUserInfo?._id && !currentUserInfo?.userId) {
+        console.error('用户ID不存在，无法查询用户信息')
+        console.error('用户信息详情:', currentUserInfo)
+        return null
+      }
+
+      const userId = currentUserInfo._id || currentUserInfo.userId
+
+      console.log('使用通用接口查询用户信息，用户ID:', userId)
+
+      // 设置刷新状态
+      set({ isRefreshing: true })
+
+      // 使用通用接口查询用户实体
+      const response = await query<UserInfo>('wquser', {
+        conditions: {
+          _id: userId
+        }
       })
 
       if (response && response.data) {
-        const userInfoFromServer = response.data
+        // 通用接口返回的是数组，取第一个元素
+        const userList = response.data as any
+        const userInfoFromServer = Array.isArray(userList) ? userList[0] : userList
 
-        // 确保_id字段存在，如果后端没有返回，则使用已有的userId
-        const currentUserInfo = get().userInfo
+        if (!userInfoFromServer) {
+          console.error('未查询到用户信息')
+          set({ isRefreshing: false })
+          return null
+        }
+
         const userInfo: UserInfo = {
           ...userInfoFromServer,
-          _id: userInfoFromServer._id || userInfoFromServer.id || currentUserInfo?._id || '',
-          id: userInfoFromServer.id || userInfoFromServer._id || currentUserInfo?.id || '',
-          // 保留已有的社区信息
+          _id: userInfoFromServer._id || userInfoFromServer.id || userId,
+          id: userInfoFromServer.id || userInfoFromServer._id || userId,
+          userId: userInfoFromServer.userId || userInfoFromServer._id || userId,
+          // 保留已有的社区信息（如果后端没有返回）
           communityId: userInfoFromServer.communityId || currentUserInfo?.communityId,
           communityName: userInfoFromServer.communityName || currentUserInfo?.communityName
         }
 
         console.log('获取到用户信息:', userInfo)
 
-        // 更新store状态
-        set({ userInfo })
+        // 更新store状态、最后获取时间、重置刷新状态
+        set({
+          userInfo,
+          lastFetchTime: Date.now(),
+          isRefreshing: false
+        })
         saveUserInfo(userInfo)
 
         return userInfo
       }
 
+      set({ isRefreshing: false })
       return null
     } catch (error) {
       console.error('获取用户信息失败:', error)
+      set({ isRefreshing: false })
       return null
     }
   },

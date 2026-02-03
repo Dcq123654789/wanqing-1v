@@ -13,6 +13,13 @@ function Profile() {
     setStatusBarHeight(systemInfo.statusBarHeight || 0)
   }, [])
 
+  // 将性别数字转换为可读文本
+  const getGenderText = (gender?: number): string => {
+    if (gender === 1) return '男'
+    if (gender === 2) return '女'
+    return '未知'
+  }
+
   const handleLogout = () => {
     Taro.showModal({
       title: '提示',
@@ -97,7 +104,9 @@ function Profile() {
             <View className="user-details">
               <Text className="user-name">{userInfo?.realName || userInfo?.nickname || userInfo?.username || '未登录'}</Text>
               <View className="user-meta">
-                <Text className="user-desc">享受美好晚年生活 </Text> 
+                <Text className="user-desc">
+                  {getGenderText(userInfo?.gender)} · 享受美好晚年生活
+                </Text>
               </View>
             </View>
           </View>

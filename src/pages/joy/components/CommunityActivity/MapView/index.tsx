@@ -1,7 +1,6 @@
 import { View, Map } from '@tarojs/components'
 import Taro, { useRouter, useDidShow } from '@tarojs/taro'
-import { useState, useEffect } from 'react'
-import PageTransitionOverlay from '@/components/PageTransitionOverlay'
+import { useState, useEffect } from 'react' 
 import type { MapMarker } from './types'
 import './index.scss'
 
@@ -30,20 +29,37 @@ function MapView() {
     const params = router.params
     const lat = parseFloat(params.lat || '0')
     const lng = parseFloat(params.lng || '0')
-    const name = params.name || '活动地点'
+    // 手动解码中文参数
+    const name = params.name ? decodeURIComponent(params.name) : '活动地点'
+    const address = params.address ? decodeURIComponent(params.address) : ''
+
+    console.log('地图参数:', { lat, lng, name, address })
+    console.log('原始params:', params)
 
     if (lat && lng) {
+      // 设置地图中心点和标记点使用相同的经纬度
       setLatitude(lat)
       setLongitude(lng)
 
       // 创建标记点
       setMarkers([{
         id: 1,
-        latitude: lat,
-        longitude: lng,
-        title: name,
-        width: 25,
-        height: 35
+        latitude: lat,  // 标记点纬度
+        longitude: lng, // 标记点经度
+        title: name,    // 标记点标题（已解码）
+        width: 30,
+        height: 40,
+        // 气泡一直显示
+        callout: {
+          content: name,  // 显示解码后的名称
+          display: 'ALWAYS', // 改为始终显示
+          textAlign: 'center',
+          padding: 10,
+          borderRadius: 5,
+          bgColor: '#fff',
+          color: '#333',
+          fontSize: 14
+        }
       }])
     } else {
       Taro.showToast({
@@ -61,8 +77,7 @@ function MapView() {
   }
 
   return (
-    <View className="map-view-page">
-      <PageTransitionOverlay />
+    <View className="map-view-page"> 
       {/* 地图 */}
       <Map
         id="activity-map"

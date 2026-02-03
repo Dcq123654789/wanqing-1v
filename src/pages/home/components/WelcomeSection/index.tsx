@@ -15,7 +15,8 @@ interface WeatherInfo {
 
 function WelcomeSection({ subtitle = '欢迎使用晚晴' }: WelcomeSectionProps) {
   const { userInfo } = useUserStore()
-  const username = userInfo?.username || '访客'
+  // 使用与Profile页面相同的用户名显示优先级
+  const username = userInfo?.realName || userInfo?.nickname || userInfo?.username || '访客'
 
   // 获取时间段问候语
   const [greeting, setGreeting] = useState('早上好')

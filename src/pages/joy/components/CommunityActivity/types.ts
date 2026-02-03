@@ -17,10 +17,11 @@ export type ActivityStatus = 'upcoming' | 'ongoing' | 'ended' | 'full'
 export interface CommunityActivity {
   id: string
   title: string
-  coverImage: string
+  coverImage: string | string[] // 支持单张图片或图片数组
   description: string
   time: string
   timestamp: number
+  locationAddress: string // 详细地址（后端原始字段）
   location: {
     name: string
     address: string
@@ -47,7 +48,7 @@ export interface CommunityActivity {
 export interface ActivityListItem {
   id: string
   title: string
-  coverImage: string
+  coverImage: string | string[] // 支持单张图片或图片数组
   time: string
   location: string
   currentParticipants: number

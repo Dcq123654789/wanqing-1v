@@ -1,15 +1,17 @@
-import { View, Text, Image, ScrollView } from '@tarojs/components'
+import { View, Text, Image, ScrollView, Swiper, SwiperItem } from '@tarojs/components'
 import Taro, { useDidShow } from '@tarojs/taro'
-import { useState, useEffect } from 'react'
-import { mockActivityList, categoryConfig, statusConfig } from './mockData'
+import { useState, useEffect, useCallback } from 'react'
+import { categoryConfig, statusConfig } from './mockData'
 import type { ActivityListItem } from './types'
-import './index.scss'
-import PageTransitionOverlay from "@/components/PageTransitionOverlay";
-import { navigateTo } from "@/utils/navigation";
+import './index.scss' 
+import { fetchActivities } from './services/activity.service'
 function CommunityActivity() {
   const [statusBarHeight, setStatusBarHeight] = useState(0)
   const [activeTab, setActiveTab] = useState<string>('all')
   const [activityList, setActivityList] = useState<ActivityListItem[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [allActivities, setAllActivities] = useState<ActivityListItem[]>([])
 
   // 分类标签
   const tabs = [
@@ -21,13 +23,47 @@ function CommunityActivity() {
     { key: 'learning', name: '学习' }
   ]
 
+  // 加载活动数据
+  const loadActivities = useCallback(async (category?: string) => {
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      const params: any = { deleted: 0 }
+      if (category && category !== 'all') {
+        params.category = category
+      }
+
+      const response = await fetchActivities(params)
+      const activities = response.activities || []
+
+      if (category === 'all' || !category) {
+        // 保存全部活动
+        setAllActivities(activities)
+        setActivityList(activities)
+      } else {
+        // 过滤显示
+        setActivityList(activities)
+      }
+    } catch (err: any) {
+      console.error('加载活动列表失败:', err)
+      setError(err?.message || '加载活动列表失败')
+      Taro.showToast({
+        title: err?.message || '加载失败',
+        icon: 'none'
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
+
   useEffect(() => {
     const systemInfo = Taro.getSystemInfoSync()
     setStatusBarHeight(systemInfo.statusBarHeight || 0)
 
     // 初始化加载所有活动
-    filterActivities('all')
-  }, [])
+    loadActivities('all')
+  }, [loadActivities])
 
   // 页面显示时隐藏遮罩（从详情页返回时）
   useDidShow(() => {
@@ -38,12 +74,12 @@ function CommunityActivity() {
     }, 100)
   })
 
-  // 筛选活动
+  // 筛选活动（使用全部数据进行前端筛选）
   const filterActivities = (category: string) => {
     if (category === 'all') {
-      setActivityList(mockActivityList)
+      setActivityList(allActivities)
     } else {
-      const filtered = mockActivityList.filter(item => item.category === category)
+      const filtered = allActivities.filter(item => item.category === category)
       setActivityList(filtered)
     }
   }
@@ -51,7 +87,14 @@ function CommunityActivity() {
   // 切换标签
   const handleTabChange = (tabKey: string) => {
     setActiveTab(tabKey)
+    // 对于分类筛选，使用前端筛选（从已加载的全部数据中筛选）
+    // 如果需要实时性，可以调用 loadActivities(tabKey)
     filterActivities(tabKey)
+  }
+
+  // 重新加载数据
+  const handleRetry = () => {
+    loadActivities(activeTab)
   }
 
   // 活动点击
@@ -62,17 +105,21 @@ function CommunityActivity() {
       category: item.category,
       status: item.status
     })
+    const url = `/pages/joy/components/CommunityActivity/Detail/index?${params.toString()}`
+    console.log('点击活动，跳转URL:', url)
+    console.log('活动ID:', item.id)
 
-    navigateTo(`/pages/joy/components/CommunityActivity/Detail/index?${params.toString()}`);
+    Taro.navigateTo({
+      url
+    })
   }
 
   // 返回上一页
  
 
   return (
-    <View className="community-activity-page">
-      <PageTransitionOverlay />
-      {/* 状态栏占位 */} 
+    <View className="community-activity-page"> 
+      {/* 状态栏占位 */}
       <ScrollView scrollY className="activity-scroll">
         {/* 分类标签栏 */}
         <View className="tabs-container">
@@ -91,10 +138,30 @@ function CommunityActivity() {
           </ScrollView>
         </View>
 
+        {/* 加载中状态 */}
+        {isLoading && (
+          <View className="loading-container">
+            <Text className="loading-text">加载中...</Text>
+          </View>
+        )}
+
+        {/* 错误状态 */}
+        {!isLoading && error && (
+          <View className="error-container">
+            <Text className="error-icon">⚠️</Text>
+            <Text className="error-title">加载失败</Text>
+            <Text className="error-message">{error}</Text>
+            <View className="retry-btn" onClick={handleRetry}>
+              <Text>重新加载</Text>
+            </View>
+          </View>
+        )}
+
         {/* 活动列表 */}
-        <View className="activity-list">
-          {activityList.length > 0 ? (
-            activityList.map((item) => {
+        {!isLoading && !error && (
+          <View className="activity-list">
+            {activityList.length > 0 ? (
+              activityList.map((item) => {
               const categoryInfo = categoryConfig[item.category as keyof typeof categoryConfig]
               const statusInfo = statusConfig[item.status]
 
@@ -105,11 +172,36 @@ function CommunityActivity() {
                   onClick={() => handleActivityClick(item)}
                 >
                   <View className="card-header">
-                    <Image
-                      src={item.coverImage}
-                      className="card-image"
-                      mode="aspectFill"
-                    />
+                    {/* 图片轮播 */}
+                    {Array.isArray(item.coverImage) && item.coverImage.length > 0 ? (
+                      <Swiper
+                        className="card-image-swiper"
+                        indicatorDots
+                        indicatorColor="rgba(255, 255, 255, 0.5)"
+                        indicatorActiveColor="#fff"
+                        autoplay
+                        interval={3000}
+                        circular
+                      >
+                        {item.coverImage.map((img, index) => (
+                          <SwiperItem key={index}>
+                            <Image
+                              src={img}
+                              className="card-image"
+                              mode="aspectFit"
+                              lazyLoad
+                            />
+                          </SwiperItem>
+                        ))}
+                      </Swiper>
+                    ) : (
+                      <Image
+                        src={typeof item.coverImage === 'string' ? item.coverImage : item.coverImage?.[0] || ''}
+                        className="card-image"
+                        mode="aspectFit"
+                        lazyLoad
+                      />
+                    )}
                     <View className="card-category-badge" style={{ backgroundColor: categoryInfo.color }}>
                       <Text className="category-icon">{categoryInfo.icon}</Text>
                     </View>
@@ -174,12 +266,13 @@ function CommunityActivity() {
               )
             })
           ) : (
-            <View className="empty-state">
-              <Text className="empty-icon">📋</Text>
-              <Text className="empty-text">暂无活动</Text>
-            </View>
-          )}
-        </View>
+              <View className="empty-state">
+                <Text className="empty-icon">📋</Text>
+                <Text className="empty-text">暂无活动</Text>
+              </View>
+            )}
+          </View>
+        )}
 
         {/* 底部留白 */}
         <View className="bottom-spacer"></View>

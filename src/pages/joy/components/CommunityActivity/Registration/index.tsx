@@ -1,12 +1,16 @@
-import { View, Text, ScrollView, Input, Button, Image } from '@tarojs/components'
+import { View, Text, ScrollView, Input, Button, Textarea } from '@tarojs/components'
 import Taro, { useRouter } from '@tarojs/taro'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useUserStore } from '@/store/userStore'
-import { navigateTo } from '@/utils/navigation'
 import PageTransitionOverlay from '@/components/PageTransitionOverlay'
-import PaymentSelector from './components/PaymentSelector'
-import type { RegistrationFormData, PaymentMethod, ActivityInfo } from './types'
-import { getActivityById } from '../mockData'
+import type { RegistrationFormData, ActivityInfo } from './types'
+import {
+  fetchActivityDetail,
+  joinActivity,
+  getWechatPayParams,
+  pollPaymentStatus,
+  cancelRegistrationAndUpdateActivity
+} from '../services/activity.service'
 import './index.scss'
 
 function ActivityRegistration() {
@@ -20,36 +24,19 @@ function ActivityRegistration() {
   const [formData, setFormData] = useState<RegistrationFormData>({
     name: '',
     phone: '',
-    detailAddress: ''
+    remarks: ''
   })
 
-  // 支付方式
-  const [paymentMethod, setPaymentMethod] = useState<'wechat' | 'balance'>('wechat')
+  // 提交状态
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const submitLock = useRef(false)  // 防止快速连点
+  const isUnmounted = useRef(false)  // 页面是否已卸载
 
   useEffect(() => {
     // 解析路由参数
     const params = router.params
     if (params.activityId) {
-      // 通过 activityId 获取完整活动信息
-      const activity = getActivityById(params.activityId)
-      if (activity) {
-        setActivityInfo({
-          activityId: activity.id,
-          title: activity.title,
-          coverImage: activity.coverImage,
-          price: activity.price || 0,
-          isFree: !activity.price || activity.price === 0
-        })
-      } else {
-        Taro.showToast({
-          title: '活动不存在',
-          icon: 'none'
-        })
-        setTimeout(() => {
-          Taro.navigateBack()
-        }, 1500)
-      }
+      loadActivityInfo(params.activityId)
     } else {
       Taro.showToast({
         title: '参数错误',
@@ -64,12 +51,65 @@ function ActivityRegistration() {
     if (userInfo) {
       setFormData(prev => ({
         ...prev,
-        name: userInfo.name || '',
-        phone: userInfo.phone || '',
-        detailAddress: userInfo.address?.detail || ''
+        name: userInfo.realName || userInfo.name || '',
+        phone: userInfo.phone || ''
       }))
     }
+
+    // 页面卸载时标记
+    return () => {
+      isUnmounted.current = true
+    }
   }, [router.params.activityId, userInfo])
+
+  // 加载活动信息
+  const loadActivityInfo = async (activityId: string) => {
+    try {
+      const activity = await fetchActivityDetail(activityId)
+
+      // 检查活动状态
+      if (activity.status === 'full') {
+        Taro.showToast({
+          title: '活动已满员',
+          icon: 'none'
+        })
+        setTimeout(() => {
+          Taro.navigateBack()
+        }, 1500)
+        return
+      }
+
+      if (activity.status === 'ended') {
+        Taro.showToast({
+          title: '活动已结束',
+          icon: 'none'
+        })
+        setTimeout(() => {
+          Taro.navigateBack()
+        }, 1500)
+        return
+      }
+
+      setActivityInfo({
+        activityId: activity.id,
+        title: activity.title,
+        coverImage: Array.isArray(activity.coverImage) ? activity.coverImage[0] : activity.coverImage,
+        price: activity.price || 0,
+        isFree: !activity.price || activity.price === 0,
+        maxParticipants: activity.maxParticipants,
+        currentParticipants: activity.currentParticipants
+      })
+    } catch (error: any) {
+      console.error('加载活动信息失败:', error)
+      Taro.showToast({
+        title: error?.message || '加载失败',
+        icon: 'none'
+      })
+      setTimeout(() => {
+        Taro.navigateBack()
+      }, 1500)
+    }
+  }
 
   // 更新表单字段
   const updateFormField = <K extends keyof RegistrationFormData>(
@@ -106,152 +146,191 @@ function ActivityRegistration() {
       return false
     }
 
-    // 详细地址验证
-    if (!formData.detailAddress.trim()) {
-      Taro.showToast({
-        title: '请输入详细地址',
-        icon: 'none'
-      })
-      return false
-    }
-
     return true
   }
 
   // 提交报名
   const handleSubmit = async () => {
-    if (!activityInfo) return
+    if (!activityInfo || !userInfo) return
+
+    // 双重检查：防止快速连点
+    if (isSubmitting || submitLock.current) {
+      console.log('提交中，请勿重复点击')
+      return
+    }
 
     if (!validateForm()) {
       return
     }
 
+    // 设置提交状态
+    submitLock.current = true
     setIsSubmitting(true)
 
     try {
-      // 免费活动直接报名
-      if (activityInfo.isFree) {
-        await handleFreeRegistration()
+      console.log('开始报名流程')
+
+      // 1. 调用报名接口
+      const result = await joinActivity({
+        activityId: activityInfo.activityId,
+        userId: userInfo._id || userInfo.userId || '',
+        userName: formData.name,
+        userPhone: formData.phone,
+        remarks: formData.remarks
+      })
+
+      console.log('报名成功，订单信息:', result.data)
+
+      // 2. 检查是否需要支付
+      if (result.data?.isFree === false || result.data?.needPayment === true) {
+        // 需要支付，直接调起微信支付
+        console.log('需要支付，调起微信支付')
+
+        Taro.showLoading({
+          title: '正在调起支付...',
+          mask: true
+        })
+
+        try {
+          // 获取微信支付参数
+          const { wechatPayParams } = await getWechatPayParams({
+            registrationId: result.data.registrationId || result.data.id,
+            orderNo: result.data.orderNo
+          })
+
+          Taro.hideLoading()
+
+          console.log('获取到支付参数，准备调起微信支付')
+
+          // 调起微信原生支付
+          await new Promise<void>((resolve, reject) => {
+            Taro.requestPayment({
+              timeStamp: wechatPayParams.timeStamp,
+              nonceStr: wechatPayParams.nonceStr,
+              package: wechatPayParams.package,
+              signType: wechatPayParams.signType,
+              paySign: wechatPayParams.paySign,
+              success: () => {
+                console.log('微信支付调用成功')
+                resolve()
+              },
+              fail: (err) => {
+                console.error('微信支付调用失败:', err)
+                reject(err)
+              }
+            })
+          })
+
+          // 轮询查询支付状态
+          Taro.showLoading({
+            title: '支付确认中...',
+            mask: true
+          })
+
+          try {
+            const record = await pollPaymentStatus(
+              result.data.registrationId || result.data.id,
+              () => isUnmounted.current
+            )
+
+            Taro.hideLoading()
+
+            // 支付成功
+            Taro.showToast({
+              title: '报名成功！',
+              icon: 'success'
+            })
+
+            setTimeout(() => {
+              // 跳转到活动详情页
+              Taro.redirectTo({
+                url: `/pages/joy/components/CommunityActivity/Detail/index?id=${activityInfo.activityId}`
+              })
+            }, 1500)
+          } catch (pollError: any) {
+            Taro.hideLoading()
+            throw pollError
+          }
+        } catch (payError: any) {
+          console.error('支付流程失败:', payError)
+
+          // 判断错误类型
+          let errorMessage = '支付失败'
+
+          if (payError?.errMsg) {
+            if (payError.errMsg.includes('cancel')) {
+              errorMessage = '您已取消支付'
+            } else if (payError.errMsg.includes('fail')) {
+              errorMessage = '支付失败，请重试'
+            }
+          } else if (payError?.message) {
+            errorMessage = payError.message
+          }
+
+          Taro.showToast({
+            title: errorMessage,
+            icon: 'none'
+          })
+
+          // 如果用户取消支付，删除报名记录并释放名额
+          if (payError?.errMsg?.includes('cancel')) {
+            try {
+              await cancelRegistrationAndUpdateActivity(
+                result.data.registrationId || result.data.id,
+                activityInfo.activityId
+              )
+              console.log('已取消报名并释放名额')
+            } catch (cancelError) {
+              console.error('取消报名失败:', cancelError)
+            }
+          }
+        }
       } else {
-        // 收费活动需要支付
-        await handlePaidRegistration()
-      }
-    } catch (error) {
-      console.error('报名失败:', error)
-      Taro.showToast({
-        title: '报名失败，请重试',
-        icon: 'none'
-      })
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
-
-  // 免费活动报名
-  const handleFreeRegistration = async () => {
-    if (!activityInfo) return
-
-    // TODO: 调用免费活动报名接口
-    // await registrationApi({
-    //   activityId: activityInfo.activityId,
-    //   ...formData
-    // })
-
-    // 模拟接口调用
-    await new Promise(resolve => setTimeout(resolve, 500))
-
-    Taro.showToast({
-      title: '报名成功',
-      icon: 'success'
-    })
-
-    setTimeout(() => {
-      Taro.navigateBack()
-    }, 1500)
-  }
-
-  // 收费活动报名
-  const handlePaidRegistration = async () => {
-    if (!activityInfo) return
-
-    const price = activityInfo.price || 0
-
-    if (paymentMethod === 'balance') {
-      // 余额支付
-      const balance = userInfo?.balance || 0
-
-      if (balance < price) {
-        Taro.showToast({
-          title: '余额不足',
-          icon: 'none'
-        })
-        return
-      }
-
-      // TODO: 调用余额支付接口
-      // await balancePayApi({
-      //   activityId: activityInfo.activityId,
-      //   amount: price,
-      //   ...formData
-      // })
-
-      // 模拟支付
-      await new Promise(resolve => setTimeout(resolve, 500))
-
-      Taro.showToast({
-        title: '支付成功',
-        icon: 'success'
-      })
-
-      setTimeout(() => {
-        Taro.navigateBack()
-      }, 1500)
-    } else {
-      // 微信支付
-      try {
-        // TODO: 调用微信支付
-        // await Taro.requestPayment({
-        //   timeStamp: '',
-        //   nonceStr: '',
-        //   package: '',
-        //   signType: 'MD5',
-        //   paySign: ''
-        // })
-
-        // 模拟支付流程
-        await Taro.showModal({
-          title: '模拟支付',
-          content: `确认支付 ¥${price.toFixed(2)}？`,
-          confirmText: '确认支付'
-        })
-
-        // 模拟支付成功
-        await new Promise(resolve => setTimeout(resolve, 500))
-
-        // TODO: 支付成功后调用报名接口
-        // await registrationApi({
-        //   activityId: activityInfo.activityId,
-        //   ...formData
-        // })
+        // 免费活动，直接报名成功
+        console.log('免费活动，报名成功')
 
         Taro.showToast({
-          title: '报名成功',
+          title: result.message || '报名成功！',
           icon: 'success'
         })
 
         setTimeout(() => {
-          Taro.navigateBack()
-        }, 1500)
-      } catch (error: any) {
-        if (error.errMsg !== 'showModal:fail cancel') {
-          console.error('支付失败:', error)
-          Taro.showToast({
-            title: '支付失败',
-            icon: 'none'
+          // 跳转到活动详情页
+          Taro.redirectTo({
+            url: `/pages/joy/components/CommunityActivity/Detail/index?id=${activityInfo.activityId}`
           })
+        }, 1500)
+      }
+    } catch (error: any) {
+      console.error('报名失败:', error)
+
+      // 错误处理
+      handleRegistrationError(error.message || '报名失败，请重试')
+    } finally {
+      // 延迟释放锁，防止快速连点
+      setTimeout(() => {
+        submitLock.current = false
+        setIsSubmitting(false)
+      }, 1000)
+    }
+  }
+
+  // 报名错误处理
+  const handleRegistrationError = (errorMessage: string) => {
+    Taro.showModal({
+      title: '报名失败',
+      content: errorMessage,
+      confirmText: '重新报名',
+      cancelText: '返回',
+      success: (res) => {
+        if (res.confirm) {
+          // 用户选择重新报名，不做任何操作，让用户重新填写
+        } else {
+          // 用户选择返回
+          Taro.navigateBack()
         }
       }
-    }
+    })
   }
 
   if (!activityInfo) {
@@ -263,27 +342,6 @@ function ActivityRegistration() {
       <PageTransitionOverlay />
 
       <ScrollView scrollY className="registration-scroll">
-        {/* 活动信息卡片 */}
-        <View className="activity-info-card">
-          {activityInfo.coverImage && (
-            <Image
-              src={activityInfo.coverImage}
-              className="activity-cover"
-              mode="aspectFill"
-            />
-          )}
-          <View className="activity-info-content">
-            <Text className="activity-title">{activityInfo.title}</Text>
-            <View className="activity-meta">
-              {activityInfo.isFree ? (
-                <Text className="activity-price activity-price--free">免费</Text>
-              ) : (
-                <Text className="activity-price">¥{(activityInfo.price || 0).toFixed(2)}</Text>
-              )}
-            </View>
-          </View>
-        </View>
-
         {/* 报名表单 */}
         <View className="form-section">
           <View className="section-title">
@@ -317,29 +375,19 @@ function ActivityRegistration() {
             />
           </View>
 
-          {/* 详细地址 */}
+          {/* 备注 */}
           <View className="form-item">
-            <Text className="form-label">详细地址</Text>
-            <Input
-              className="form-input"
-              type="text"
-              placeholder="请输入您的详细地址"
-              value={formData.detailAddress}
-              onInput={(e) => updateFormField('detailAddress', e.detail.value)}
+            <Text className="form-label">备注（选填）</Text>
+            <Textarea
+              className="form-textarea"
+              placeholder="如有特殊需求请填写"
+              value={formData.remarks}
+              onInput={(e) => updateFormField('remarks', e.detail.value)}
               placeholderClass="form-placeholder"
+              maxlength={200}
             />
           </View>
         </View>
-
-        {/* 支付方式选择（仅收费活动） */}
-        {!activityInfo.isFree && (
-          <PaymentSelector
-            price={activityInfo.price || 0}
-            balance={userInfo?.balance}
-            value={paymentMethod}
-            onChange={setPaymentMethod}
-          />
-        )}
 
         {/* 底部留白 */}
         <View className="bottom-spacer"></View>

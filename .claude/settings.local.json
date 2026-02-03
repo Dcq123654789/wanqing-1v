@@ -16,7 +16,8 @@
       "Skill(speckit.specify)",
       "Skill(ui-design)",
       "Bash(npm run lint:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(du:*)"
     ]
   }
 }

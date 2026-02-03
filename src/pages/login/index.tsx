@@ -30,14 +30,9 @@ function Login() {
   const { login, isLoggedIn, initializeAuth, getCurrentUser } = useUserStore();
 
   /**
-   * 页面加载时检查登录状态
+   * 检查登录状态并跳转到首页
    */
-  useLoad(() => {
-    console.log('登录页面加载');
-    // 初始化认证状态
-    initializeAuth();
-
-    // 如果已经登录，直接跳转到首页
+  const checkLoginAndRedirect = () => {
     if (isLoggedIn) {
       console.log('用户已登录，跳转到首页');
       setTimeout(() => {
@@ -45,7 +40,18 @@ function Login() {
           url: "/pages/home/index",
         });
       }, 100);
+      return true;
     }
+    return false;
+  };
+
+  /**
+   * 页面加载时检查登录状态
+   */
+  useLoad(() => {
+    console.log('登录页面加载');
+    // 注意：initializeAuth() 已在 App 启动时调用，这里不需要重复调用
+    checkLoginAndRedirect();
   });
 
   /**
@@ -58,14 +64,7 @@ function Login() {
     }
 
     // 再次检查登录状态
-    if (isLoggedIn) {
-      console.log('用户已登录，跳转到首页');
-      setTimeout(() => {
-        Taro.switchTab({
-          url: "/pages/home/index",
-        });
-      }, 100);
-    }
+    checkLoginAndRedirect();
   });
 
   /**
@@ -165,12 +164,14 @@ function Login() {
       }
 
       // 第三步：调用后端登录接口
+      // 注意：不传递微信头像和昵称，避免覆盖用户已设置的自定义头像
+      // 后端会返回数据库中保存的用户完整信息
       const success = await login({
         type: 'wechat',
         code: loginRes.code,
-        nickname: userInfo?.nickName,
-        avatar: userInfo?.avatarUrl,
-        gender: userInfo?.gender,
+        // nickname: userInfo?.nickName,  // 不传递，避免覆盖
+        // avatar: userInfo?.avatarUrl,    // 不传递，避免覆盖
+        // gender: userInfo?.gender,       // 不传递，避免覆盖
       });
 
       if (success) {
@@ -197,20 +198,12 @@ function Login() {
             });
           }, 1500);
         } else {
-          // 老用户：先获取完整的用户信息，再进入首页
+          // 老用户：initializeAuth() 已经自动获取了最新用户信息，直接进入首页
           Taro.showToast({
             title: "登录成功",
             icon: "success",
             duration: 1500,
           });
-
-          // 获取完整的用户信息
-          try {
-            await getCurrentUser();
-            console.log('已获取老用户的完整信息');
-          } catch (err) {
-            console.error('获取用户信息失败:', err);
-          }
 
           setTimeout(() => {
             Taro.switchTab({

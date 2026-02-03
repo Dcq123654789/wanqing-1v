@@ -1,16 +1,21 @@
-import { View, Text, Image, ScrollView } from '@tarojs/components'
+import { View, Text, Image, ScrollView, Swiper, SwiperItem } from '@tarojs/components'
 import Taro, { useRouter, useDidShow } from '@tarojs/taro'
 import { useState, useEffect } from 'react'
-import { getActivityById, categoryConfig, statusConfig } from '../mockData'
+import { categoryConfig, statusConfig } from '../mockData'
 import type { CommunityActivity } from '../types'
 import './index.scss'
-import PageTransitionOverlay from '@/components/PageTransitionOverlay'
-import { navigateTo } from '@/utils/navigation'
+import { fetchActivityDetail, checkUserRegistration } from '../services/activity.service'
+import { useUserStore } from '@/store/userStore'
 
 function ActivityDetail() {
   const router = useRouter()
   const [activity, setActivity] = useState<CommunityActivity | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [hasRegistered, setHasRegistered] = useState(false)  // 是否已报名
+
+  // 获取用户信息
+  const { userInfo } = useUserStore()
 
   // 页面显示时隐藏遮罩
   useDidShow(() => {
@@ -25,30 +30,49 @@ function ActivityDetail() {
   })
 
   useEffect(() => {
-    const activityId = router.params.id
-    if (activityId) {
-      const activityData = getActivityById(activityId)
-      if (activityData) {
+    const loadActivityDetail = async () => {
+      const activityId = router.params.id
+      console.log('详情页 router.params:', router.params)
+      console.log('详情页 activityId:', activityId)
+
+      if (!activityId) {
+        setError('参数错误')
+        setLoading(false)
+        return
+      }
+
+      try {
+        setLoading(true)
+        setError(null)
+        console.log('开始获取活动详情, ID:', activityId)
+
+        // 获取活动详情
+        const activityData = await fetchActivityDetail(activityId)
+        console.log('获取到的活动数据:', activityData)
         setActivity(activityData)
-      } else {
+
+        // 检查用户是否已报名（需要传入用户ID）
+        if (userInfo?._id) {
+          const registered = await checkUserRegistration(activityId, userInfo._id)
+          console.log('用户报名状态:', registered)
+          setHasRegistered(registered)
+        } else {
+          console.log('用户未登录，无法检查报名状态')
+          setHasRegistered(false)
+        }
+      } catch (err: any) {
+        console.error('加载活动详情失败:', err)
+        setError(err?.message || '加载活动详情失败')
         Taro.showToast({
-          title: '活动不存在',
+          title: err?.message || '加载失败',
           icon: 'none'
         })
-        setTimeout(() => {
-          Taro.navigateBack()
-        }, 1500)
+      } finally {
+        setLoading(false)
       }
-    } else {
-      Taro.showToast({
-        title: '参数错误',
-        icon: 'none'
-      })
-      setTimeout(() => {
-        Taro.navigateBack()
-      }, 1500)
     }
-    setLoading(false)
+
+    loadActivityDetail()
   }, [router.params.id])
 
   // 拨打电话
@@ -70,12 +94,17 @@ function ActivityDetail() {
     if (!activity) return
     if (activity.location.latitude && activity.location.longitude) {
       const params = new URLSearchParams({
-        lat: activity.location.latitude.toString(),
-        lng: activity.location.longitude.toString(),
-        name: activity.location.name,
-        address: activity.location.address
+        lat: activity.location.latitude,
+        lng: activity.location.longitude,
+        name: activity.locationAddress,
+        address: activity.locationAddress
       })
-      navigateTo(`/pages/joy/components/CommunityActivity/MapView/index?${params.toString()}`)
+      console.log('数据', activity)
+      console.log('params', params)
+
+      Taro.navigateTo({
+        url: `/pages/joy/components/CommunityActivity/MapView/index?${params.toString()}`
+      })
     } else {
       Taro.showToast({
         title: '暂无位置信息',
@@ -87,6 +116,15 @@ function ActivityDetail() {
   // 报名活动
   const handleRegister = () => {
     if (!activity) return
+
+    // 检查是否已报名
+    if (hasRegistered) {
+      Taro.showToast({
+        title: '您已经报名过该活动',
+        icon: 'none'
+      })
+      return
+    }
 
     if (activity.status === 'full') {
       Taro.showToast({
@@ -104,15 +142,28 @@ function ActivityDetail() {
       return
     }
 
-    // 跳转到报名页面，只传递 activityId
-    navigateTo(`/pages/joy/components/CommunityActivity/Registration/index?activityId=${activity.id}`)
+    // 跳转到报名页面
+    Taro.navigateTo({
+      url: `/pages/joy/components/CommunityActivity/Registration/index?activityId=${activity.id}`
+    })
   }
 
 
-  if (!activity) {
+  // 加载中状态
+  if (loading) {
     return (
-      <View className="activity-detail-page">
-        <PageTransitionOverlay />
+      <View className="activity-detail-page"> 
+        <View className="loading-state">
+          <Text className="loading-text">加载中...</Text>
+        </View>
+      </View>
+    )
+  }
+
+  // 错误状态
+  if (error || !activity) {
+    return (
+      <View className="activity-detail-page"> 
         <View className="error-state">
           <Text className="error-icon">😕</Text>
           <Text className="error-text">活动不存在</Text>
@@ -126,16 +177,40 @@ function ActivityDetail() {
   const progress = (activity.currentParticipants / activity.maxParticipants) * 100
 
   return (
-    <View className="activity-detail-page">
-      <PageTransitionOverlay />
+    <View className="activity-detail-page"> 
       <ScrollView scrollY className="detail-scroll">
         {/* 封面图 */}
         <View className="detail-cover">
-          <Image
-            src={activity.coverImage}
-            className="cover-image"
-            mode="aspectFill"
-          />
+          {/* 图片轮播 */}
+          {Array.isArray(activity.coverImage) && activity.coverImage.length > 0 ? (
+            <Swiper
+              className="cover-image-swiper"
+              indicatorDots
+              indicatorColor="rgba(255, 255, 255, 0.5)"
+              indicatorActiveColor="#fff"
+              autoplay
+              interval={3000}
+              circular
+            >
+              {activity.coverImage.map((img, index) => (
+                <SwiperItem key={index}>
+                  <Image
+                    src={img}
+                    className="cover-image"
+                    mode="aspectFit"
+                    lazyLoad
+                  />
+                </SwiperItem>
+              ))}
+            </Swiper>
+          ) : (
+            <Image
+              src={typeof activity.coverImage === 'string' ? activity.coverImage : activity.coverImage?.[0] || ''}
+              className="cover-image"
+              mode="aspectFit"
+              lazyLoad
+            />
+          )}
           <View className="cover-overlay">
             <View
               className="status-badge"
@@ -191,7 +266,7 @@ function ActivityDetail() {
               <View className="info-item">
                 <Text className="info-label">📍 活动地点</Text>
                 <View className="info-value-row">
-                  <Text className="info-value">{activity.location.name}</Text>
+                  <Text className="info-value">{activity.locationAddress}</Text>
                   <Text className="info-link" onClick={handleViewMap}>
                     查看地图 →
                   </Text>
@@ -199,7 +274,7 @@ function ActivityDetail() {
               </View>
               <View className="info-item">
                 <Text className="info-label">🏢 详细地址</Text>
-                <Text className="info-value info-value-small">{activity.location.address}</Text>
+                <Text className="info-value info-value-small">{activity.locationAddress}</Text>
               </View>
               <View className="info-item">
                 <Text className="info-label">⏰ 报名截止</Text>
@@ -233,16 +308,12 @@ function ActivityDetail() {
               <Text className="title-icon">👤</Text>
               <Text className="title-text">组织者</Text>
             </View>
-            <View className="organizer-card">
-              <Image
-                src={activity.organizer.avatar}
-                className="organizer-avatar"
-              />
+            <View className="organizer-card"> 
               <View className="organizer-info">
-                <Text className="organizer-name">{activity.organizer.name}</Text>
+                <Text className="organizer-name">姓名 :{activity.organizer.name}</Text>
                 {activity.organizer.phone && (
                   <Text className="organizer-phone" onClick={() => handleCall(activity.organizer.phone)}>
-                    📞 联系组织者
+                    📞: {activity.organizer.phone} 联系组织者
                   </Text>
                 )}
               </View>
@@ -258,11 +329,11 @@ function ActivityDetail() {
       <View className="detail-footer">
         <View className="footer-actions">
           <View
-            className={`action-btn action-btn--primary ${activity.status === 'full' || activity.status === 'ended' ? 'action-btn--disabled' : ''}`}
+            className={`action-btn action-btn--primary ${hasRegistered || activity.status === 'full' || activity.status === 'ended' ? 'action-btn--disabled' : ''}`}
             onClick={handleRegister}
           >
             <Text className="action-text">
-              {activity.status === 'full' ? '已满员' : activity.status === 'ended' ? '已结束' : '立即报名'}
+              {hasRegistered ? '已报名' : activity.status === 'full' ? '已满员' : activity.status === 'ended' ? '已结束' : '立即报名'}
             </Text>
           </View>
         </View>

@@ -288,23 +288,49 @@ const redirectToLogin = () => {
 // ==================== 请求拦截器 ====================
 
 /**
- * 请求拦截器
+ * 请求拦截器（异步，支持 token 刷新）
  */
-const requestInterceptor = (config: RequestConfig): RequestConfig => {
-  // 添加 Token（如果需要认证） 
-    const token = getAccessToken()
-    if (token) {
-      config.header = {
-        ...config.header,
-        'Authorization': `Bearer ${token}`
-      }
-    } 
-
+const requestInterceptor = async (config: RequestConfig): Promise<RequestConfig> => {
   // 添加通用请求头
   config.header = {
     'Content-Type': 'application/json',
     ...config.header
-    
+  }
+
+  // 添加 Token（如果需要认证）
+  // needAuth 默认为 true，需要认证；明确设置为 false 时才不需要认证
+  if (config.needAuth !== false) {
+    let token = getAccessToken()
+
+    // 如果内存中没有 accessToken，尝试用 refreshToken 刷新
+    if (!token) {
+      const refreshToken = getRefreshToken()
+
+      if (!refreshToken) {
+        // 没有 refreshToken，需要重新登录
+        console.error('需要认证但 RefreshToken 不存在')
+        redirectToLogin()
+        throw new Error('未登录')
+      }
+
+      // 有 refreshToken，尝试刷新获取新 accessToken
+      console.log('AccessToken 不存在，尝试用 RefreshToken 刷新')
+      try {
+        token = await refreshAccessToken()
+        console.log('AccessToken 刷新成功')
+      } catch (error) {
+        console.error('刷新 Token 失败:', error)
+        // 刷新失败，清除 token 并跳转登录
+        clearTokens()
+        redirectToLogin()
+        throw new Error('Token 刷新失败，请重新登录')
+      }
+    }
+
+    config.header = {
+      ...config.header,
+      'Authorization': `Bearer ${token}`
+    }
   }
 
   console.log('🚀 发起请求:', config.url, config.data)
@@ -398,8 +424,8 @@ export const request = async <T = any>(
     })
   }
 
-  // 请求拦截
-  let interceptedConfig = requestInterceptor(config)
+  // 请求拦截（异步）
+  let interceptedConfig = await requestInterceptor(config)
 
   const makeRequest = (): Promise<ResponseData<T>> => {
     return new Promise((resolve, reject) => {
