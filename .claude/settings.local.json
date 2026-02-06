@@ -17,7 +17,10 @@
       "Skill(ui-design)",
       "Bash(npm run lint:*)",
       "Bash(npx tsc:*)",
-      "Bash(du:*)"
+      "Bash(du:*)",
+      "Bash(pnpm dev:*)",
+      "Bash(pnpm install)",
+      "Bash(ls:*)"
     ]
   }
 }

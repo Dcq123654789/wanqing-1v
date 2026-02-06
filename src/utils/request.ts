@@ -54,6 +54,20 @@ export interface ResponseData<T = any> {
 }
 
 /**
+ * 分页响应数据接口
+ */
+export interface PageResponse<T = any> {
+  content: T[]
+  totalElements: number
+  totalPages: number
+  first: boolean
+  last: boolean
+  number: number
+  size: number
+  empty: boolean
+}
+
+/**
  * Token 刷新响应
  */
 interface RefreshTokenResponse {

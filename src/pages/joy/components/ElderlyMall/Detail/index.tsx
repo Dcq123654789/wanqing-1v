@@ -1,8 +1,10 @@
-import { View, Text, Image, ScrollView } from '@tarojs/components'
+import { View, Text, Image, ScrollView, Swiper, SwiperItem } from '@tarojs/components'
 import Taro, { useDidShow } from '@tarojs/taro'
 import { useState, useEffect } from 'react'
-import { getProductDetailById, categoryConfig } from '../mockData'
 import type { ProductDetail } from '../types'
+import { getCategoryInfo, ProductCategory } from '../types'
+import type { PageResponse } from '@/utils/request'
+import { query } from '@/utils/request'
 import './index.scss'
 import PageTransitionOverlay from '@/components/PageTransitionOverlay'
 
@@ -13,39 +15,82 @@ function ProductDetail() {
 
   // 页面显示时隐藏遮罩
   useDidShow(() => {
-    console.log('商品详情页面显示，开始隐藏遮罩流程')
-    console.log('当前页面参数:', Taro.getCurrentInstance().router?.params)
-
-    // 延迟一小段时间，确保页面完全渲染
     setTimeout(() => {
-      console.log('商品详情页面触发隐藏遮罩事件')
       Taro.eventCenter.trigger('hidePageTransition')
     }, 100)
   })
 
   useEffect(() => {
-    // 获取页面参数
     const instance = Taro.getCurrentInstance()
     const params = instance.router?.params
     const productId = params?.id
 
     if (productId) {
-      const detail = getProductDetailById(productId)
-      if (detail) {
-        setProductDetail(detail)
-      } else {
-        Taro.showToast({
-          title: '商品不存在',
-          icon: 'none'
-        })
-        setTimeout(() => {
-          Taro.navigateBack()
-        }, 1500)
-      }
+      fetchProductDetail(productId)
     }
   }, [])
 
- 
+
+  // 从后端获取商品详情
+  const fetchProductDetail = async (id: string) => {
+    try {
+      const response = await query<any>('product', {
+        conditions: { _id: id, status: 1 },
+        pageNum: 1,
+        pageSize: 1
+      })
+
+      if (response.code === 200 && response.data) {
+        const pageData = response.data as PageResponse<any>
+        const dataList = pageData.content || []
+
+        if (dataList.length > 0) {
+          const item = dataList[0]
+
+          const detail: ProductDetail = {
+            id: item._id,
+            name: item.name,
+            price: Number(item.price),
+            poster: item.poster,
+            sales: item.sales || 0,
+            category: item.category ?? ProductCategory.NUTRITION,
+            description: item.description || '',
+            images: (item.images && item.images.length > 0) ? item.images : [item.poster],
+            spec: item.spec || undefined,
+            origin: item.origin || undefined,
+            shelfLife: item.shelfLife || undefined,
+            stock: item.stock || 0,
+            rating: Number(item.rating) || 0,
+            reviewCount: item.reviewCount || 0
+          }
+          setProductDetail(detail)
+        } else {
+          showNotFoundError()
+        }
+      } else {
+        showNotFoundError()
+      }
+    } catch (error) {
+      console.error('获取商品详情失败:', error)
+      Taro.showToast({
+        title: '加载失败',
+        icon: 'none'
+      })
+      setTimeout(() => {
+        Taro.navigateBack()
+      }, 1500)
+    }
+  }
+
+  const showNotFoundError = () => {
+    Taro.showToast({
+      title: '商品不存在',
+      icon: 'none'
+    })
+    setTimeout(() => {
+      Taro.navigateBack()
+    }, 1500)
+  }
 
   // 数量减少
   const handleDecrease = () => {
@@ -54,7 +99,7 @@ function ProductDetail() {
     }
   }
 
-  // 数量增加 
+  // 数量增加
   const handleIncrease = () => {
     if (productDetail && quantity < productDetail.stock) {
       setQuantity(quantity + 1)
@@ -70,10 +115,19 @@ function ProductDetail() {
   const handleBuyNow = () => {
     if (!productDetail) return
 
-    Taro.showToast({
-      title: `购买${quantity}件，总计￥${productDetail.price * quantity}`,
-      icon: 'none',
-      duration: 2000
+    // 构建订单数据
+    const orderData = {
+      productId: productDetail.id,
+      name: productDetail.name,
+      poster: productDetail.poster,
+      price: productDetail.price,
+      spec: productDetail.spec,
+      stock: productDetail.stock
+    }
+
+    // 跳转到订单确认页面
+    Taro.navigateTo({
+      url: `/pages/joy/components/ElderlyMall/OrderConfirm/index?product=${encodeURIComponent(JSON.stringify(orderData))}&quantity=${quantity}`
     })
   }
 
@@ -87,32 +141,37 @@ function ProductDetail() {
     )
   }
 
-  const categoryInfo = categoryConfig[productDetail.category as keyof typeof categoryConfig]
+  // 获取分类显示名称
+  const categoryInfo = getCategoryInfo(productDetail.category)
 
   return (
     <View className="product-detail-page">
       <PageTransitionOverlay />
       <ScrollView scrollY className="detail-scroll">
-       
-
         {/* 商品图片轮播 */}
         <View className="product-images">
-          <Image
-            src={productDetail.images[currentImageIndex] || productDetail.poster}
-            className="main-image"
-            mode="aspectFit"
-          />
-          {productDetail.images.length > 1 && (
-            <View className="image-indicators">
-              {productDetail.images.map((_, index) => (
-                <View
-                  key={index}
-                  className={`indicator ${currentImageIndex === index ? 'indicator--active' : ''}`}
-                  onClick={() => setCurrentImageIndex(index)}
+          <Swiper
+            className="product-swiper"
+            indicatorDots
+            indicatorColor="rgba(255, 255, 255, 0.5)"
+            indicatorActiveColor="#fff"
+            autoplay={productDetail.images.length > 1}
+            interval={3000}
+            circular
+            onChange={(e) => {
+              setCurrentImageIndex(e.detail.current)
+            }}
+          >
+            {productDetail.images.map((image, index) => (
+              <SwiperItem key={index}>
+                <Image
+                  src={image}
+                  className="main-image"
+                  mode="aspectFit"
                 />
-              ))}
-            </View>
-          )}
+              </SwiperItem>
+            ))}
+          </Swiper>
         </View>
 
         {/* 商品基本信息 */}
@@ -148,20 +207,44 @@ function ProductDetail() {
           </View>
         </View>
 
-        {/* 商品规格 */}
-        <View className="product-specs">
+        {/* 商品分类 */}
+        <View className="product-category-section">
           <View className="section-title">
-            <Text className="title-text">商品规格</Text>
+            <Text className="title-text">商品分类</Text>
           </View>
-          <View className="specs-list">
-            {Object.entries(productDetail.specifications).map(([key, value]) => (
-              <View key={key} className="spec-item">
-                <Text className="spec-label">{key}</Text>
-                <Text className="spec-value">{value}</Text>
-              </View>
-            ))}
+          <View className="category-tag">
+            <Text className="category-tag-text">{categoryInfo.name}</Text>
           </View>
         </View>
+
+        {/* 商品规格 */}
+        {(productDetail.spec || productDetail.origin || productDetail.shelfLife) && (
+          <View className="product-specs">
+            <View className="section-title">
+              <Text className="title-text">商品规格</Text>
+            </View>
+            <View className="specs-list">
+              {productDetail.spec && (
+                <View className="spec-item">
+                  <Text className="spec-label">规格</Text>
+                  <Text className="spec-value">{productDetail.spec}</Text>
+                </View>
+              )}
+              {productDetail.origin && (
+                <View className="spec-item">
+                  <Text className="spec-label">产地</Text>
+                  <Text className="spec-value">{productDetail.origin}</Text>
+                </View>
+              )}
+              {productDetail.shelfLife && (
+                <View className="spec-item">
+                  <Text className="spec-label">保质期</Text>
+                  <Text className="spec-value">{productDetail.shelfLife}个月</Text>
+                </View>
+              )}
+            </View>
+          </View>
+        )}
 
         {/* 商品详情 */}
         <View className="product-description">

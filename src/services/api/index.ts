@@ -82,6 +82,43 @@ export const getProductList = (params?: {
 }
 
 /**
+ * 通过 batch 接口获取商品列表
+ * @param params 查询参数
+ */
+export const getProductListByBatch = async (params?: {
+  category?: number  // 0:全部, 1:保健品, 2:食品, 3:日用品, 4:医疗器械
+  keyword?: string
+  page?: number
+  pageSize?: number
+  sort?: Record<string, 'asc' | 'desc'>
+}) => {
+  // 构建查询条件
+  const conditions: Record<string, any> = {
+    status: 1  // 只查询状态正常的商品
+  }
+
+  // 注意：分类筛选改由前端处理，这里不添加 category 条件
+  // 原因：数据库中的商品 category 值可能不完整，后端筛选会导致无结果
+
+  // 添加关键词搜索
+  if (params?.keyword) {
+    conditions.name = { $like: `%${params.keyword}%` }
+  }
+
+  // 默认排序：按创建时间降序
+  const sort = params?.sort || { createTime: 'desc' as const }
+
+  // 调用 batch 接口
+  const { query } = await import('@/utils/request')
+  return query<any>('product', {
+    conditions,
+    pageNum: params?.page || 1,
+    pageSize: params?.pageSize || 50,
+    sort
+  })
+}
+
+/**
  * 获取商品详情
  * @param id 商品 ID
  */

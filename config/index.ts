@@ -38,6 +38,8 @@ const config = {
     },
     webpackChain(chain) {
       chain.resolve.alias.set('@', path.resolve(__dirname, '..', 'src'))
+      // 修复 Taro bug: @tarojs/shared 被错误设置为 null
+      chain.resolve.alias.set('@tarojs/shared', path.resolve(__dirname, '..', 'node_modules/.pnpm/@tarojs+shared@4.1.11/node_modules/@tarojs/shared'))
     },
     postcss: {
       pxtransform: {

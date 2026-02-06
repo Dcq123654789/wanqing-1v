@@ -1,0 +1,281 @@
+.order-detail-page {
+  width: 100%;
+  min-height: 100vh;
+  background: #f6ffed;
+  padding-bottom: 120rpx;
+}
+
+.scroll-container {
+  height: 100vh;
+}
+
+/* 订单状态 */
+.status-section {
+  background: linear-gradient(135deg, #67c23a 0%, #85ce61 100%);
+  padding: 60rpx 30rpx;
+  text-align: center;
+  color: #fff;
+}
+
+.status-icon {
+  font-size: 80rpx;
+  margin-bottom: 20rpx;
+}
+
+.status-text {
+  display: block;
+  font-size: 36rpx;
+  font-weight: 600;
+  margin-bottom: 16rpx;
+}
+
+.status-tip {
+  display: block;
+  font-size: 26rpx;
+  opacity: 0.9;
+}
+
+/* 收货地址 */
+.address-section {
+  background: #fff;
+  margin: 20rpx;
+  padding: 30rpx;
+  border-radius: 16rpx;
+}
+
+.address-header {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-bottom: 20rpx;
+}
+
+.address-icon {
+  font-size: 32rpx;
+}
+
+.address-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.address-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.receiver-info {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.receiver-address {
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.5;
+}
+
+/* 商品信息 */
+.product-section {
+  background: #fff;
+  margin: 0 20rpx 20rpx;
+  padding: 30rpx;
+  border-radius: 16rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+
+.product-card {
+  display: flex;
+  gap: 20rpx;
+}
+
+.product-image {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 12rpx;
+  background: #f0f0f0;
+}
+
+.product-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.product-name {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.product-spec {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.product-quantity {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.product-price {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #ff4d4f;
+}
+
+/* 订单信息 */
+.order-info-section {
+  background: #fff;
+  margin: 0 20rpx 20rpx;
+  padding: 30rpx;
+  border-radius: 16rpx;
+}
+
+.info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.info-label {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.info-value-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.info-value {
+  font-size: 28rpx;
+  color: #333;
+  text-align: right;
+}
+
+.copy-button {
+  font-size: 24rpx;
+  color: #67c23a;
+  padding: 4rpx 12rpx;
+  border: 1rpx solid #67c23a;
+  border-radius: 8rpx;
+}
+
+/* 价格明细 */
+.price-section {
+  background: #fff;
+  margin: 0 20rpx 20rpx;
+  padding: 30rpx;
+  border-radius: 16rpx;
+}
+
+.price-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.price-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.price-item.total {
+  border-top: 1rpx solid #f0f0f0;
+  padding-top: 16rpx;
+  margin-top: 8rpx;
+}
+
+.price-label {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.price-value {
+  font-size: 28rpx;
+  color: #333;
+}
+
+.total-amount {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #ff4d4f;
+}
+
+/* 底部操作栏 */
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20rpx 30rpx;
+  background: #fff;
+  box-shadow: 0 -2rpx 8rpx rgba(0, 0, 0, 0.1);
+  z-index: 100;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 16rpx;
+}
+
+.action-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20rpx;
+  border-radius: 50rpx;
+  transition: all 0.3s ease;
+}
+
+.action-btn:active {
+  opacity: 0.8;
+  transform: scale(0.98);
+}
+
+.action-btn.secondary {
+  background: #f5f5f5;
+  border: 2rpx solid #ddd;
+}
+
+.action-btn.primary {
+  background: linear-gradient(135deg, #67c23a 0%, #85ce61 100%);
+}
+
+.action-text {
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.action-btn.secondary .action-text {
+  color: #666;
+}
+
+.action-btn.primary .action-text {
+  color: #fff;
+}
+
+.bottom-spacer {
+  height: 20rpx;
+}
