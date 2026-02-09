@@ -11,7 +11,7 @@ function Payment() {
   const [expireTime, setExpireTime] = useState<number>(0)
   const [selectedMethod, setSelectedMethod] = useState<string>('wechat')
   const [loading, setLoading] = useState(false)
-  const [countdown, setCountdown] = useState(15 * 60) // 15分钟倒计时
+  const [countdown, setCountdown] = useState(1 * 60) // 1分钟倒计时
 
   useEffect(() => {
     const instance = Taro.getCurrentInstance()
@@ -97,10 +97,10 @@ function Payment() {
           duration: 2000
         })
 
-        // 跳转到订单详情
+        // 返回首页
         setTimeout(() => {
-          Taro.redirectTo({
-            url: `/pages/joy/components/ElderlyMall/OrderDetail/index?orderId=${orderId}`
+          Taro.reLaunch({
+            url: '/pages/joy/components/ElderlyMall/index'
           })
         }, 2000)
       } else {
@@ -121,7 +121,7 @@ function Payment() {
   const handleCancelPay = () => {
     Taro.showModal({
       title: '提示',
-      content: '确定要取消支付吗？订单将在15分钟后自动取消。',
+      content: '确定要取消支付吗？订单将在1分钟后自动取消。',
       success: (res) => {
         if (res.confirm) {
           Taro.navigateBack()
@@ -201,7 +201,7 @@ function Payment() {
       {/* 支付说明 */}
       <View className="payment-tips">
         <Text className="tips-title">支付说明</Text>
-        <Text className="tips-item">• 请在15分钟内完成支付，否则订单将自动取消</Text>
+        <Text className="tips-item">• 请在1分钟内完成支付，否则订单将自动取消</Text>
         <Text className="tips-item">• 下单时已锁定库存，超时未支付将自动释放</Text>
         <Text className="tips-item">• 支付过程中请勿关闭页面</Text>
         <Text className="tips-item">• 如遇支付问题，请联系客服</Text>

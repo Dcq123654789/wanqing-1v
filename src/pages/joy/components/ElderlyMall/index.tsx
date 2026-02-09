@@ -1,5 +1,5 @@
 import { View, Text, Image, ScrollView, Input } from '@tarojs/components'
-import Taro from '@tarojs/taro'
+import Taro, { useDidShow } from '@tarojs/taro'
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import type { ProductItem, SortType } from './types'
 import { CATEGORY_MAP, getCategoryValue, ProductCategory } from './types'
@@ -23,6 +23,11 @@ function ElderlyMall() {
   useEffect(() => {
     fetchAllProducts()
   }, [])
+
+  // 页面显示时刷新商品列表（从订单页返回时获取最新库存）
+  useDidShow(() => {
+    fetchAllProducts()
+  })
 
   // 从后端获取所有商品
   const fetchAllProducts = async () => {

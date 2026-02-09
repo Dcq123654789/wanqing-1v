@@ -13,14 +13,24 @@ function ProductDetail() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [quantity, setQuantity] = useState(1)
 
-  // 页面显示时隐藏遮罩
+  // 页面显示时隐藏遮罩并刷新数据
   useDidShow(() => {
     setTimeout(() => {
       Taro.eventCenter.trigger('hidePageTransition')
     }, 100)
+
+    // 每次页面显示时重新获取商品详情，确保库存数据是最新的
+    const instance = Taro.getCurrentInstance()
+    const params = instance.router?.params
+    const productId = params?.id
+
+    if (productId) {
+      fetchProductDetail(productId)
+    }
   })
 
   useEffect(() => {
+    // 初次加载时也获取数据
     const instance = Taro.getCurrentInstance()
     const params = instance.router?.params
     const productId = params?.id

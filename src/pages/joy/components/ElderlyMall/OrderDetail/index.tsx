@@ -1,6 +1,7 @@
 import { View, Text, Image, ScrollView } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { useState, useEffect } from 'react'
+import { get, post } from '@/utils/request'
 import './index.scss'
 import PageTransitionOverlay from '@/components/PageTransitionOverlay'
 
@@ -48,35 +49,22 @@ function OrderDetail() {
     setLoading(true)
 
     try {
-      const response = await Taro.request({
-        url: `http://localhost:8080/api/mall/order/detail/${id}`,
-        method: 'GET',
-        header: {
-          'Content-Type': 'application/json'
-        }
-      })
+      const response = await get<OrderDetailData>(`/api/mall/order/detail/${id}`)
 
-      if (response.statusCode === 200 && response.data.success) {
-        const data = response.data.data as OrderDetailData
+      const data = response.data as OrderDetailData
 
-        // 格式化时间
-        if (data.createTime) {
-          data.createTime = formatTime(data.createTime)
-        }
-        if (data.payTime) {
-          data.payTime = formatTime(data.payTime)
-        }
-
-        setOrderDetail(data)
-      } else {
-        throw new Error(response.data.message || '获取订单详情失败')
+      // 格式化时间
+      if (data.createTime) {
+        data.createTime = formatTime(data.createTime)
       }
+      if (data.payTime) {
+        data.payTime = formatTime(data.payTime)
+      }
+
+      setOrderDetail(data)
     } catch (error: any) {
       console.error('获取订单详情失败:', error)
-      Taro.showToast({
-        title: error.message || '获取订单详情失败',
-        icon: 'none'
-      })
+      // 错误已经在 request 工具中统一处理
     } finally {
       setLoading(false)
     }
@@ -143,15 +131,8 @@ function OrderDetail() {
       success: async (res) => {
         if (res.confirm) {
           try {
-            await Taro.request({
-              url: `http://localhost:8080/api/mall/order/cancel/${orderId}`,
-              method: 'POST',
-              header: {
-                'Content-Type': 'application/json'
-              },
-              data: {
-                reason: '用户主动取消'
-              }
+            await post(`/api/mall/order/cancel/${orderId}`, {
+              reason: '用户主动取消'
             })
 
             Taro.showToast({
@@ -164,10 +145,7 @@ function OrderDetail() {
               fetchOrderDetail(orderId)
             }
           } catch (error: any) {
-            Taro.showToast({
-              title: '取消失败',
-              icon: 'none'
-            })
+            // 错误已经在 request 工具中统一处理
           }
         }
       }

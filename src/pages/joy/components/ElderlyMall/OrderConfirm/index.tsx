@@ -217,14 +217,11 @@ function OrderConfirm() {
           duration: 1500
         })
 
-        // 直接跳转到订单详情页（暂时不接入支付）
+        // 返回首页
         setTimeout(() => {
-          const orderId = response.data?.orderId
-          if (orderId) {
-            Taro.redirectTo({
-              url: `/pages/joy/components/ElderlyMall/OrderDetail/index?orderId=${orderId}`
-            })
-          }
+          Taro.reLaunch({
+            url: '/pages/joy/components/ElderlyMall/index'
+          })
         }, 1500)
       } else {
         throw new Error(response.message || '订单创建失败')
